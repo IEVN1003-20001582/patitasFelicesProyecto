@@ -4,7 +4,7 @@ import random
 from datetime import datetime, timedelta
 
 def init_db():
-    print("🛠️  INICIANDO RE-ESTRUCTURACIÓN DE LA BASE DE DATOS (VERSIÓN EXTENDIDA)...")
+    print("🛠️  INICIANDO RE-ESTRUCTURACIÓN DE LA BASE DE DATOS (VERSIÓN DEFINITIVA)...")
     conn = get_db_connection()
 
     if conn is None:
@@ -15,19 +15,23 @@ def init_db():
         cursor = conn.cursor()
 
         # ==========================================
-        # 1. BORRAR TABLAS (Limpieza)
+        # 1. BORRAR TABLAS (Orden Inverso)
         # ==========================================
         print("🗑️  Borrando tablas antiguas...")
-        tablas = ["detalle_factura", "facturas", "historial_medico", "citas", 
-                  "productos", "mascotas", "veterinarios", "clientes", "usuarios"]
-        for tabla in tablas:
+        tablas_a_borrar = [
+            "notificaciones", "vacunas_aplicadas", "detalle_factura", "facturas", 
+            "historial_medico", "citas", "productos", "mascotas", 
+            "veterinarios", "clientes", "usuarios"
+        ]
+        for tabla in tablas_a_borrar:
             cursor.execute(f"DROP TABLE IF EXISTS {tabla}")
 
         # ==========================================
-        # 2. CREACIÓN DE TABLAS
+        # 2. CREACIÓN DE TABLAS (Estructura Nueva)
         # ==========================================
         print("🏗️  Creando tablas...")
         
+        # USUARIOS
         cursor.execute("""
             CREATE TABLE usuarios (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -38,6 +42,7 @@ def init_db():
             )
         """)
 
+        # CLIENTES
         cursor.execute("""
             CREATE TABLE clientes (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -49,6 +54,7 @@ def init_db():
             )
         """)
 
+        # VETERINARIOS
         cursor.execute("""
             CREATE TABLE veterinarios (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -60,6 +66,21 @@ def init_db():
             )
         """)
 
+        # NOTIFICACIONES (NUEVA)
+        cursor.execute("""
+            CREATE TABLE notificaciones (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                usuario_id INT NOT NULL,
+                titulo VARCHAR(100),
+                mensaje TEXT NOT NULL,
+                leida BOOLEAN DEFAULT FALSE,
+                tipo ENUM('Cita', 'Stock', 'Vacuna') NOT NULL,
+                fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+            )
+        """)
+
+        # MASCOTAS
         cursor.execute("""
             CREATE TABLE mascotas (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -76,6 +97,7 @@ def init_db():
             )
         """)
 
+        # PRODUCTOS
         cursor.execute("""
             CREATE TABLE productos (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -88,6 +110,7 @@ def init_db():
             )
         """)
 
+        # CITAS
         cursor.execute("""
             CREATE TABLE citas (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -102,6 +125,7 @@ def init_db():
             )
         """)
 
+        # HISTORIAL MÉDICO
         cursor.execute("""
             CREATE TABLE historial_medico (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -117,6 +141,23 @@ def init_db():
             )
         """)
 
+        # VACUNAS APLICADAS (NUEVA)
+        cursor.execute("""
+            CREATE TABLE vacunas_aplicadas (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                mascota_id INT NOT NULL,
+                producto_id INT,
+                nombre_vacuna VARCHAR(100) NOT NULL,
+                fecha_aplicacion DATE NOT NULL,
+                fecha_proxima_dosis DATE,
+                veterinario_id INT,
+                FOREIGN KEY (mascota_id) REFERENCES mascotas(id) ON DELETE CASCADE,
+                FOREIGN KEY (producto_id) REFERENCES productos(id),
+                FOREIGN KEY (veterinario_id) REFERENCES veterinarios(id)
+            )
+        """)
+
+        # FACTURAS
         cursor.execute("""
             CREATE TABLE facturas (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -128,160 +169,164 @@ def init_db():
             )
         """)
 
+        # DETALLE FACTURA (NUEVA)
+        cursor.execute("""
+            CREATE TABLE detalle_factura (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                factura_id INT NOT NULL,
+                producto_id INT,
+                concepto VARCHAR(150) NOT NULL,
+                cantidad INT NOT NULL DEFAULT 1,
+                precio_unitario DECIMAL(10,2) NOT NULL,
+                subtotal DECIMAL(10,2) NOT NULL,
+                FOREIGN KEY (factura_id) REFERENCES facturas(id) ON DELETE CASCADE,
+                FOREIGN KEY (producto_id) REFERENCES productos(id)
+            )
+        """)
+
         # ==========================================
-        # 3. INSERTAR DATOS MASIVOS (SEEDERS)
+        # 3. INSERTAR DATOS (SEEDERS)
         # ==========================================
         print("🌱  Sembrando datos de prueba...")
 
-        # --- A. USUARIOS (1 Admin, 5 Vets, 9 Clientes) ---
+        # --- A. USUARIOS ---
         users_data = [
             ('admin@patitas.com', 'admin123', 'admin'),
-            # 5 Veterinarios
             ('vet1@patitas.com', 'vet123', 'veterinario'),
             ('vet2@patitas.com', 'vet123', 'veterinario'),
             ('vet3@patitas.com', 'vet123', 'veterinario'),
-            ('vet4@patitas.com', 'vet123', 'veterinario'),
-            ('vet5@patitas.com', 'vet123', 'veterinario'),
-            # 9 Clientes
             ('juan@gmail.com', 'client123', 'cliente'),
             ('maria@hotmail.com', 'client123', 'cliente'),
             ('pedro@yahoo.com', 'client123', 'cliente'),
-            ('luisa@gmail.com', 'client123', 'cliente'),
-            ('carlos@outlook.com', 'client123', 'cliente'),
-            ('ana@gmail.com', 'client123', 'cliente'),
-            ('sofia@gmail.com', 'client123', 'cliente'),
-            ('miguel@gmail.com', 'client123', 'cliente'),
-            ('lucia@gmail.com', 'client123', 'cliente')
+            ('ana@gmail.com', 'client123', 'cliente')
         ]
         cursor.executemany("INSERT INTO usuarios (email, password, rol) VALUES (%s, %s, %s)", users_data)
         conn.commit()
 
-        # Obtener IDs para relacionar
-        def get_id(email):
+        # Helper para obtener IDs
+        def get_user_id(email):
             cursor.execute("SELECT id FROM usuarios WHERE email = %s", (email,))
-            return cursor.fetchone()[0]
+            res = cursor.fetchone()
+            return res[0] if res else None
 
-        # --- B. PERFILES VETERINARIOS (5) ---
-        vets_profiles = [
-            (get_id('vet1@patitas.com'), 'Dr. Israel González', '1234567', 'Cardiología'),
-            (get_id('vet2@patitas.com'), 'Dra. Mariana López', '7654321', 'Dermatología'),
-            (get_id('vet3@patitas.com'), 'Dr. Roberto Ruiz', '1122334', 'Cirugía General'),
-            (get_id('vet4@patitas.com'), 'Dra. Elena Torres', '4455667', 'Medicina Interna'),
-            (get_id('vet5@patitas.com'), 'Dr. Alejandro Diaz', '9988776', 'Odontología')
-        ]
-        cursor.executemany("INSERT INTO veterinarios (usuario_id, nombre_completo, cedula, especialidad) VALUES (%s, %s, %s, %s)", vets_profiles)
+        id_admin = get_user_id('admin@patitas.com')
+        id_vet1 = get_user_id('vet1@patitas.com')
+        id_vet2 = get_user_id('vet2@patitas.com')
+        id_vet3 = get_user_id('vet3@patitas.com')
         
-        # --- C. PERFILES CLIENTES (9) ---
-        clients_profiles = [
-            (get_id('juan@gmail.com'), 'Juan Pérez', '555-0101', 'Col. Centro #123'),
-            (get_id('maria@hotmail.com'), 'Maria Gómez', '555-0102', 'Av. Vallarta #456'),
-            (get_id('pedro@yahoo.com'), 'Pedro Almodovar', '555-0103', 'Calle 5 de Mayo #789'),
-            (get_id('luisa@gmail.com'), 'Luisa Lane', '555-0104', 'Metropolis #10'),
-            (get_id('carlos@outlook.com'), 'Carlos Santana', '555-0105', 'Calle Musica #88'),
-            (get_id('ana@gmail.com'), 'Ana Frank', '555-0106', 'Calle Diario #11'),
-            (get_id('sofia@gmail.com'), 'Sofia Vergara', '555-0107', 'Hollywood Blvd'),
-            (get_id('miguel@gmail.com'), 'Miguel Hidalgo', '555-0108', 'Dolores Hidalgo #1810'),
-            (get_id('lucia@gmail.com'), 'Lucia Méndez', '555-0109', 'Televisa San Angel')
+        # --- B. NOTIFICACIONES (Alertas de Prueba) ---
+        notif_data = [
+            (id_admin, 'Stock Bajo', 'La Vacuna Rabia está por agotarse (Quedan 3)', False, 'Stock'),
+            (id_vet1, 'Nueva Cita', 'Se ha agendado una cirugía para mañana', True, 'Cita'),
+            (get_user_id('juan@gmail.com'), 'Recordatorio Vacuna', 'A Max le toca su refuerzo pronto', False, 'Vacuna')
         ]
-        cursor.executemany("INSERT INTO clientes (usuario_id, nombre_completo, telefono, direccion) VALUES (%s, %s, %s, %s)", clients_profiles)
+        cursor.executemany("INSERT INTO notificaciones (usuario_id, titulo, mensaje, leida, tipo) VALUES (%s, %s, %s, %s, %s)", notif_data)
+
+        # --- C. PERFILES ---
+        cursor.execute("INSERT INTO veterinarios (usuario_id, nombre_completo, cedula, especialidad) VALUES (%s, 'Dr. Israel González', '1234567', 'Cardiología')", (id_vet1,))
+        cursor.execute("INSERT INTO veterinarios (usuario_id, nombre_completo, cedula, especialidad) VALUES (%s, 'Dra. Mariana López', '7654321', 'Dermatología')", (id_vet2,))
+        cursor.execute("INSERT INTO veterinarios (usuario_id, nombre_completo, cedula, especialidad) VALUES (%s, 'Dr. Roberto Ruiz', '1122334', 'Cirugía General')", (id_vet3,))
+        
+        clients_data = [
+            (get_user_id('juan@gmail.com'), 'Juan Pérez', '555-0101', 'Col. Centro #123'),
+            (get_user_id('maria@hotmail.com'), 'Maria Gómez', '555-0102', 'Av. Vallarta #456'),
+            (get_user_id('pedro@yahoo.com'), 'Pedro Almodovar', '555-0103', 'Calle 5 de Mayo #789'),
+            (get_user_id('ana@gmail.com'), 'Ana Frank', '555-0106', 'Calle Diario #11')
+        ]
+        cursor.executemany("INSERT INTO clientes (usuario_id, nombre_completo, telefono, direccion) VALUES (%s, %s, %s, %s)", clients_data)
         conn.commit()
 
-        # Recuperar IDs de Perfiles para Mascotas y Citas
+        # Obtener IDs de Perfiles
         cursor.execute("SELECT id FROM clientes")
-        client_ids = [row[0] for row in cursor.fetchall()] # Lista de IDs de clientes [1, 2, 3...]
-        
+        client_ids = [row[0] for row in cursor.fetchall()]
         cursor.execute("SELECT id FROM veterinarios")
-        vet_ids = [row[0] for row in cursor.fetchall()]   # Lista de IDs de veterinarios
+        vet_ids = [row[0] for row in cursor.fetchall()]
 
-        # --- D. PRODUCTOS (10) ---
+        # --- D. PRODUCTOS ---
         productos_data = [
-            ('VAC-001', 'Vacuna Rabia', 'Vacunas', 350.00, 50, 10),
+            ('VAC-001', 'Vacuna Rabia', 'Vacunas', 350.00, 10, 10),
             ('VAC-002', 'Vacuna Parvovirus', 'Vacunas', 400.00, 45, 10),
-            ('ALI-001', 'Croquetas Premium Perro 20kg', 'Alimento', 1200.50, 20, 5),
-            ('ALI-002', 'Croquetas Gato Salmón 5kg', 'Alimento', 450.00, 15, 5),
-            ('JUG-001', 'Pelota de Hule Indestructible', 'Juguetes', 150.00, 100, 10),
-            ('MED-001', 'Antibiótico General 500mg', 'Medicamento', 200.00, 8, 20), # Stock BAJO (8 < 20)
-            ('ACC-001', 'Collar Antipulgas', 'Accesorios', 250.00, 30, 5),
-            ('HIG-001', 'Shampoo Hipoalergénico', 'Higiene', 180.00, 25, 5),
-            ('SNA-001', 'Premios de Tocino', 'Snacks', 80.00, 200, 20),
-            ('MED-002', 'Desparasitante Total', 'Medicamento', 120.00, 60, 10)
+            ('ALI-001', 'Croquetas Premium 20kg', 'Alimento', 1200.50, 20, 5),
+            ('MED-001', 'Antibiótico General', 'Medicamento', 200.00, 4, 10), # Stock Bajo
+            ('SER-001', 'Consulta General', 'Servicios', 300.00, 999, 0),
+            ('SER-002', 'Limpieza Dental', 'Servicios', 800.00, 999, 0)
         ]
         cursor.executemany("INSERT INTO productos (sku, nombre, categoria, precio_venta, stock_actual, stock_minimo) VALUES (%s, %s, %s, %s, %s, %s)", productos_data)
+        conn.commit()
+        
+        # Mapa de productos para vacunas
+        cursor.execute("SELECT id, nombre FROM productos")
+        prod_map = {row[1]: row[0] for row in cursor.fetchall()}
 
-        # --- E. MASCOTAS (12) ---
-        # Asignamos mascotas a clientes al azar o secuencialmente
+        # --- E. MASCOTAS ---
         mascotas_data = [
-            (client_ids[0], 'Firulais', 'Perro', 'Golden Retriever', '2020-05-10', 28.5, 'M', 'Pollo'),
+            (client_ids[0], 'Firulais', 'Perro', 'Golden', '2020-05-10', 28.5, 'M', 'Pollo'),
             (client_ids[0], 'Pelusa', 'Gato', 'Persa', '2021-02-15', 4.2, 'H', 'Ninguna'),
             (client_ids[1], 'Rex', 'Perro', 'Pastor Alemán', '2019-08-20', 32.0, 'M', 'Ninguna'),
             (client_ids[2], 'Nemo', 'Pez', 'Payaso', '2023-01-01', 0.1, 'M', 'Ninguna'),
-            (client_ids[3], 'Simba', 'Gato', 'Mestizo', '2022-11-30', 5.0, 'M', 'Polvo'),
-            (client_ids[4], 'Luna', 'Perro', 'Husky', '2021-06-15', 22.0, 'H', 'Ninguna'),
-            (client_ids[5], 'Thor', 'Perro', 'Bulldog', '2020-03-10', 25.0, 'M', 'Pasto'),
-            (client_ids[6], 'Lola', 'Conejo', 'Cabeza de León', '2023-04-05', 1.5, 'H', 'Ninguna'),
-            (client_ids[7], 'Rocky', 'Perro', 'Boxer', '2018-12-25', 30.0, 'M', 'Ninguna'),
-            (client_ids[8], 'Coco', 'Gato', 'Siamés', '2020-09-09', 4.5, 'M', 'Lana'),
-            (client_ids[0], 'Hércules', 'Hámster', 'Sirio', '2023-10-01', 0.2, 'M', 'Ninguna'),
-            (client_ids[1], 'Bella', 'Perro', 'Chihuahua', '2022-01-20', 2.5, 'H', 'Ninguna')
+            (client_ids[3], 'Luna', 'Perro', 'Husky', '2021-06-15', 22.0, 'H', 'Ninguna')
         ]
         cursor.executemany("INSERT INTO mascotas (cliente_id, nombre, especie, raza, fecha_nacimiento, peso, sexo, alergias) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", mascotas_data)
         conn.commit()
-
-        # Recuperar IDs de Mascotas
+        
         cursor.execute("SELECT id FROM mascotas")
         pet_ids = [row[0] for row in cursor.fetchall()]
 
-        # --- F. CITAS (10) ---
+        # --- F. CITAS ---
         citas_data = [
             (pet_ids[0], vet_ids[0], datetime.now() + timedelta(days=1), 'Consulta', 'Revisión anual', 'Confirmada'),
-            (pet_ids[1], vet_ids[1], datetime.now() + timedelta(days=2), 'Vacuna', 'Refuerzo Rabia', 'Pendiente'),
+            (pet_ids[1], vet_ids[1], datetime.now() - timedelta(days=2), 'Vacuna', 'Refuerzo', 'Completada'),
             (pet_ids[2], vet_ids[2], datetime.now() - timedelta(days=5), 'Cirugía', 'Esterilización', 'Completada'),
-            (pet_ids[5], vet_ids[3], datetime.now() - timedelta(days=2), 'Consulta', 'Vómitos recurrentes', 'Completada'),
-            (pet_ids[6], vet_ids[4], datetime.now() + timedelta(days=5), 'Limpieza Dental', 'Sarro excesivo', 'Confirmada'),
-            (pet_ids[7], vet_ids[0], datetime.now() - timedelta(days=10), 'Consulta', 'Revisión general', 'Cancelada'),
-            (pet_ids[8], vet_ids[1], datetime.now() + timedelta(days=3), 'Vacuna', 'Quíntuple', 'Pendiente'),
-            (pet_ids[9], vet_ids[2], datetime.now() - timedelta(days=20), 'Urgencia', 'Atropellamiento leve', 'Completada'),
-            (pet_ids[0], vet_ids[3], datetime.now() + timedelta(days=7), 'Baño', 'Baño medicado', 'Pendiente'),
-            (pet_ids[11], vet_ids[0], datetime.now() - timedelta(days=1), 'Consulta', 'Tos perrera', 'Completada')
+            (pet_ids[3], vet_ids[0], datetime.now() + timedelta(days=3), 'Consulta', 'Manchas blancas', 'Pendiente')
         ]
         cursor.executemany("INSERT INTO citas (mascota_id, veterinario_id, fecha_hora, tipo, motivo, estado) VALUES (%s, %s, %s, %s, %s, %s)", citas_data)
         conn.commit()
 
-        # Recuperar citas completadas para historial
-        cursor.execute("SELECT id, mascota_id, veterinario_id FROM citas WHERE estado = 'Completada'")
-        citas_completadas = cursor.fetchall()
+        # --- G. HISTORIAL y VACUNAS APLICADAS ---
+        # Historial de la cita completada de Pelusa (Vacuna)
+        cursor.execute("SELECT id FROM citas WHERE estado='Completada' AND tipo='Vacuna' LIMIT 1")
+        cita_vac = cursor.fetchone()
+        if cita_vac:
+            cursor.execute("""
+                INSERT INTO historial_medico (cita_id, mascota_id, veterinario_id, diagnostico, tratamiento)
+                VALUES (%s, %s, %s, 'Paciente sano', 'Se aplicó vacuna anual')
+            """, (cita_vac[0], pet_ids[1], vet_ids[1]))
+            
+            # Registrar en tabla vacunas_aplicadas
+            cursor.execute("""
+                INSERT INTO vacunas_aplicadas (mascota_id, producto_id, nombre_vacuna, fecha_aplicacion, fecha_proxima_dosis, veterinario_id)
+                VALUES (%s, %s, 'Vacuna Rabia', NOW(), DATE_ADD(NOW(), INTERVAL 1 YEAR), %s)
+            """, (pet_ids[1], prod_map.get('Vacuna Rabia'), vet_ids[1]))
 
-        # --- G. HISTORIAL MÉDICO (Basado en citas completadas) ---
-        historial_data = [
-            (citas_completadas[0][0], citas_completadas[0][1], citas_completadas[0][2], 'Esterilización exitosa', 'Reposo 5 días, Analgésico cada 12h'),
-            (citas_completadas[1][0], citas_completadas[1][1], citas_completadas[1][2], 'Infección estomacal', 'Dieta blanda, Suero oral'),
-            (citas_completadas[2][0], citas_completadas[2][1], citas_completadas[2][2], 'Contusiones menores', 'Antiinflamatorio inyectado'),
-            (citas_completadas[3][0], citas_completadas[3][1], citas_completadas[3][2], 'Tos de las perreras', 'Jarabe expectorante, Aislamiento')
+        # --- H. FACTURAS y DETALLE (Complejo) ---
+        # Crear una factura pagada para Juan Pérez
+        cursor.execute("""
+            INSERT INTO facturas (cliente_id, fecha, total, estado) 
+            VALUES (%s, NOW(), 0, 'Pagada')
+        """, (client_ids[0],))
+        factura_id = cursor.lastrowid
+
+        # Agregar detalles a la factura (Consulta + Vacuna)
+        items = [
+            (factura_id, prod_map.get('Consulta General'), 'Consulta General', 1, 300.00),
+            (factura_id, prod_map.get('Vacuna Rabia'), 'Vacuna Rabia (Aplicación)', 1, 350.00)
         ]
-        # Agregamos uno extra sin cita (urgencia directa)
-        historial_data.append((None, pet_ids[0], vet_ids[0], 'Reacción alérgica leve', 'Antihistamínico dosis única'))
+        total_factura = 0
+        for item in items:
+            subtotal = item[3] * item[4]
+            total_factura += subtotal
+            cursor.execute("""
+                INSERT INTO detalle_factura (factura_id, producto_id, concepto, cantidad, precio_unitario, subtotal)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (item[0], item[1], item[2], item[3], item[4], subtotal))
         
-        cursor.executemany("INSERT INTO historial_medico (cita_id, mascota_id, veterinario_id, diagnostico, tratamiento) VALUES (%s, %s, %s, %s, %s)", historial_data)
+        # Actualizar total de factura
+        cursor.execute("UPDATE facturas SET total = %s WHERE id = %s", (total_factura, factura_id))
 
-        # --- H. FACTURAS (5) ---
-        facturas_data = [
-            (client_ids[0], datetime.now(), 1500.00, 'Pagada'),
-            (client_ids[1], datetime.now(), 350.00, 'Pendiente'),
-            (client_ids[2], datetime.now(), 4500.00, 'Pagada'),
-            (client_ids[3], datetime.now(), 800.00, 'Pendiente'),
-            (client_ids[4], datetime.now(), 1200.00, 'Pagada')
-        ]
-        cursor.executemany("INSERT INTO facturas (cliente_id, fecha, total, estado) VALUES (%s, %s, %s, %s)", facturas_data)
         conn.commit()
-
-        print("\n✅ ¡BASE DE DATOS LLENA DE VIDA!")
-        print(f"   - {len(users_data)} Usuarios creados")
-        print(f"   - {len(vets_profiles)} Veterinarios")
-        print(f"   - {len(clients_profiles)} Clientes")
-        print(f"   - {len(mascotas_data)} Mascotas")
-        print(f"   - {len(productos_data)} Productos")
-        print(f"   - {len(citas_data)} Citas")
-        print("   Todo listo para probar tu API.")
+        print("\n✅ ¡BASE DE DATOS DEFINITIVA LISTA!")
+        print(f"   - Se crearon todas las tablas nuevas: Notificaciones, Vacunas, Detalle Factura")
+        print(f"   - Se insertaron datos de prueba relacionados.")
 
     except mysql.connector.Error as err:
         print(f"\n❌ Error SQL: {err}")
