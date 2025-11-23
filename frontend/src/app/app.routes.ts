@@ -54,8 +54,8 @@ export const routes: Routes = [
 
     // --- ÁREA VETERINARIO ---
     { path: 'veterinario/agenda', component: AgendaComponent, title: 'Mi Agenda' },
-    { path: 'veterinario/clientes', component: ClientesVetComponent, title: 'Mis Pacientes (Clientes)' },
-    { path: 'veterinario/mascotas', component: MisMascotasComponent, title: 'Historial Médico' },
+    { path: 'veterinario/clientes', component: ClientesVetComponent, title: 'Clientes' },
+    { path: 'veterinario/mascotas', component: MisMascotasComponent, title: 'Mascotas' },
     { path: 'veterinario/inventario', component: MiInventarioComponent, title: 'Consulta de Inventario' },
     { path: 'veterinario/perfil', component: MiPerfilComponent, title: 'Mi Perfil Profesional' },
 
