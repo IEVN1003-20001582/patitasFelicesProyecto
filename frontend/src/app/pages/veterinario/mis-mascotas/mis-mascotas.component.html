@@ -1,1 +1,115 @@
-<p>mis-mascotas works!</p>
+<!-- Barra Superior de la Página -->
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-primary-dark flex items-center">
+        <span class="mr-2">🐾</span> Gestión de Mascotas
+    </h1>
+    
+    <div class="relative w-full max-w-md mx-4">
+        <input type="text" placeholder="Buscar mascota..." class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
+        <svg class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+    </div>
+
+    <div class="flex space-x-4">
+         <button (click)="abrirModalAgregar()" class="bg-secondary-teal text-white font-semibold py-2 px-5 rounded-lg text-sm shadow-md hover:bg-opacity-80 transition duration-300 flex items-center">
+            <span>+ Agregar Mascota</span>
+        </button>
+    </div>
+</div>
+
+<!-- KPIs -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center">
+        <div class="ml-4">
+            <p class="text-gray-500">Total de Pacientes</p>
+            <p class="text-2xl font-bold text-primary-dark">{{ mascotas.length }}</p>
+        </div>
+    </div>
+    <!-- ... Puedes agregar más KPIs aquí ... -->
+</div>
+
+<!-- Rejilla de Mascotas -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div *ngFor="let mascota of mascotas" 
+         (click)="verDetalle(mascota)"
+         class="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 hover:shadow-xl transition duration-300 cursor-pointer"
+         [ngClass]="{'opacity-75 grayscale': mascota.estado === 'memoria'}">
+        
+        <div class="h-40 bg-gray-200 relative">
+            <img [src]="mascota.foto" alt="Foto" class="h-full w-full object-cover">
+            <div *ngIf="mascota.estado === 'memoria'" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 text-white font-bold">
+                EN MEMORIA
+            </div>
+        </div>
+        
+        <div class="p-5">
+            <h3 class="text-xl font-bold text-primary-dark truncate">{{ mascota.nombre }}</h3>
+            <p class="text-gray-600 text-sm">{{ mascota.especie }} - {{ mascota.raza }}</p>
+            
+            <div class="my-3 h-6">
+                <span *ngIf="mascota.alerta" 
+                      [ngClass]="mascota.alerta === 'ALERGIAS' ? 'bg-red-200 text-red-800' : 'bg-yellow-200 text-yellow-800'"
+                      class="px-3 py-1 text-xs font-bold rounded-full animate-pulse">
+                    {{ mascota.alerta }}
+                </span>
+            </div>
+            
+            <div class="space-y-2 text-sm text-gray-500">
+                <div class="flex items-center">
+                    <span class="mr-2">👤</span> {{ mascota.dueno }}
+                </div>
+                <div class="flex items-center">
+                    <span class="mr-2 text-secondary-teal">💉</span> {{ mascota.ultimoTratamiento }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 1: Agregar Mascota -->
+<div *ngIf="mostrarModalAgregar" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
+        <div class="flex justify-between items-center p-5 border-b">
+            <h3 class="text-xl font-bold text-primary-dark">Registrar Nueva Mascota</h3>
+            <button (click)="cerrarModalAgregar()" class="text-gray-400 hover:text-gray-600">X</button>
+        </div>
+        <div class="p-6">
+            <!-- Aquí pegas tu formulario de agregar mascota -->
+            <p class="text-gray-500 italic">Formulario de registro...</p>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 2: Detalle de Mascota -->
+<div *ngIf="mostrarModalDetalle" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl relative">
+        <button (click)="cerrarDetalle()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl font-bold">×</button>
+        
+        <div class="p-8" *ngIf="mascotaSeleccionada">
+            <div class="flex items-center space-x-4 mb-6">
+                <img [src]="mascotaSeleccionada.foto" class="h-24 w-24 rounded-full object-cover border-4 border-secondary-teal">
+                <div>
+                    <h2 class="text-3xl font-bold text-primary-dark">{{ mascotaSeleccionada.nombre }}</h2>
+                    <p class="text-gray-600 text-lg">{{ mascotaSeleccionada.especie }} - {{ mascotaSeleccionada.raza }}</p>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex justify-end space-x-4 mt-8 border-t pt-4">
+                <button (click)="cerrarDetalle()" class="bg-secondary-teal text-white px-6 py-2 rounded-lg">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 3: Confirmar Archivar -->
+<div *ngIf="mostrarModalArchivar" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-[60]">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+        <h3 class="text-xl font-bold text-red-600 mb-4">¿Archivar Mascota?</h3>
+        <p>Esta acción moverá a la mascota al archivo histórico.</p>
+        <div class="flex justify-end space-x-4 mt-6">
+            <button (click)="mostrarModalArchivar = false" class="text-gray-600 font-semibold">Cancelar</button>
+        </div>
+    </div>
+</div>

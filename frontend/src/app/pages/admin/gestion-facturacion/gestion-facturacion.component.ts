@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './gestion-facturacion.component.html',
-  styleUrl: './gestion-facturacion.component.css'
+  
 })
 export class GestionFacturacionComponent {
 

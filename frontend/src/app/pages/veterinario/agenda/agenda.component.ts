@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './agenda.component.html',
-  styleUrl: './agenda.component.css'
+ 
 })
 export class AgendaComponent {
 

@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './gestion-inventario.component.html',
-  styleUrl: './gestion-inventario.component.css'
+ 
 })
 export class GestionInventarioComponent {
 

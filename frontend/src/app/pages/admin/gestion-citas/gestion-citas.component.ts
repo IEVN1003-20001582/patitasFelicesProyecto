@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './gestion-citas.component.html',
-  styleUrl: './gestion-citas.component.css'
+  
 })
 export class GestionCitasComponent {
 

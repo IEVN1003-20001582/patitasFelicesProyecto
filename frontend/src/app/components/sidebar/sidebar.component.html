@@ -1,1 +1,100 @@
-<p>sidebar works!</p>
+<aside class="w-64 bg-primary-dark text-white flex-col hidden md:flex h-screen fixed left-0 top-0 overflow-y-auto z-30 shadow-2xl font-poppins">
+    
+    <!-- LOGO -->
+    <div class="flex items-center justify-center p-6 shadow-md bg-primary-dark z-10">
+        <!-- Nota: Asegúrate de tener tu logo.png en src/assets/images/ -->
+        <img 
+            src="assets/images/logo.png" 
+            onerror="this.src='https://placehold.co/100x100/48C9B0/ffffff?text=PF&font=poppins'; this.onerror=null;" 
+            alt="Logo" 
+            class="h-12 w-12 rounded-full border-2 border-secondary-teal"
+        >
+        <span class="ml-3 text-xl font-bold tracking-wide">Patitas Felices</span>
+    </div>
+
+    <!-- MENÚ DE NAVEGACIÓN -->
+    <nav class="flex-1 mt-6 px-4 space-y-2 pb-24">
+        
+        <!-- =======================
+             MENÚ DE ADMINISTRADOR
+        ======================== -->
+        <ng-container *ngIf="rolUsuario === 'admin'">
+            <a routerLink="/admin/dashboard" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">📊</span> Dashboard
+            </a>
+            <a routerLink="/admin/citas" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">📅</span> Gestión de Citas
+            </a>
+            <a routerLink="/admin/clientes" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">👥</span> Clientes
+            </a>
+            <a routerLink="/admin/mascotas" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">🐾</span> Mascotas
+            </a>
+            <a routerLink="/admin/veterinarios" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">🩺</span> Veterinarios
+            </a>
+            <a routerLink="/admin/inventario" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">📦</span> Inventario
+            </a>
+            <a routerLink="/admin/facturacion" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">🧾</span> Facturación
+            </a>
+            <a routerLink="/admin/reportes" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">📈</span> Reportes
+            </a>
+            <a routerLink="/admin/configuracion" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">⚙️</span> Configuración
+            </a>
+        </ng-container>
+
+        <!-- =======================
+             MENÚ DE VETERINARIO
+        ======================== -->
+        <ng-container *ngIf="rolUsuario === 'veterinario'">
+            <a routerLink="/veterinario/agenda" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">📅</span> Mi Agenda
+            </a>
+            <a routerLink="/veterinario/clientes" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">👥</span> Mis Pacientes
+            </a>
+            <a routerLink="/veterinario/mascotas" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">📋</span> Historial Médico
+            </a>
+            <a routerLink="/veterinario/inventario" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">🔍</span> Consultar Stock
+            </a>
+            <div class="border-t border-gray-600 my-2"></div>
+            <a routerLink="/veterinario/perfil" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">👤</span> Mi Perfil
+            </a>
+        </ng-container>
+
+        <!-- =======================
+             MENÚ DE CLIENTE (Opcional si usa el layout con sidebar)
+        ======================== -->
+        <ng-container *ngIf="rolUsuario === 'cliente'">
+            <a routerLink="/cliente/portal" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
+                <span class="mr-3">🏠</span> Mi Portal
+            </a>
+        </ng-container>
+
+    </nav>
+
+    <!-- FOOTER DEL SIDEBAR (Usuario y Logout) -->
+    <div class="p-4 border-t border-gray-700 bg-primary-dark absolute bottom-0 w-full">
+        <div class="flex items-center mb-4">
+            <img class="h-10 w-10 rounded-full object-cover border border-gray-500" src="https://placehold.co/40x40/ffffff/2C3E50?text=U" alt="User">
+            <div class="ml-3 overflow-hidden">
+                <p class="text-sm font-semibold text-white truncate">Usuario</p>
+                <p class="text-xs text-gray-400 capitalize">{{ rolUsuario }}</p>
+            </div>
+        </div>
+        <button (click)="logout()" class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded transition duration-300 flex items-center justify-center group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Cerrar Sesión
+        </button>
+    </div>
+</aside>

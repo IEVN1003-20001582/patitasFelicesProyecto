@@ -1,41 +1,68 @@
 import { Routes } from '@angular/router';
 
-// Públicas
-import { LoginComponent } from './pages/public/login/login.component';
+// --- 1. IMPORTACIÓN DE COMPONENTES PÚBLICOS ---
 import { BienvenidaComponent } from './pages/public/bienvenida/bienvenida.component';
+import { LoginComponent } from './pages/public/login/login.component';
 
-// Admin
+// --- 2. IMPORTACIÓN DE COMPONENTES ADMIN ---
 import { DashboardComponent } from './pages/admin/dashboard/dashboard.component';
 import { GestionCitasComponent } from './pages/admin/gestion-citas/gestion-citas.component';
-// ... importa los demás componentes de admin aquí
+import { GestionClientesComponent } from './pages/admin/gestion-clientes/gestion-clientes.component';
+import { GestionMascotasComponent } from './pages/admin/gestion-mascotas/gestion-mascotas.component';
+import { GestionVeterinariosComponent } from './pages/admin/gestion-veterinarios/gestion-veterinarios.component';
+import { GestionInventarioComponent } from './pages/admin/gestion-inventario/gestion-inventario.component';
+import { GestionFacturacionComponent } from './pages/admin/gestion-facturacion/gestion-facturacion.component';
+import { ReportesComponent } from './pages/admin/reportes/reportes.component';
+import { ConfiguracionComponent } from './pages/admin/configuracion/configuracion.component';
 
-// Veterinario
+// --- 3. IMPORTACIÓN DE COMPONENTES VETERINARIO ---
 import { AgendaComponent } from './pages/veterinario/agenda/agenda.component';
-// ... importa los demás de vet
+import { MiInventarioComponent } from './pages/veterinario/mi-inventario/mi-inventario.component';
+import { MiPerfilComponent } from './pages/veterinario/mi-perfil/mi-perfil.component';
+import { ClientesVetComponent } from './pages/veterinario/mis-clientes/mis-clientes.component';
+import { MisMascotasComponent } from './pages/veterinario/mis-mascotas/mis-mascotas.component';
 
-// Cliente
+
+
+
+
+// --- 4. IMPORTACIÓN DE COMPONENTES CLIENTE ---
 import { MiPortalComponent } from './pages/cliente/mi-portal/mi-portal.component';
 
-// Guards (Protección de rutas - lo veremos luego)
-// import { AuthGuard } from './guards/auth.guard';
 
+// --- DEFINICIÓN DE RUTAS ---
 export const routes: Routes = [
+    
+    // RUTA POR DEFECTO: Redirigir a bienvenida
     { path: '', redirectTo: 'bienvenida', pathMatch: 'full' },
-    { path: 'bienvenida', component: BienvenidaComponent },
-    { path: 'login', component: LoginComponent },
 
-    // Rutas de Admin
-    { path: 'admin/dashboard', component: DashboardComponent },
-    { path: 'admin/citas', component: GestionCitasComponent },
-    // ... añade las demás rutas de admin
+    // --- ÁREA PÚBLICA ---
+    { path: 'bienvenida', component: BienvenidaComponent, title: 'Bienvenido a Patitas Felices' },
+    { path: 'login', component: LoginComponent, title: 'Iniciar Sesión' },
 
-    // Rutas de Veterinario
-    { path: 'veterinario/agenda', component: AgendaComponent },
-    // ... añade las demás rutas de vet
+    // --- ÁREA ADMINISTRADOR ---
+    // Agrupamos bajo 'admin/' para mantener orden
+    { path: 'admin/dashboard', component: DashboardComponent, title: 'Dashboard Admin' },
+    { path: 'admin/citas', component: GestionCitasComponent, title: 'Gestión de Citas' },
+    { path: 'admin/clientes', component: GestionClientesComponent, title: 'Gestión de Clientes' },
+    { path: 'admin/mascotas', component: GestionMascotasComponent, title: 'Gestión de Mascotas' },
+    { path: 'admin/veterinarios', component: GestionVeterinariosComponent, title: 'Gestión de Veterinarios' },
+    { path: 'admin/inventario', component: GestionInventarioComponent, title: 'Inventario General' },
+    { path: 'admin/facturacion', component: GestionFacturacionComponent, title: 'Facturación' },
+    { path: 'admin/reportes', component: ReportesComponent, title: 'Reportes y Estadísticas' },
+    { path: 'admin/configuracion', component: ConfiguracionComponent, title: 'Configuración del Sistema' },
 
-    // Rutas de Cliente
-    { path: 'cliente/portal', component: MiPortalComponent },
+    // --- ÁREA VETERINARIO ---
+    { path: 'veterinario/agenda', component: AgendaComponent, title: 'Mi Agenda' },
+    { path: 'veterinario/clientes', component: ClientesVetComponent, title: 'Mis Pacientes (Clientes)' },
+    { path: 'veterinario/mascotas', component: MisMascotasComponent, title: 'Historial Médico' },
+    { path: 'veterinario/inventario', component: MiInventarioComponent, title: 'Consulta de Inventario' },
+    { path: 'veterinario/perfil', component: MiPerfilComponent, title: 'Mi Perfil Profesional' },
 
-    // Ruta comodín (404)
+    // --- ÁREA CLIENTE ---
+    { path: 'cliente/portal', component: MiPortalComponent, title: 'Mi Portal' },
+
+    // --- RUTA COMODÍN (404) ---
+    // Si el usuario escribe algo raro, lo mandamos a bienvenida o login
     { path: '**', redirectTo: 'bienvenida' }
 ];

@@ -1,1 +1,20 @@
-/* You can add global styles to this file, and also import other style files */
+/* 1. Importar la fuente Poppins de Google */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* 2. Directivas de Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 3. Estilos Base Globales */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #F4F6F6; /* Tu color light-bg por defecto */
+    margin: 0;
+}
+
+/* Estilos de scrollbar (Para que se vea bonito en toda la app) */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #48C9B0; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #3EaA94; }

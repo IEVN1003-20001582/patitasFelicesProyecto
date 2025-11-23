@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './mi-perfil.component.html',
-  styleUrl: './mi-perfil.component.css'
+  
 })
 export class MiPerfilComponent {
 

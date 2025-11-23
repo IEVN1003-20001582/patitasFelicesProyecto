@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './mi-inventario.component.html',
-  styleUrl: './mi-inventario.component.css'
+  
 })
 export class MiInventarioComponent {
 
