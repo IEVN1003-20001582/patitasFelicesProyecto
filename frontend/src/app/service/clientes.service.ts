@@ -11,13 +11,7 @@ export class ClientesService {
 
   constructor(private http: HttpClient) { }
 
-  getClientes(): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(this.apiUrl);
-  }
 
-  crearCliente(cliente: Cliente): Observable<any> {
-    return this.http.post(this.apiUrl, cliente);
-  }
 
-  // Actualizar (PUT) y Eliminar (DELETE) serían similares
+
 }

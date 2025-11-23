@@ -8,7 +8,5 @@ export class DashboardService {
 
   constructor(private http: HttpClient) {}
 
-  getKPIs(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/kpis`);
-  }
+
 }

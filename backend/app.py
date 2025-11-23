@@ -148,7 +148,7 @@ def get_vets():
     return jsonify(res)
 
 # ==========================================
-# 4. MASCOTAS
+# 4. MASCOTAS (ACTUALIZADO)
 # ==========================================
 @app.route('/api/mascotas', methods=['GET', 'POST'])
 def manage_mascotas():
@@ -156,9 +156,20 @@ def manage_mascotas():
     cursor = conn.cursor(dictionary=True)
     
     if request.method == 'GET':
-        # Si viene ?cliente_id=5 en la URL, filtramos (Para el Portal Cliente)
         cliente_id = request.args.get('cliente_id')
-        query = "SELECT m.*, c.nombre_completo as dueno FROM mascotas m JOIN clientes c ON m.cliente_id = c.id"
+        
+        # Consulta Maestra: Trae Mascota + Dueño + Último Tratamiento (Subconsulta)
+        query = """
+            SELECT 
+                m.*, 
+                c.nombre_completo as dueno,
+                (SELECT concepto FROM detalle_factura df 
+                 JOIN facturas f ON df.factura_id = f.id 
+                 WHERE df.producto_id IS NOT NULL 
+                 ORDER BY f.fecha DESC LIMIT 1) as ultimo_tratamiento
+            FROM mascotas m
+            JOIN clientes c ON m.cliente_id = c.id
+        """
         
         if cliente_id:
             query += f" WHERE m.cliente_id = {cliente_id}"
@@ -170,10 +181,13 @@ def manage_mascotas():
 
     if request.method == 'POST':
         data = request.get_json()
-        query = """INSERT INTO mascotas (cliente_id, nombre, especie, raza, fecha_nacimiento, peso, sexo, alergias)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"""
+        # Validar si existe 'estado', si no, poner 'Activo' por defecto
+        estado = data.get('estado', 'Activo') 
+        
+        query = """INSERT INTO mascotas (cliente_id, nombre, especie, raza, fecha_nacimiento, peso, sexo, alergias, estado)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"""
         vals = (data['cliente_id'], data['nombre'], data['especie'], data.get('raza'), 
-                data.get('fecha_nacimiento'), data.get('peso'), data.get('sexo'), data.get('alergias'))
+                data.get('fecha_nacimiento'), data.get('peso'), data.get('sexo'), data.get('alergias'), estado)
         cursor.execute(query, vals)
         conn.commit()
         conn.close()
@@ -296,7 +310,46 @@ def manage_facturas():
             conn.close()
 
 # ==========================================
-# 8. HISTORIAL Y VACUNAS (VETERINARIO)
+# 8. HISTORIAL MÉDICO (ACTUALIZADO CON MEDICAMENTOS)
+# ==========================================
+@app.route('/api/historial', methods=['GET', 'POST'])
+def manage_historial():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    if request.method == 'GET':
+        mascota_id = request.args.get('mascota_id')
+        query = """
+            SELECT h.*, v.nombre_completo as veterinario 
+            FROM historial_medico h
+            JOIN veterinarios v ON h.veterinario_id = v.id
+        """
+        if mascota_id: query += f" WHERE h.mascota_id = {mascota_id}"
+        query += " ORDER BY h.fecha DESC"
+        
+        cursor.execute(query)
+        return jsonify(cursor.fetchall())
+
+    if request.method == 'POST':
+        data = request.get_json()
+        # Aquí recibimos los campos de tu modal: Servicio, Diagnóstico (Notas), Medicamentos
+        query = """
+            INSERT INTO historial_medico (cita_id, mascota_id, veterinario_id, diagnostico, tratamiento, medicamentos)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (
+            data.get('cita_id'), 
+            data['mascota_id'], 
+            data['veterinario_id'],
+            data['diagnostico'],  # Notas del procedimiento
+            data['tratamiento'],  # Servicio realizado (Consulta, Cirugía...)
+            data.get('medicamentos') # Medicamentos recetados
+        ))
+        conn.commit()
+        return jsonify({"mensaje": "Tratamiento registrado exitosamente"}), 201
+
+# ==========================================
+# 9. VACUNAS (VETERINARIO)
 # ==========================================
 @app.route('/api/vacunas', methods=['GET', 'POST'])
 def manage_vacunas():

@@ -9,12 +9,5 @@ export class FacturasService {
 
   constructor(private http: HttpClient) {}
 
-  getFacturas(): Observable<Factura[]> {
-    return this.http.get<Factura[]>(this.apiUrl);
-  }
 
-  crearFactura(factura: Factura): Observable<any> {
-    // El backend espera { cliente_id, items: [...] }
-    return this.http.post(this.apiUrl, factura);
-  }
 }

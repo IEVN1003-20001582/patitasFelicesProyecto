@@ -9,19 +9,5 @@ export class ProductosService {
 
   constructor(private http: HttpClient) {}
 
-  getProductos(): Observable<Producto[]> {
-    return this.http.get<Producto[]>(this.apiUrl);
-  }
 
-  getProductosBajosStock(): Observable<Producto[]> {
-    return this.http.get<Producto[]>(`${this.apiUrl}/bajo-stock`);
-  }
-
-  crearProducto(producto: Producto): Observable<any> {
-    return this.http.post(this.apiUrl, producto);
-  }
-  
-  actualizarStock(id: number, nuevoStock: number): Observable<any> {
-      return this.http.put(`${this.apiUrl}/${id}`, { stock_actual: nuevoStock });
-  }
 }

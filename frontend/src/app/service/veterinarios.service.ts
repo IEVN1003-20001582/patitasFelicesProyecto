@@ -11,12 +11,5 @@ export class VeterinariosService {
 
   constructor(private http: HttpClient) { }
 
-  getVeterinarios(): Observable<Veterinario[]> {
-    return this.http.get<Veterinario[]>(this.apiUrl);
-  }
-  
-  // Métodos extra para Admin
-  crearVeterinario(vet: Veterinario): Observable<any> {
-      return this.http.post(this.apiUrl, vet);
-  }
+
 }
