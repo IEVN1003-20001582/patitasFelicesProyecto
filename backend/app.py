@@ -10,6 +10,24 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 # ==========================================
 # FUNCIONES AUXILIARES
 # ==========================================
+
+
+def format_fecha(data):
+    """
+    Recorre una lista de diccionarios y convierte los objetos 
+    de tipo 'date' o 'datetime' a string (ISO format) 
+    para que JSON no falle.
+    """
+    if not data:
+        return []
+    for item in data:
+        for key, value in item.items():
+            if isinstance(value, (date, datetime)):
+                item[key] = value.isoformat()
+    return data
+
+
+
 def leer_usuario(email):
     """Busca un usuario por email para validar login"""
     try:
@@ -213,12 +231,25 @@ def eliminar_mascota(id):
         return jsonify({'mensaje': 'Error al eliminar: ' + str(ex), 'exito': False})
 
 
-# 3. CITAS
+# 3. CITAS (MODIFICADO PARA AUTO-CANCELAR)
 @app.route('/api/citas', methods=['GET'])
 def listar_citas():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
+        
+        # --- NUEVA LÓGICA: AUTO-CANCELACIÓN ---
+        # Si la fecha ya pasó (es menor a hoy) y seguía 'pendiente', la marcamos 'cancelada'
+        cursor.execute("""
+            UPDATE citas 
+            SET estado = 'cancelada' 
+            WHERE fecha_hora < NOW() AND estado = 'pendiente'
+        """)
+        conn.commit() # Guardamos los cambios
+        # --------------------------------------
+
+        mascota_id = request.args.get('mascota_id')
+        
         sql = """
             SELECT c.id, c.fecha_hora, c.motivo, c.estado, 
                    m.nombre as nombre_mascota, 
@@ -226,19 +257,20 @@ def listar_citas():
             FROM citas c
             JOIN mascotas m ON c.mascota_id = m.id
             LEFT JOIN veterinarios v ON c.veterinario_id = v.id
-            ORDER BY c.fecha_hora DESC
         """
-        cursor.execute(sql)
-        datos = cursor.fetchall()
-        
-        for fila in datos:
-            if isinstance(fila.get('fecha_hora'), (date, datetime)):
-                fila['fecha_hora'] = fila['fecha_hora'].isoformat()
-                
+        params = ()
+        if mascota_id:
+            sql += " WHERE c.mascota_id = %s ORDER BY c.fecha_hora DESC"
+            params = (mascota_id,)
+        else:
+            sql += " ORDER BY c.fecha_hora DESC"
+            
+        cursor.execute(sql, params)
+        datos = format_fecha(cursor.fetchall())
         conn.close()
-        return jsonify({'citas': datos, 'mensaje': 'Citas listadas', 'exito': True})
+        return jsonify({'citas': datos, 'exito': True})
     except Exception as ex:
-        return jsonify({'mensaje': 'Error al listar citas: ' + str(ex), 'exito': False})
+        return jsonify({'mensaje': str(ex), 'exito': False})
 
 @app.route('/api/citas', methods=['POST'])
 def registrar_cita():
@@ -319,11 +351,13 @@ def get_historial():
             SELECT h.*, v.nombre_completo as veterinario
             FROM historial_medico h
             JOIN veterinarios v ON h.veterinario_id = v.id
-            WHERE h.mascota_id = %s ORDER BY h.fecha DESC
+            WHERE h.mascota_id = %s 
+            ORDER BY h.fecha DESC
         """
         cursor.execute(sql, (mascota_id,))
         datos = format_fecha(cursor.fetchall())
         conn.close()
+
         return jsonify({'historial': datos, 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
@@ -362,11 +396,13 @@ def get_vacunas():
             FROM vacunacion v
             JOIN productos p ON v.producto_id = p.id
             JOIN veterinarios vet ON v.veterinario_id = vet.id
-            WHERE v.mascota_id = %s ORDER BY v.fecha_aplicacion DESC
+            WHERE v.mascota_id = %s 
+            ORDER BY v.fecha_aplicacion DESC
         """
         cursor.execute(sql, (mascota_id,))
         datos = format_fecha(cursor.fetchall())
         conn.close()
+
         return jsonify({'vacunas': datos, 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
