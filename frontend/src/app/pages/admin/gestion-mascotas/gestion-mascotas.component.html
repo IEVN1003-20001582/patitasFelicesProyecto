@@ -1,4 +1,7 @@
 <div class="w-full p-6 md:p-8"> 
+    <!-- ============================ -->
+    <!-- SECCIÓN 1: KPIs (Tarjetas Superiores) -->
+    <!-- ============================ -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center">
             <div class="p-3 bg-secondary-teal rounded-full">
@@ -8,7 +11,7 @@
             </div>
             <div class="ml-4">
                 <p class="text-gray-500">Total de Pacientes</p>
-                <p class="text-2xl font-bold text-primary-dark">215</p>
+                <p class="text-2xl font-bold text-primary-dark">{{ kpis.total }}</p>
             </div>
         </div>
         <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center">
@@ -18,8 +21,8 @@
                 </svg>
             </div>
             <div class="ml-4">
-                <p class="text-gray-500">Nuevas Mascotas (Mes)</p>
-                <p class="text-2xl font-bold text-primary-dark">18</p>
+                <p class="text-gray-500">Nuevas Mascotas (Est.)</p>
+                <p class="text-2xl font-bold text-primary-dark">{{ kpis.nuevas }}</p>
             </div>
         </div>
         <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center">
@@ -30,26 +33,33 @@
             </div>
             <div class="ml-4">
                 <p class="text-gray-500">Pacientes con Alergias</p>
-                <p class="text-2xl font-bold text-light-red">12</p>
+                <p class="text-2xl font-bold text-light-red">{{ kpis.alergias }}</p>
             </div>
         </div>
     </div>
 
+    <!-- ============================ -->
+    <!-- SECCIÓN 2: Barra de Herramientas -->
+    <!-- ============================ -->
     <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <div class="relative w-full max-w-md">
-            <input type="text" placeholder="Buscar mascota por nombre o dueño..." class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
+            <input type="text" 
+                   [(ngModel)]="textoBusqueda" 
+                   (input)="filtrarMascotas()"
+                   placeholder="Buscar mascota por nombre o dueño..." 
+                   class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
         </div>
         <div class="flex space-x-4">
-            <button id="btn-filtros-avanzados" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg text-sm hover:bg-gray-50 transition duration-300 flex items-center">
+            <button (click)="abrirModalFiltros()" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg text-sm hover:bg-gray-50 transition duration-300 flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
                 </svg>
                 Filtros
             </button>
-             <button id="btn-agregar-mascota" class="bg-secondary-teal text-white font-semibold py-2 px-5 rounded-lg text-sm shadow-md hover:bg-opacity-80 transition duration-300 flex items-center">
+             <button (click)="abrirModalAgregar()" class="bg-secondary-teal text-white font-semibold py-2 px-5 rounded-lg text-sm shadow-md hover:bg-opacity-80 transition duration-300 flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
@@ -58,95 +68,43 @@
         </div>
     </div>
 
+    <!-- ============================ -->
+    <!-- SECCIÓN 3: Grid de Mascotas -->
+    <!-- ============================ -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         
-        <div class="btn-detalle-mascota bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 hover:shadow-xl transition duration-300 cursor-pointer">
-            <div class="h-40 bg-gray-200">
-                <img src="https://th.bing.com/th/id/R.9003028d7ec6ff58a70a2be15a05ffed?rik=9cLEFO6s9oiGeg&riu=http%3a%2f%2fwww.publicdomainpictures.net%2fpictures%2f40000%2fvelka%2fgolden-retriever-dog-1364426710r9x.jpg&ehk=Z8ZK9mRUJe0rT61EYByfWPUGg1BEToYpGPK3bCz1aTU%3d&risl=&pid=ImgRaw&r=0" alt="Foto de Max" class="h-full w-full object-cover">
+        <div *ngFor="let mascota of mascotasFiltradas" 
+             (click)="abrirModalDetalle(mascota)"
+             class="btn-detalle-mascota bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 hover:shadow-xl transition duration-300 cursor-pointer">
+            
+            <div class="h-40 bg-gray-200 relative">
+                <img [src]="mascota.foto_url || 'https://placehold.co/400x300?text=' + mascota.nombre" 
+                     alt="Foto de {{mascota.nombre}}" 
+                     class="h-full w-full object-cover">
             </div>
             <div class="p-5">
-                <h3 class="text-xl font-bold text-primary-dark truncate">Max</h3>
-                <p class="text-gray-600 text-sm">Perro - Golden Retriever</p>
-                <div class="my-3">
-                    <span class="px-3 py-1 text-xs font-bold text-red-800 bg-red-200 rounded-full animate-pulse">¡ALERGIAS!</span>
+                <h3 class="text-xl font-bold text-primary-dark truncate">{{ mascota.nombre }}</h3>
+                <p class="text-gray-600 text-sm">{{ mascota.especie }} - {{ mascota.raza }}</p>
+                
+                <div class="my-3 h-6">
+                    <span *ngIf="mascota.alergias && mascota.alergias.length > 2 && mascota.alergias !== 'Ninguna'" 
+                          class="px-3 py-1 text-xs font-bold text-red-800 bg-red-200 rounded-full animate-pulse">
+                        ¡ALERGIAS!
+                    </span>
+                    <span *ngIf="!mascota.alergias || mascota.alergias === 'Ninguna'" 
+                          class="px-3 py-1 text-xs font-semibold text-gray-700 bg-gray-100 rounded-full">
+                        Sin Alertas
+                    </span>
                 </div>
-                <div class="space-y-2 text-sm text-gray-500">
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 mr-2"><path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.126-2.095a1.23 1.23 0 00.41-1.412A9.99 9.99 0 0010 12c-2.31 0-4.438.784-6.126 2.095z" /></svg>
-                        Dueño: Ana Gomez
-                    </div>
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 mr-2 text-secondary-teal"><path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z" /><path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" /></svg>
-                        Últ. Trat: Vacuna (Dr. Salas)
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="btn-detalle-mascota bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 hover:shadow-xl transition duration-300 cursor-pointer">
-            <div class="h-40 bg-gray-200">
-                 <img src="https://media.lmneuquen.com/p/99281b9c6dd8a95b846122fff662a0d5/adjuntos/195/imagenes/004/557/0004557642/1200x675/smart/gatojpg.jpg" alt="Foto de Mishi" class="h-full w-full object-cover">
-            </div>
-            <div class="p-5">
-                <h3 class="text-xl font-bold text-primary-dark truncate">Mishi</h3>
-                <p class="text-gray-600 text-sm">Gato - Doméstico</p>
-                <div class="my-3">
-                    <span class="px-3 py-1 text-xs font-semibold text-yellow-800 bg-yellow-200 rounded-full">MEDICACIÓN CRÓNICA</span>
-                </div>
                 <div class="space-y-2 text-sm text-gray-500">
                     <div class="flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 mr-2"><path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.126-2.095a1.23 1.23 0 00.41-1.412A9.99 9.99 0 0010 12c-2.31 0-4.438.784-6.126 2.095z" /></svg>
-                        Dueño: Carlos Ruiz
+                        Dueño: {{ mascota.nombre_dueno || 'Sin asignar' }}
                     </div>
                     <div class="flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 mr-2 text-secondary-teal"><path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z" /><path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" /></svg>
-                        Últ. Trat: Consulta (Dr. Israel)
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="btn-detalle-mascota bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 hover:shadow-xl transition duration-300 cursor-pointer">
-            <div class="h-40 bg-gray-200">
-                 <img src="https://www.publicdomainpictures.net/pictures/40000/velka/labrador-dog-1362609655W6O.jpg" alt="Foto de Thor" class="h-full w-full object-cover">
-            </div>
-            <div class="p-5">
-                <h3 class="text-xl font-bold text-primary-dark truncate">Thor</h3>
-                <p class="text-gray-600 text-sm">Perro - Labrador</p>
-                <div class="my-3">
-                    <span class="px-3 py-1 text-xs font-semibold text-gray-700 bg-gray-100 rounded-full">Sin Alertas</span>
-                </div>
-                <div class="space-y-2 text-sm text-gray-500">
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 mr-2"><path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.126-2.095a1.23 1.23 0 00.41-1.412A9.99 9.99 0 0010 12c-2.31 0-4.438.784-6.126 2.095z" /></svg>
-                        Dueño: Maria Lopez
-                    </div>
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 mr-2 text-secondary-teal"><path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z" /><path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" /></svg>
-                        Últ. Trat: Consulta (Dr. Salas)
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="btn-detalle-mascota bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 hover:shadow-xl transition duration-300 cursor-pointer mascota-en-memoria">
-            <div class="h-40 bg-gray-200">
-                 <img src="https://tse1.mm.bing.net/th/id/OIP.WHhVzewbv9Q8V3F9oZSgFgHaEK?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Foto de Firulais" class="h-full w-full object-cover">
-            </div>
-            <div class="p-5">
-                <h3 class="text-xl font-bold text-primary-dark truncate">Firulais (En Memoria)</h3>
-                <p class="text-gray-600 text-sm">Perro - Mixto</p>
-                <div class="my-3">
-                    <span class="px-3 py-1 text-xs font-semibold text-gray-700 bg-gray-100 rounded-full">Sin Alertas</span>
-                </div>
-                <div class="space-y-2 text-sm text-gray-500">
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 mr-2"><path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.126-2.095a1.23 1.23 0 00.41-1.412A9.99 9.99 0 0010 12c-2.31 0-4.438.784-6.126 2.095z" /></svg>
-                        Dueño: Juan Perez
-                    </div>
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 mr-2 text-secondary-teal"><path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z" /><path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" /></svg>
-                        Últ. Trat: N/A
+                        Peso: {{ mascota.peso }} kg
                     </div>
                 </div>
             </div>
@@ -155,170 +113,180 @@
     </div>
 </div>
 
-<div id="modal-agregar-mascota" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
+<!-- ============================ -->
+<!-- MODAL AGREGAR MASCOTA -->
+<!-- ============================ -->
+<div *ngIf="mostrarModalAgregar" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl animate-fade-in-down">
         <div class="flex justify-between items-center p-5 border-b">
             <h3 class="text-xl font-bold text-primary-dark">Registrar Nueva Mascota</h3>
-            <button id="btn-close-agregar-mascota" class="text-gray-400 hover:text-gray-600">
+            <button (click)="cerrarModalAgregar()" class="text-gray-400 hover:text-gray-600">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         </div>
         <div class="p-6 max-h-[70vh] overflow-y-auto">
-            <form id="form-registrar-mascota" class="space-y-4">
+            <form class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="md:col-span-1 flex flex-col items-center">
-                        <label class="block text-gray-700 mb-2 font-semibold">Foto de la Mascota</label>
-                        <div class="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center mb-2">
+                        <label class="block text-gray-700 mb-2 font-semibold">Foto</label>
+                        <div class="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center mb-2 overflow-hidden">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l-1.586-1.586a2 2 0 00-2.828 0L6 14m6-6l.25-.25a2 2 0 012.828 0l.25.25m-3 3l.25.25a2 2 0 002.828 0l.25-.25m-3-3l.25-.25a2 2 0 012.828 0l.25.25m0 0l-3 3m0 0l-3-3m3 3V3" /></svg>
                         </div>
-                        <input type="file" id="mascota-foto" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-secondary-teal file:text-white hover:file:bg-opacity-80"/>
+                        <input type="file" disabled class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-secondary-teal file:text-white hover:file:bg-opacity-80"/>
                     </div>
+                    
                     <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="md:col-span-2">
-                            <label for="mascota-nombre" class="block text-gray-700 mb-1 font-semibold">Nombre de la Mascota</label>
-                            <input id="mascota-nombre" type="text" placeholder="Ej. Max" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal" required>
+                            <label class="block text-gray-700 mb-1 font-semibold">Nombre</label>
+                            <input [(ngModel)]="nuevaMascota.nombre" name="nombre" type="text" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal" required>
                         </div>
                         <div class="md:col-span-2">
-                            <label for="mascota-dueño" class="block text-gray-700 mb-1 font-semibold">Dueño (Cliente)</label>
-                            <select id="mascota-dueño" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal" required>
-                                <option value="">Buscar y seleccionar cliente...</option>
-                                <option value="1">Ana Gomez</option>
-                                <option value="2">Carlos Ruiz</option>
+                            <label class="block text-gray-700 mb-1 font-semibold">Dueño (Cliente)</label>
+                            <select [(ngModel)]="nuevaMascota.cliente_id" name="cliente_id" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal" required>
+                                <option [value]="0">Seleccionar cliente...</option>
+                                <option *ngFor="let cli of clientes" [value]="cli.id">{{ cli.nombre }}</option>
                             </select>
                         </div>
                         <div>
-                            <label for="mascota-especie" class="block text-gray-700 mb-1 font-semibold">Especie</label>
-                            <input id="mascota-especie" type="text" placeholder="Ej. Perro" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
+                            <label class="block text-gray-700 mb-1 font-semibold">Especie</label>
+                            <input [(ngModel)]="nuevaMascota.especie" name="especie" type="text" placeholder="Perro/Gato" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
                         </div>
                         <div>
-                            <label for="mascota-raza" class="block text-gray-700 mb-1 font-semibold">Raza</label>
-                            <input id="mascota-raza" type="text" placeholder="Ej. Golden Retriever" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
+                            <label class="block text-gray-700 mb-1 font-semibold">Raza</label>
+                            <input [(ngModel)]="nuevaMascota.raza" name="raza" type="text" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
                         </div>
                         <div>
-                            <label for="mascota-fecha-nac" class="block text-gray-700 mb-1 font-semibold">Fecha de Nacimiento</label>
-                            <input id="mascota-fecha-nac" type="date" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
+                            <label class="block text-gray-700 mb-1 font-semibold">Nacimiento</label>
+                            <input [(ngModel)]="nuevaMascota.fecha_nacimiento" name="fecha" type="date" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
                         </div>
                         <div>
-                            <label for="mascota-sexo" class="block text-gray-700 mb-1 font-semibold">Sexo</label>
-                            <select id="mascota-sexo" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
+                            <label class="block text-gray-700 mb-1 font-semibold">Sexo</label>
+                            <select [(ngModel)]="nuevaMascota.sexo" name="sexo" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
                                 <option value="Macho">Macho</option>
                                 <option value="Hembra">Hembra</option>
                             </select>
                         </div>
                         <div>
-                            <label for="mascota-peso" class="block text-gray-700 mb-1 font-semibold">Peso (kg)</label>
-                            <input id="mascota-peso" type="number" step="0.1" placeholder="Ej. 5.2" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                        </div>
-                         <div>
-                            <label for="mascota-esterilizado" class="block text-gray-700 mb-1 font-semibold">Esterilizado</label>
-                            <select id="mascota-esterilizado" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                                <option value="Si">Sí</option>
-                                <option value="No">No</option>
-                                <option value="No Aplica">No Aplica</option>
-                            </select>
+                            <label class="block text-gray-700 mb-1 font-semibold">Peso (kg)</label>
+                            <input [(ngModel)]="nuevaMascota.peso" name="peso" type="number" step="0.1" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
                         </div>
                     </div>
                     <div class="md:col-span-3">
-                        <label for="mascota-alergias" class="block text-gray-700 mb-1 font-semibold">Alergias Conocidas</label>
-                        <textarea id="mascota-alergias" rows="3" placeholder="Ej. Alergia al pollo, polvo..." class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal"></textarea>
+                        <label class="block text-gray-700 mb-1 font-semibold">Alergias</label>
+                        <textarea [(ngModel)]="nuevaMascota.alergias" name="alergias" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal"></textarea>
                     </div>
                 </div>
             </form>
         </div>
         <div class="flex justify-end p-5 border-t space-x-4">
-            <button id="btn-cancel-agregar-mascota" type="button" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
+            <button (click)="cerrarModalAgregar()" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
                 Cancelar
             </button>
-            <button type="submit" form="form-registrar-mascota" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-opacity-80 transition duration-300">
+            <button (click)="guardarMascota()" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-opacity-80 transition duration-300">
                 Guardar Mascota
             </button>
         </div>
     </div>
 </div>
 
-<div id="modal-detalle-mascota" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl">
+<!-- ============================ -->
+<!-- MODAL DETALLE MASCOTA -->
+<!-- ============================ -->
+<div *ngIf="mostrarModalDetalle && mascotaSeleccionada" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl animate-fade-in-down">
         <div class="flex justify-between items-center p-5 border-b">
             <div class="flex items-center space-x-3">
-                <img class="h-16 w-16 rounded-full" src="https://placehold.co/80x80/F4D03F/ffffff?text=M&font=poppins" alt="Mascota">
+                <div class="h-16 w-16 rounded-full bg-secondary-yellow flex items-center justify-center text-2xl font-bold text-white">
+                    {{ mascotaSeleccionada.nombre.charAt(0) }}
+                </div>
                 <div>
-                    <h3 class="text-2xl font-bold text-primary-dark">Max</h3>
-                    <p class="text-gray-600">Perro - Golden Retriever</p>
+                    <h3 class="text-2xl font-bold text-primary-dark">{{ mascotaSeleccionada.nombre }}</h3>
+                    <p class="text-gray-600">{{ mascotaSeleccionada.especie }} - {{ mascotaSeleccionada.raza }}</p>
                 </div>
             </div>
             <div class="flex space-x-3">
-                <button class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg text-sm hover:bg-gray-50 transition duration-300 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                    Exportar Ficha PDF
-                </button>
-                <button id="btn-close-detalle-mascota" class="text-gray-400 hover:text-gray-600">
+                <button (click)="cerrarModalDetalle()" class="text-gray-400 hover:text-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
         </div>
         
+        <!-- Tabs de Navegación -->
         <div class="border-b border-gray-200">
-            <nav class="flex space-x-4 md:space-x-8 px-6 -mb-px">
-                <button id="tab-btn-info" class="tab-btn active py-4 px-1 border-b-4 text-sm font-medium">Info General</button>
-                <button id="tab-btn-historial" class="tab-btn py-4 px-1 border-b-4 text-sm font-medium text-gray-500 hover:text-gray-700">Historial Clínico</button>
-                <button id="tab-btn-vacunacion" class="tab-btn py-4 px-1 border-b-4 text-sm font-medium text-gray-500 hover:text-gray-700">Vacunación</button>
-                <button id="tab-btn-citas" class="tab-btn py-4 px-1 border-b-4 text-sm font-medium text-gray-500 hover:text-gray-700">Próximas Citas</button>
+            <nav class="flex space-x-4 md:space-x-8 px-6 -mb-px cursor-pointer">
+                <a (click)="cambiarTab('info')" [class.border-secondary-teal]="tabActiva === 'info'" class="py-4 px-1 border-b-4 text-sm font-medium hover:text-secondary-teal transition-colors" [ngClass]="{'text-secondary-teal': tabActiva === 'info', 'text-gray-500': tabActiva !== 'info'}">Info General</a>
+                <a (click)="cambiarTab('historial')" [class.border-secondary-teal]="tabActiva === 'historial'" class="py-4 px-1 border-b-4 text-sm font-medium hover:text-secondary-teal transition-colors" [ngClass]="{'text-secondary-teal': tabActiva === 'historial', 'text-gray-500': tabActiva !== 'historial'}">Historial Clínico</a>
+                <a (click)="cambiarTab('vacunacion')" [class.border-secondary-teal]="tabActiva === 'vacunacion'" class="py-4 px-1 border-b-4 text-sm font-medium hover:text-secondary-teal transition-colors" [ngClass]="{'text-secondary-teal': tabActiva === 'vacunacion', 'text-gray-500': tabActiva !== 'vacunacion'}">Vacunación</a>
+                <a (click)="cambiarTab('citas')" [class.border-secondary-teal]="tabActiva === 'citas'" class="py-4 px-1 border-b-4 text-sm font-medium hover:text-secondary-teal transition-colors" [ngClass]="{'text-secondary-teal': tabActiva === 'citas', 'text-gray-500': tabActiva !== 'citas'}">Próximas Citas</a>
             </nav>
         </div>
 
         <div class="p-6 max-h-[60vh] overflow-y-auto">
-            <div id="tab-content-info" class="tab-content active space-y-4">
-                <div class="p-4 bg-red-100 border border-red-300 rounded-lg">
+            
+            <!-- TAB: INFO -->
+            <div *ngIf="tabActiva === 'info'" class="space-y-4">
+                <div *ngIf="mascotaSeleccionada.alergias && mascotaSeleccionada.alergias !== 'Ninguna'" class="p-4 bg-red-100 border border-red-300 rounded-lg">
                     <h4 class="font-bold text-red-800">¡Alerta de Alergia!</h4>
-                    <p class="text-sm text-red-700">Alergia al pollo.</p>
+                    <p class="text-sm text-red-700">{{ mascotaSeleccionada.alergias }}</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-500">Dueño</label>
-                        <p class="text-md text-gray-800">Ana Gomez</p>
+                        <p class="text-md text-gray-800">{{ mascotaSeleccionada.nombre_dueno }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-500">Fecha de Nacimiento</label>
-                        <p class="text-md text-gray-800">10/05/2023 (2 años)</p>
+                        <p class="text-md text-gray-800">{{ mascotaSeleccionada.fecha_nacimiento }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-500">Peso</label>
-                        <p class="text-md text-gray-800">25.4 kg</p>
+                        <p class="text-md text-gray-800">{{ mascotaSeleccionada.peso }} kg</p>
                     </div>
                 </div>
                 
-                <div class="pt-4 border-t flex justify-between">
+                <div class="pt-4 border-t flex justify-between mt-4">
                     <div>
-                        <button class="text-secondary-teal font-semibold text-sm hover:underline">Editar Información de la Mascota</button>
-                        <button id="btn-reactivar-mascota" class="ml-4 text-light-green font-semibold text-sm hover:underline">Re-activar Mascota</button>
+                        <button class="text-secondary-teal font-semibold text-sm hover:underline">Editar Información</button>
                     </div>
-                    <button id="btn-archivar-mascota" class="bg-white text-light-red border border-light-red font-semibold py-2 px-4 rounded-lg text-sm hover:bg-red-50 transition duration-300">
-                        Archivar / Marcar como Fallecida
+                    <button (click)="abrirModalArchivar()" class="bg-white text-light-red border border-light-red font-semibold py-2 px-4 rounded-lg text-sm hover:bg-red-50 transition duration-300">
+                        Archivar Mascota
                     </button>
                 </div>
             </div>
             
-            <div id="tab-content-historial" class="tab-content space-y-4">
+            <!-- TAB: HISTORIAL (DINÁMICO) -->
+            <div *ngIf="tabActiva === 'historial'" class="space-y-4">
                 <div class="flex justify-between items-center">
                     <h4 class="text-lg font-semibold text-primary-dark">Tratamientos Anteriores</h4>
-                    <button id="btn-agregar-tratamiento" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg text-sm shadow-md hover:bg-opacity-80 transition duration-300 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                    <button (click)="abrirModalTratamiento()" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg text-sm shadow-md hover:bg-opacity-80 transition duration-300 flex items-center">
                         Agregar Tratamiento
                     </button>
                 </div>
+                
                 <div class="space-y-3">
-                    <div class="p-4 border rounded-lg">
-                        <p class="font-semibold text-gray-800">Vacunación Anual</p>
-                        <span class="text-sm text-gray-500">10/11/2025 - Dr. Salas</span>
+                    <div *ngIf="historialMascota.length === 0" class="text-center text-gray-400 py-4">No hay registros médicos aún.</div>
+                    
+                    <div *ngFor="let item of historialMascota" class="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="flex justify-between">
+                            <p class="font-semibold text-gray-800">{{ item.diagnostico || 'Consulta General' }}</p>
+                            <span class="text-sm text-gray-500">{{ item.fecha | date:'shortDate' }}</span>
+                        </div>
+                        <div class="mt-2 text-sm text-gray-600">
+                            <!-- CORREGIDO: Usamos tratamiento_aplicado -->
+                            <p><strong>Tratamiento:</strong> {{ item.tratamiento_aplicado }}</p>
+                            <!-- CORREGIDO: Usamos medicamentos_recetados -->
+                            <p *ngIf="item.medicamentos_recetados" class="mt-1"><strong>Receta:</strong> {{ item.medicamentos_recetados }}</p>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-100">Atendido por: {{ item.veterinario }}</p>
                     </div>
                 </div>
             </div>
 
-            <div id="tab-content-vacunacion" class="tab-content space-y-4">
+            <!-- TAB: VACUNACION (DINÁMICO) -->
+            <div *ngIf="tabActiva === 'vacunacion'" class="space-y-4">
                 <div class="flex justify-between items-center">
                     <h4 class="text-lg font-semibold text-primary-dark">Calendario de Vacunación</h4>
-                    <button id="btn-agregar-vacuna" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg text-sm shadow-md hover:bg-opacity-80 transition duration-300 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                    <button (click)="abrirModalVacuna()" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg text-sm shadow-md hover:bg-opacity-80 transition duration-300 flex items-center">
                         Registrar Vacuna
                     </button>
                 </div>
@@ -326,400 +294,139 @@
                     <table class="w-full">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Vacuna</th>
-                                <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Fecha Aplicación</th>
-                                <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Próxima Dosis</th>
-                                <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Aplicada por</th>
+                                <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">Vacuna</th>
+                                <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">Fecha</th>
+                                <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">Próxima</th>
+                                <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">Vet</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y">
-                            <tr>
-                                <td class="px-4 py-3 text-sm font-medium text-gray-800">Rabia</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">10/11/2025</td>
-                                <td class="px-4 py-3 text-sm font-semibold text-light-red">10/11/2026 (Pendiente)</td>
-                                <td class="px-4 py-3 text-sm text-gray-500">Dr. Salas</td>
+                            <tr *ngFor="let vac of vacunasMascota">
+                                <td class="px-4 py-3 text-sm font-medium text-gray-800">{{ vac.nombre_vacuna }}</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">{{ vac.fecha_aplicacion | date:'shortDate' }}</td>
+                                <td class="px-4 py-3 text-sm font-semibold text-light-red">{{ vac.fecha_proxima_dosis ? (vac.fecha_proxima_dosis | date:'shortDate') : 'N/A' }}</td>
+                                <td class="px-4 py-3 text-sm text-gray-500">{{ vac.veterinario }}</td>
                             </tr>
-                            <tr>
-                                <td class="px-4 py-3 text-sm font-medium text-gray-800">Múltiple (PUPPY)</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">10/06/2023</td>
-                                <td class="px-4 py-3 text-sm text-gray-500">N/A (Esquema completo)</td>
-                                <td class="px-4 py-3 text-sm text-gray-500">Dr. Israel</td>
+                            <tr *ngIf="vacunasMascota.length === 0">
+                                <td colspan="4" class="text-center py-4 text-gray-400">Sin vacunas registradas.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="tab-content-citas" class="tab-content space-y-4">
-                <h4 class="text-lg font-semibold text-primary-dark">Próximas Citas Programadas</h4>
-                <div class="p-4 border border-secondary-teal rounded-lg">
-                    <div class="flex justify-between items-center mb-1">
-                        <p class="font-semibold text-gray-800">Vacunación Anual</p>
-                        <span class="text-sm text-gray-500">15 Nov 2025 - 10:00 AM</span>
-                    </div>
-                    <p class="text-sm text-gray-600">Con: <span class="font-medium">Dr. Salas</span></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="modal-agregar-tratamiento" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-[60]">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg">
-        <div class="flex justify-between items-center p-5 border-b">
-            <h3 class="text-xl font-bold text-primary-dark">Agregar Nuevo Tratamiento</h3>
-            <button id="btn-close-agregar-tratamiento" class="text-gray-400 hover:text-gray-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-        </div>
-        <div class="p-6">
-            <form id="form-agregar-tratamiento" class="space-y-4">
-                <div>
-                    <label for="tratamiento-veterinario" class="block text-gray-700 mb-1 font-semibold">Veterinario que atiende</label>
-                    <select id="tratamiento-veterinario" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal" required>
-                        <option value="">Selecciona un veterinario...</option>
-                        <option value="1">Dr. Israel Gonzalez</option>
-                        <option value="2">Dr. Salas</option>
-                        <option value="3">Dra. Morales</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="tratamiento-servicio" class="block text-gray-700 mb-1 font-semibold">Servicio / Tratamiento Realizado</label>
-                    <select id="tratamiento-servicio" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal" required disabled>
-                        <option value="">Selecciona un veterinario primero...</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="tratamiento-desc" class="block text-gray-700 mb-1 font-semibold">Notas del Procedimiento</label>
-                    <textarea id="tratamiento-desc" rows="3" placeholder="Notas clínicas, hallazgos..." class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal"></textarea>
-                </div>
-                <div>
-                    <label for="tratamiento-medicamentos" class="block text-gray-700 mb-1 font-semibold">Medicamentos Recetados (Opcional)</label>
-                    <textarea id="tratamiento-medicamentos" rows="2" placeholder="Ej. Amoxicilina 500mg c/8h por 7 días..." class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal"></textarea>
-                </div>
-            </form>
-        </div>
-        <div class="flex justify-end p-5 border-t space-x-4">
-            <button id="btn-cancel-agregar-tratamiento" type="button" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
-                Cancelar
-            </button>
-            <button type="submit" form="form-agregar-tratamiento" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-opacity-80 transition duration-300">
-                Guardar Tratamiento
-            </button>
-        </div>
-    </div>
-</div>
-
-<div id="modal-filtros-avanzados" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg">
-        <div class="flex justify-between items-center p-5 border-b">
-            <h3 class="text-xl font-bold text-primary-dark">Filtros Avanzados</h3>
-            <button id="btn-close-filtros" class="text-gray-400 hover:text-gray-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-        </div>
-        <div class="p-6">
-            <form id="form-filtros-avanzados" class="space-y-4">
-                <div>
-                    <label for="filtro-estado" class="block text-gray-700 mb-1 font-semibold">Filtrar por Estado</label>
-                    <select id="filtro-estado" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                        <option value="Activas">Mascotas Activas</option>
-                        <option value="Archivadas">Mascotas Archivadas</option>
-                        <option value="En Memoria">Mascotas en Memoria</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="filtro-especie" class="block text-gray-700 mb-1 font-semibold">Filtrar por Especie</label>
-                    <select id="filtro-especie" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                        <option value="todos">Todos</option>
-                        <option value="Perro">Perro</option>
-                        <option value="Gato">Gato</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="filtro-alertas" class="block text-gray-700 mb-1 font-semibold">Filtrar por Alertas</label>
-                    <select id="filtro-alertas" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                        <option value="todos">Todos</option>
-                        <option value="con-alertas">Con Alertas</option>
-                        <option value="sin-alertas">Sin Alertas</option>
-                    </select>
-                </div>
-            </form>
-        </div>
-        <div class="flex justify-end p-5 border-t space-x-4">
-            <button id="btn-cancel-filtros" type="button" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
-                Cancelar
-            </button>
-            <button type="submit" form="form-filtros-avanzados" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-opacity-80 transition duration-300">
-                Aplicar Filtros
-            </button>
-        </div>
-    </div>
-</div>
-
-<div id="modal-agregar-vacuna" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-[70]">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg">
-        <div class="flex justify-between items-center p-5 border-b">
-            <h3 class="text-xl font-bold text-primary-dark">Registrar Vacuna Aplicada</h3>
-            <button id="btn-close-agregar-vacuna" class="text-gray-400 hover:text-gray-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-        </div>
-        <div class="p-6">
-            <form id="form-agregar-vacuna" class="space-y-4">
-                <div>
-                    <label for="vacuna-producto" class="block text-gray-700 mb-1 font-semibold">Vacuna (Producto del Inventario)</label>
-                    <select id="vacuna-producto" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal" required>
-                        <option value="">Selecciona una vacuna...</option>
-                        <option value="1">Vacuna Rabia DEFENSOR (10 en stock)</option>
-                        <option value="2">Vacuna Múltiple PUPPY (5 en stock)</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="vacuna-veterinario" class="block text-gray-700 mb-1 font-semibold">Veterinario que aplicó</label>
-                    <select id="vacuna-veterinario" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal" required>
-                        <option value="">Selecciona un veterinario...</option>
-                        <option value="1">Dr. Israel Gonzalez</option>
-                        <option value="2">Dr. Salas</option>
-                    </select>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="vacuna-fecha-aplicacion" class="block text-gray-700 mb-1 font-semibold">Fecha de Aplicación</label>
-                        <input id="vacuna-fecha-aplicacion" type="date" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal" required>
-                    </div>
-                    <div>
-                        <label for="vacuna-fecha-proxima" class="block text-gray-700 mb-1 font-semibold">Próxima Dosis (Opcional)</label>
-                        <input id="vacuna-fecha-proxima" type="date" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="flex justify-end p-5 border-t space-x-4">
-            <button id="btn-cancel-agregar-vacuna" type="button" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
-                Cancelar
-            </button>
-            <button type="submit" form="form-agregar-vacuna" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-opacity-80 transition duration-300">
-                Registrar Vacuna
-            </button>
-        </div>
-    </div>
-</div>
-
-<div id="modal-archivar-mascota" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-[70]">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg">
-        <div class="flex justify-between items-center p-5 border-b border-red-200">
-            <h3 class="text-xl font-bold text-light-red">Archivar / Marcar como Fallecida</h3>
-            <button id="btn-close-archivar-mascota" class="text-gray-400 hover:text-gray-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-        </div>
-        <div class="p-6">
-            <p class="text-gray-700 mb-4">¿Estás seguro de que deseas cambiar el estado de <strong class="text-primary-dark">Max</strong>?</p>
-            <div class="space-y-2">
-                <label class="flex items-center p-3 border rounded-lg has-[:checked]:bg-gray-50 has-[:checked]:border-gray-400">
-                    <input type="radio" name="motivo_archivar" value="archivar" class="h-4 w-4 text-secondary-teal focus:ring-secondary-teal" checked>
-                    <span class="ml-3">
-                        <span class="font-semibold text-gray-800">Archivar</span>
-                        <span class="block text-sm text-gray-600">La mascota se mudó, cambió de veterinario, etc.</span>
-                    </span>
-                </label>
-                <label class="flex items-center p-3 border rounded-lg has-[:checked]:bg-gray-50 has-[:checked]:border-gray-400">
-                    <input type="radio" name="motivo_archivar" value="memoria" class="h-4 w-4 text-secondary-teal focus:ring-secondary-teal">
-                    <span class="ml-3">
-                        <span class="font-semibold text-gray-800">Marcar como "En Memoria" (Fallecida)</span>
-                        <span class="block text-sm text-gray-600">La mascota falleció.</span>
-                    </span>
-                </label>
-            </div>
-        </div>
-        <div class="flex justify-end p-5 border-t space-x-4">
-            <button id="btn-cancel-archivar-mascota" type="button" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
-                Cancelar
-            </button>
-            <button id="btn-confirmar-archivar" type="button" class="bg-light-red text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 transition duration-300">
-                Sí, Confirmar Cambio
-            </button>
-        </div>
-    </div>
-</div>
-
-<script>
-    // --- Modal Helpers ---
-    function openModal(modal) {
-        if (modal) modal.classList.remove('hidden');
-    }
-    function closeModal(modal) {
-        if (modal) modal.classList.add('hidden');
-    }
-
-    // --- Tabs del Modal Detalle ---
-    const tabBtnInfo = document.getElementById('tab-btn-info');
-    const tabBtnHistorial = document.getElementById('tab-btn-historial');
-    const tabBtnVacunacion = document.getElementById('tab-btn-vacunacion'); 
-    const tabBtnCitas = document.getElementById('tab-btn-citas'); 
-    
-    const tabContentInfo = document.getElementById('tab-content-info');
-    const tabContentHistorial = document.getElementById('tab-content-historial');
-    const tabContentVacunacion = document.getElementById('tab-content-vacunacion'); 
-    const tabContentCitas = document.getElementById('tab-content-citas'); 
-
-    const allTabBtns = [tabBtnInfo, tabBtnHistorial, tabBtnVacunacion, tabBtnCitas];
-    const allTabContents = [tabContentInfo, tabContentHistorial, tabContentVacunacion, tabContentCitas];
-
-    function handleTabClick(clickedBtn, activeContent) {
-        allTabBtns.forEach(btn => {
-            if(btn) btn.classList.remove('active');
-        });
-        allTabContents.forEach(content => {
-            if(content) content.classList.remove('active');
-            if(content) content.classList.add('hidden');
-        });
-        
-        if (clickedBtn) clickedBtn.classList.add('active');
-        if (activeContent) {
-            activeContent.classList.add('active');
-            activeContent.classList.remove('hidden');
-        }
-    }
-
-    if (tabBtnInfo && tabContentInfo) {
-        tabBtnInfo.addEventListener('click', () => handleTabClick(tabBtnInfo, tabContentInfo));
-    }
-    if (tabBtnHistorial && tabContentHistorial) {
-        tabBtnHistorial.addEventListener('click', () => handleTabClick(tabBtnHistorial, tabContentHistorial));
-    }
-    if (tabBtnVacunacion && tabContentVacunacion) {
-        tabBtnVacunacion.addEventListener('click', () => handleTabClick(tabBtnVacunacion, tabContentVacunacion));
-    }
-    if (tabBtnCitas && tabContentCitas) {
-        tabBtnCitas.addEventListener('click', () => handleTabClick(tabBtnCitas, tabContentCitas));
-    }
-
-    // --- Modal 1: Agregar Mascota ---
-    const btnAgregarMascota = document.getElementById('btn-agregar-mascota');
-    const modalAgregarMascota = document.getElementById('modal-agregar-mascota');
-    if (btnAgregarMascota && modalAgregarMascota) {
-        const btnClose = document.getElementById('btn-close-agregar-mascota');
-        const btnCancel = document.getElementById('btn-cancel-agregar-mascota');
-        
-        btnAgregarMascota.addEventListener('click', () => openModal(modalAgregarMascota));
-        if(btnClose) btnClose.addEventListener('click', () => closeModal(modalAgregarMascota));
-        if(btnCancel) btnCancel.addEventListener('click', () => closeModal(modalAgregarMascota));
-    }
-
-    // --- Modal 2: Detalle de Mascota ---
-    const btnsDetalleMascota = document.querySelectorAll('.btn-detalle-mascota');
-    const modalDetalleMascota = document.getElementById('modal-detalle-mascota');
-    if (modalDetalleMascota && btnsDetalleMascota.length > 0) {
-        const btnClose = document.getElementById('btn-close-detalle-mascota');
-        
-        btnsDetalleMascota.forEach(btn => {
-            btn.addEventListener('click', () => {
-                if(tabBtnInfo) handleTabClick(tabBtnInfo, tabContentInfo); 
-                openModal(modalDetalleMascota);
-            });
-        });
-        if(btnClose) btnClose.addEventListener('click', () => closeModal(modalDetalleMascota));
-    }
-
-    // --- Modal 3: Agregar Tratamiento (anidado) ---
-    const btnAgregarTratamiento = document.getElementById('btn-agregar-tratamiento');
-    const modalAgregarTratamiento = document.getElementById('modal-agregar-tratamiento');
-    if (btnAgregarTratamiento && modalAgregarTratamiento) {
-        const btnClose = document.getElementById('btn-close-agregar-tratamiento');
-        const btnCancel = document.getElementById('btn-cancel-agregar-tratamiento');
-
-        const selectVeterinario = document.getElementById('tratamiento-veterinario');
-        const selectServicio = document.getElementById('tratamiento-servicio');
-
-        if (selectVeterinario && selectServicio) {
-            selectVeterinario.addEventListener('change', (e) => {
-                const vetId = e.target.value;
-                selectServicio.innerHTML = ''; 
+            <!-- TAB: CITAS (DINÁMICO) -->
+            <div *ngIf="tabActiva === 'citas'" class="space-y-4">
+                <h4 class="text-lg font-semibold text-primary-dark">Próximas Citas</h4>
+                <div *ngIf="citasMascota.length === 0" class="text-center text-gray-400 py-4">No hay citas programadas.</div>
                 
-                if (vetId) {
-                    selectServicio.disabled = false;
-                    selectServicio.add(new Option('Selecciona un servicio...', ''));
-                    if (vetId === '1') { // Dr. Israel
-                        selectServicio.add(new Option('Consulta Cardiológica', 'cardio'));
-                        selectServicio.add(new Option('Consulta General', 'general'));
-                    } else if (vetId === '2') { // Dr. Salas
-                        selectServicio.add(new Option('Cirugía Ortopédica', 'cirugia'));
-                        selectServicio.add(new Option('Consulta General', 'general'));
-                    }
-                } else {
-                    selectServicio.disabled = true;
-                    selectServicio.add(new Option('Selecciona un veterinario primero...', ''));
-                }
-            });
-        }
+                <div *ngFor="let cita of citasMascota" class="p-4 border border-secondary-teal rounded-lg">
+                    <div class="flex justify-between items-center mb-1">
+                        <p class="font-semibold text-gray-800">{{ cita.motivo }}</p>
+                        <span class="text-sm text-gray-500">{{ cita.fecha_hora | date:'medium' }}</span>
+                    </div>
+                    <p class="text-sm text-gray-600">Con: <span class="font-medium">{{ cita.nombre_veterinario || 'Por asignar' }}</span></p>
+                    <span class="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-800">{{ cita.estado }}</span>
+                </div>
+            </div>
 
-        btnAgregarTratamiento.addEventListener('click', () => {
-            if (selectVeterinario) selectVeterinario.value = "";
-            if (selectServicio) {
-                selectServicio.innerHTML = '';
-                selectServicio.add(new Option('Selecciona un veterinario primero...', ''));
-                selectServicio.disabled = true;
-            }
-            openModal(modalAgregarTratamiento)
-        });
-        if(btnClose) btnClose.addEventListener('click', () => closeModal(modalAgregarTratamiento));
-        if(btnCancel) btnCancel.addEventListener('click', () => closeModal(modalAgregarTratamiento));
-    }
+        </div>
+    </div>
+</div>
 
-    // --- Modal 4: Filtros Avanzados ---
-    const btnFiltros = document.getElementById('btn-filtros-avanzados');
-    const modalFiltros = document.getElementById('modal-filtros-avanzados');
+<!-- ============================ -->
+<!-- MODAL AGREGAR TRATAMIENTO -->
+<!-- ============================ -->
+<div *ngIf="mostrarModalTratamiento" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-[60]">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg animate-fade-in-down">
+        <div class="flex justify-between items-center p-5 border-b">
+            <h3 class="text-xl font-bold text-primary-dark">Agregar Tratamiento</h3>
+            <button (click)="cerrarModalTratamiento()" class="text-gray-400 hover:text-gray-600">X</button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div>
+                <label class="block text-gray-700 mb-1 font-semibold">Veterinario</label>
+                <select [(ngModel)]="nuevoHistorial.veterinario_id" name="vet_id" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal">
+                    <option [value]="0">Selecciona...</option>
+                    <option *ngFor="let v of veterinarios" [value]="v.id">{{ v.nombre_completo }}</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-gray-700 mb-1 font-semibold">Notas / Tratamiento</label>
+                <!-- CORREGIDO: nuevoHistorial.tratamiento_aplicado -->
+                <textarea [(ngModel)]="nuevoHistorial.tratamiento_aplicado" name="notas" rows="3" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal"></textarea>
+            </div>
+            <div>
+                <label class="block text-gray-700 mb-1 font-semibold">Medicamentos</label>
+                <!-- CORREGIDO: nuevoHistorial.medicamentos_recetados -->
+                <textarea [(ngModel)]="nuevoHistorial.medicamentos_recetados" name="meds" rows="2" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal"></textarea>
+            </div>
+        </div>
+        <div class="flex justify-end p-5 border-t space-x-4">
+            <button (click)="cerrarModalTratamiento()" class="bg-white border border-gray-300 px-4 py-2 rounded-lg text-gray-700">Cancelar</button>
+            <button (click)="guardarTratamiento()" class="bg-secondary-teal text-white px-4 py-2 rounded-lg shadow-md hover:bg-opacity-80">Guardar</button>
+        </div>
+    </div>
+</div>
 
-    if(btnFiltros && modalFiltros) {
-        const btnCloseFiltros = document.getElementById('btn-close-filtros');
-        const btnCancelFiltros = document.getElementById('btn-cancel-filtros');
+<!-- ============================ -->
+<!-- MODAL AGREGAR VACUNA -->
+<!-- ============================ -->
+<div *ngIf="mostrarModalVacuna" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-[60]">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg animate-fade-in-down">
+        <div class="flex justify-between items-center p-5 border-b">
+            <h3 class="text-xl font-bold text-primary-dark">Registrar Vacuna</h3>
+            <button (click)="cerrarModalVacuna()" class="text-gray-400 hover:text-gray-600">X</button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div>
+                <label class="block text-gray-700 mb-1 font-semibold">Vacuna</label>
+                <select [(ngModel)]="nuevaVacuna.producto_id" name="vac_prod" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal">
+                    <option [value]="0">Selecciona...</option>
+                    <option *ngFor="let p of productos" [value]="p.id">{{ p.nombre }} (Stock: {{p.stock_actual}})</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-gray-700 mb-1 font-semibold">Veterinario</label>
+                <select [(ngModel)]="nuevaVacuna.veterinario_id" name="vac_vet" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal">
+                    <option [value]="0">Selecciona...</option>
+                    <option *ngFor="let v of veterinarios" [value]="v.id">{{ v.nombre_completo }}</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 mb-1 font-semibold">Fecha Aplicación</label>
+                    <input [(ngModel)]="nuevaVacuna.fecha_aplicacion" name="vac_fecha" type="date" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal">
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-1 font-semibold">Próxima Dosis</label>
+                    <input [(ngModel)]="nuevaVacuna.fecha_proxima" name="vac_prox" type="date" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal">
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-end p-5 border-t space-x-4">
+            <button (click)="cerrarModalVacuna()" class="bg-white border border-gray-300 px-4 py-2 rounded-lg text-gray-700">Cancelar</button>
+            <button (click)="guardarVacuna()" class="bg-secondary-teal text-white px-4 py-2 rounded-lg shadow-md hover:bg-opacity-80">Guardar</button>
+        </div>
+    </div>
+</div>
 
-        btnFiltros.addEventListener('click', () => openModal(modalFiltros));
-        if (btnCloseFiltros) btnCloseFiltros.addEventListener('click', () => closeModal(modalFiltros));
-        if (btnCancelFiltros) btnCancelFiltros.addEventListener('click', () => closeModal(modalFiltros));
-    }
-    
-    // --- Modal 5: Registrar Vacuna (anidado) ---
-    const btnAgregarVacuna = document.getElementById('btn-agregar-vacuna');
-    const modalAgregarVacuna = document.getElementById('modal-agregar-vacuna');
-    if (btnAgregarVacuna && modalAgregarVacuna) {
-        const btnClose = document.getElementById('btn-close-agregar-vacuna');
-        const btnCancel = document.getElementById('btn-cancel-agregar-vacuna');
-
-        btnAgregarVacuna.addEventListener('click', () => openModal(modalAgregarVacuna));
-        if(btnClose) btnClose.addEventListener('click', () => closeModal(modalAgregarVacuna));
-        if(btnCancel) btnCancel.addEventListener('click', () => closeModal(modalAgregarVacuna));
-    }
-    
-    // --- Modal 6: Archivar Mascota (anidado) ---
-    const btnArchivarMascota = document.getElementById('btn-archivar-mascota');
-    const modalArchivarMascota = document.getElementById('modal-archivar-mascota');
-    if (btnArchivarMascota && modalArchivarMascota) {
-        const btnClose = document.getElementById('btn-close-archivar-mascota');
-        const btnCancel = document.getElementById('btn-cancel-archivar-mascota');
-        const btnConfirmar = document.getElementById('btn-confirmar-archivar');
-
-        btnArchivarMascota.addEventListener('click', () => {
-            openModal(modalArchivarMascota);
-        });
-        
-        if(btnClose) btnClose.addEventListener('click', () => closeModal(modalArchivarMascota));
-        if(btnCancel) btnCancel.addEventListener('click', () => closeModal(modalArchivarMascota));
-        if(btnConfirmar) btnConfirmar.addEventListener('click', () => {
-            console.log("Mascota Archivada");
-            closeModal(modalArchivarMascota);
-            closeModal(modalDetalleMascota);
-        });
-    }
-    
-    // Botón Re-activar
-    const btnReactivarMascota = document.getElementById('btn-reactivar-mascota');
-    if(btnReactivarMascota) {
-        btnReactivarMascota.addEventListener('click', () => {
-            console.log("Mascota Re-activada");
-            closeModal(modalDetalleMascota);
-        });
-    }
-</script>
+<!-- ============================ -->
+<!-- MODAL ARCHIVAR -->
+<!-- ============================ -->
+<div *ngIf="mostrarModalArchivar" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-[60]">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg animate-fade-in-down">
+        <div class="flex justify-between items-center p-5 border-b border-red-200">
+            <h3 class="text-xl font-bold text-light-red">Archivar Mascota</h3>
+            <button (click)="cerrarModalArchivar()" class="text-gray-400 hover:text-gray-600">X</button>
+        </div>
+        <div class="p-6">
+            <p class="text-gray-700 mb-4">¿Estás seguro de que deseas archivar a <strong class="text-primary-dark">{{ mascotaSeleccionada?.nombre }}</strong>?</p>
+            <p class="text-sm text-gray-500">Esto ocultará la mascota de la lista principal pero mantendrá su historial.</p>
+        </div>
+        <div class="flex justify-end p-5 border-t space-x-4">
+            <button (click)="cerrarModalArchivar()" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg">Cancelar</button>
+            <button (click)="archivarMascotaConfirmado()" class="bg-light-red text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700">Confirmar</button>
+        </div>
+    </div>
+</div>

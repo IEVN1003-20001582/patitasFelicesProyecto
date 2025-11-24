@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 
@@ -40,6 +41,6 @@ export class AppComponent {
   getRolActual(): string {
     // En el futuro, esto vendrá de tu AuthService
     // Por ahora, puedes cambiar esto manualmente a 'veterinario' o 'cliente' para probar
-    return 'cliente'; // 'admin', 'veterinario', 'cliente'
+    return 'admin'; // 'admin', 'veterinario', 'cliente'
   }
 }
