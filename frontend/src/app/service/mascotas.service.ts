@@ -27,6 +27,10 @@ export class MascotasService {
     return this.http.delete<RespuestaApi>(`${this.apiUrl}/mascotas/${id}`);
   }
 
+  modificarMascota(id: number, datos: Mascota): Observable<RespuestaApi> {
+  return this.http.put<RespuestaApi>(`${this.apiUrl}/mascotas/${id}`, datos);
+}
+
   // --- HISTORIAL CLÍNICO ---
   getHistorial(mascotaId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/historial?mascota_id=${mascotaId}`);

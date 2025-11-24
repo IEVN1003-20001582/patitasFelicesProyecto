@@ -24,6 +24,8 @@ import { CitasService } from '../../../service/citas.service';
 })
 export class GestionMascotasComponent implements OnInit {
 
+
+
   // --- VARIABLES DE DATOS GENERALES ---
   mascotas: any[] = [];
   mascotasFiltradas: any[] = [];
@@ -50,6 +52,7 @@ export class GestionMascotasComponent implements OnInit {
   mostrarModalVacuna = false;
   mostrarModalFiltros = false;
   mostrarModalArchivar = false;
+  mostrarModalEditar = false;
 
   tabActiva: string = 'info'; // Pestaña activa en el detalle
   textoBusqueda: string = '';
@@ -58,7 +61,8 @@ export class GestionMascotasComponent implements OnInit {
   nuevaMascota: Mascota = this.initMascota();
   nuevoHistorial: Historial = this.initHistorial();
   nuevaVacuna: Vacuna = this.initVacuna();
-  
+
+  mascotaEditando: Mascota = this.initMascota();
   mascotaSeleccionada: any = null; 
 
   constructor(
@@ -197,6 +201,44 @@ guardarTratamiento() {
     });
   }
 
+
+  abrirModalEditar() {
+    this.mascotaEditando = { ...this.mascotaSeleccionada }; // Clonamos el objeto
+    this.mostrarModalEditar = true;
+  }
+
+  cerrarModalEditar() {
+    this.mostrarModalEditar = false;
+    this.mascotaEditando = this.initMascota();
+  }
+
+  guardarEdicionMascota() {
+    if (!this.mascotaEditando.nombre || !this.mascotaEditando.cliente_id) {
+      Swal.fire('Atención', 'Nombre y Dueño son obligatorios', 'warning');
+      return;
+    }
+  // Llamamos al servicio (asegúrate de que mascotaEditando tenga ID)
+    if (this.mascotaEditando.id) {
+        this.mascotasService.modificarMascota(this.mascotaEditando.id, this.mascotaEditando).subscribe(res => {
+            if (res.exito) {
+                Swal.fire('Actualizado', 'Información actualizada correctamente', 'success');
+                
+                
+                // Actualizamos la vista local inmediatamente
+                this.mascotaSeleccionada = { ...this.mascotaEditando }; 
+
+                this.cerrarModalEditar();
+                
+                // Y recargamos la lista principal por si acaso
+                this.cargarDatosIniciales();
+                
+            } else {
+                Swal.fire('Error', 'No se pudo actualizar: ' + res.mensaje, 'error');
+            }
+        });
+    }
+  }
+
   // --- ARCHIVAR MASCOTA ---
   archivarMascotaConfirmado() {
     if (!this.mascotaSeleccionada) return;
@@ -243,6 +285,7 @@ guardarTratamiento() {
   initMascota(): Mascota {
     return { cliente_id: 0, nombre: '', especie: '', raza: '', fecha_nacimiento: '', sexo: 'Macho', peso: 0, alergias: '' };
   }
+
  initHistorial(): Historial {
     return { 
         mascota_id: 0, 
