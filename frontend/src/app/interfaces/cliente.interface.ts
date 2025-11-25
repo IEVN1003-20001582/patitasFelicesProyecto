@@ -1,9 +1,10 @@
 export interface Cliente {
-  id?: number;
-  usuario_id?: number;
-  nombre_completo: string;
-  telefono: string;
-  direccion?: string;
-  email?: string; // Dato útil traído del usuario
-  mascotas_count?: number; // Dato calculado
+    id?: number;
+    user_id?: number;
+    nombre: string;
+    email: string;
+    telefono: string;
+    direccion: string;
+    num_mascotas?: number;
+    estado?: string; // 'Activo' | 'Inactivo'
 }

@@ -73,7 +73,7 @@
     <!-- ============================ -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         
-        <div *ngFor="let mascota of mascotasFiltradas" 
+        <div *ngFor="let mascota of mascotasFiltradas; let i = index" 
              (click)="abrirModalDetalle(mascota)"
              class="btn-detalle-mascota bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 hover:shadow-xl transition duration-300 cursor-pointer">
             
@@ -86,10 +86,17 @@
                      class="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
                      onerror="this.style.display='none'">
                 
-                <!-- 2. Texto de Respaldo (Si NO hay foto o falló) -->
-                <div *ngIf="!mascota.foto_url || mascota.foto_url.length <= 10" 
-                     class="absolute inset-0 flex items-center justify-center text-gray-400 font-bold text-4xl select-none bg-gray-100">
-                    {{ mascota.nombre }}
+                 <!-- 2. Texto de Respaldo (Si NO hay foto o falló) -->
+                  <div class="absolute inset-0 flex items-center justify-center z-0"
+                     [ngClass]="{
+                        'bg-blue-100 text-blue-400': i % 4 === 0,
+                        'bg-green-100 text-green-400': i % 4 === 1,
+                        'bg-yellow-100 text-yellow-400': i % 4 === 2,
+                        'bg-purple-100 text-purple-400': i % 4 === 3
+                     }">
+                    <span class="font-bold text-6xl select-none uppercase tracking-wider opacity-50">
+                        {{ mascota.nombre }}
+                    </span>
                 </div>
             </div>
 

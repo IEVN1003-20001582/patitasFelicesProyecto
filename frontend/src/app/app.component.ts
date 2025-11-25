@@ -41,6 +41,6 @@ export class AppComponent {
   getRolActual(): string {
     // En el futuro, esto vendrá de tu AuthService
     // Por ahora, puedes cambiar esto manualmente a 'veterinario' o 'cliente' para probar
-    return 'veterinario'; // 'admin', 'veterinario', 'cliente'
+    return 'admin'; // 'admin', 'veterinario', 'cliente'
   }
 }

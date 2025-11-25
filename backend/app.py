@@ -324,19 +324,101 @@ def get_veterinarios():
         return jsonify({'mensaje': 'Error: ' + str(ex), 'exito': False})
 
 
-# 6. CLIENTES
+# ==========================================
+# GESTIÓN DE CLIENTES (CRUD)
+# ==========================================
+
 @app.route('/api/clientes', methods=['GET'])
 def get_clientes():
     try:
+        # Filtro opcional por estado (?estado=Activo)
+        estado = request.args.get('estado') 
+        
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT id, nombre_completo as nombre FROM clientes ORDER BY nombre_completo ASC")
+        
+        # Consulta base: trae clientes y cuenta sus mascotas activas
+        sql = """
+            SELECT c.*, 
+                   (SELECT COUNT(*) FROM mascotas m WHERE m.cliente_id = c.id AND m.estado = 'activo') as num_mascotas
+            FROM clientes c
+        """
+        
+        if estado:
+            sql += " WHERE c.estado = %s"
+            params = (estado,)
+            cursor.execute(sql, params)
+        else:
+            # Por defecto: Primero Activos, luego Inactivos, luego por nombre
+            sql += " ORDER BY FIELD(c.estado, 'Activo', 'Inactivo'), c.nombre_completo ASC"
+            cursor.execute(sql)
+            
         datos = cursor.fetchall()
         conn.close()
-        return jsonify(datos)
+        return jsonify({'clientes': datos, 'exito': True})
     except Exception as ex:
-        return jsonify({'mensaje': 'Error: ' + str(ex), 'exito': False})
+        return jsonify({'mensaje': str(ex), 'exito': False})
 
+@app.route('/api/clientes', methods=['POST'])
+def crear_cliente():
+    try:
+        d = request.json
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 1. Crear Login
+        cursor.execute("INSERT INTO users (email, password_hash, role) VALUES (%s, %s, 'cliente')", (d['email'], '123456'))
+        user_id = cursor.lastrowid
+        
+        # 2. Crear Perfil (Estado Activo por defecto en BD)
+        sql = """INSERT INTO clientes (user_id, nombre_completo, telefono, direccion, email_contacto, estado)
+                 VALUES (%s, %s, %s, %s, %s, 'Activo')"""
+        cursor.execute(sql, (user_id, d['nombre'], d['telefono'], d['direccion'], d['email']))
+        
+        conn.commit()
+        conn.close()
+        return jsonify({'mensaje': 'Cliente registrado', 'exito': True})
+    except Exception as ex:
+        return jsonify({'mensaje': str(ex), 'exito': False})
+
+@app.route('/api/clientes/<id>', methods=['PUT'])
+def actualizar_cliente(id):
+    try:
+        d = request.json
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        sql = "UPDATE clientes SET nombre_completo=%s, telefono=%s, direccion=%s, email_contacto=%s WHERE id=%s"
+        cursor.execute(sql, (d['nombre'], d['telefono'], d['direccion'], d['email'], id))
+        conn.commit()
+        conn.close()
+        return jsonify({'mensaje': 'Cliente actualizado', 'exito': True})
+    except Exception as ex:
+        return jsonify({'mensaje': str(ex), 'exito': False})
+
+# CAMBIO CLAVE: Este DELETE ahora es un ARCHIVAR
+@app.route('/api/clientes/<id>', methods=['DELETE'])
+def archivar_cliente(id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 1. Marcar Cliente como Inactivo
+        cursor.execute("UPDATE clientes SET estado = 'Inactivo' WHERE id = %s", (id,))
+        
+        # 2. Archivar sus mascotas también (Opcional, pero recomendado para consistencia)
+        cursor.execute("UPDATE mascotas SET estado = 'archivado' WHERE cliente_id = %s", (id,))
+        
+        # 3. Desactivar acceso (Login)
+        cursor.execute("SELECT user_id FROM clientes WHERE id = %s", (id,))
+        res = cursor.fetchone()
+        if res and res[0]:
+            cursor.execute("UPDATE users SET is_active = FALSE WHERE id = %s", (res[0],))
+
+        conn.commit()
+        conn.close()
+        return jsonify({'mensaje': 'Cliente archivado (Soft Delete)', 'exito': True})
+    except Exception as ex:
+        return jsonify({'mensaje': str(ex), 'exito': False})
 
 
 
