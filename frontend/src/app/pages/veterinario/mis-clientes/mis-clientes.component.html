@@ -1,468 +1,255 @@
+<div class="w-full h-full flex flex-col bg-gray-50">
+    
+    <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+        <!-- KPIs -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center">
+                <div class="p-3 bg-secondary-teal rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>
+                <div class="ml-4"><p class="text-gray-500">Total Clientes</p><p class="text-2xl font-bold text-primary-dark">{{ kpis.total }}</p></div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center">
+                <div class="p-3 bg-accent-yellow rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                <div class="ml-4"><p class="text-gray-500">Nuevos (Mes)</p><p class="text-2xl font-bold text-primary-dark">{{ kpis.nuevos }}</p></div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center">
+                <div class="p-3 bg-light-green rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>
+                <div class="ml-4"><p class="text-gray-500">Activos</p><p class="text-2xl font-bold text-primary-dark">{{ kpis.activos }}</p></div>
+            </div>
+        </div>
 
-            <!-- =================================================================
-                 PÁGINA 7 (VET): GESTIÓN DE CLIENTES (CONTENIDO)
-            ================================================================== -->
-            <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+        <!-- Toolbar -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+            <div class="relative w-full max-w-md">
+                <input type="text" [(ngModel)]="textoBusqueda" (input)="filtrarClientes()" placeholder="Buscar cliente..." class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </div>
+            <div class="flex space-x-4">
+                <button (click)="abrirModalFiltros()" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg text-sm hover:bg-gray-50 transition flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM7 11a1 1 0 011-1h8a1 1 0 011 1v2a1 1 0 01-1 1H8a1 1 0 01-1-1v-2zM11 18a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1v-2z" /></svg> Filtros
+                </button>
+                <button (click)="abrirModalAgregar()" class="bg-secondary-teal text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-opacity-80 transition flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg> Agregar Cliente
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Nombre</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Contacto</th>
+                            <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">Mascotas</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Estado</th>
+                            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr *ngFor="let cliente of clientesFiltrados" [class.bg-gray-50]="cliente.estado === 'Inactivo'">
+                            <td class="px-6 py-4 whitespace-nowrap font-semibold text-blue-600 cursor-pointer hover:underline" (click)="abrirVistaRapida(cliente)">
+                                {{ cliente.nombre }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-800">{{ cliente.email }}</div>
+                                <div class="text-sm text-gray-500">{{ cliente.telefono }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-semibold text-gray-700">
+                                {{ cliente.num_mascotas }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 py-1 text-xs font-semibold rounded-full"
+                                      [ngClass]="{
+                                        'text-green-800 bg-green-200': cliente.estado === 'Activo',
+                                        'text-gray-600 bg-gray-200': cliente.estado === 'Inactivo'
+                                      }">
+                                    {{ cliente.estado || 'Activo' }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                <button (click)="abrirModalEditar(cliente)" class="p-2 text-secondary-teal hover:bg-gray-100 rounded-full" title="Editar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                </button>
+                                <!-- Botón Archivar solo si está activo -->
+                            
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- ============================ -->
+    <!-- DRAWER - VISTA RÁPIDA -->
+    <!-- ============================ -->
+    <div *ngIf="mostrarModalVistaRapida" class="fixed inset-0 z-40 flex justify-end">
+        <div (click)="cerrarVistaRapida()" class="fixed inset-0 bg-black bg-opacity-30 transition-opacity cursor-pointer"></div>
+        
+        <div class="relative w-full max-w-md h-full bg-white shadow-2xl z-50 flex flex-col animate-slide-in-right">
+            <div class="flex justify-between items-center p-5 border-b bg-gray-50">
+                <h3 class="text-xl font-bold text-primary-dark">Perfil del Cliente</h3>
+                <button (click)="cerrarVistaRapida()" class="text-gray-400 hover:text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            
+            <div class="flex-1 p-6 overflow-y-auto space-y-8" *ngIf="clienteSeleccionado">
                 
-                <!-- KPIs (ELIMINADOS PARA EL ROL DE VETERINARIO) -->
-
-                <!-- Barra de Herramientas (Simplificada) -->
-                <div class="flex justify-between items-center mb-6">
-                    <!-- Barra de Búsqueda -->
-                    <div class="relative w-full max-w-md">
-                        <input type="text" placeholder="Buscar cliente por nombre o correo..." class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                <!-- Info Cliente -->
+                <div class="flex items-start space-x-4">
+                    <div class="h-20 w-20 rounded-full bg-secondary-teal flex items-center justify-center text-3xl text-white font-bold shadow-md flex-shrink-0 uppercase">
+                        {{ clienteSeleccionado.nombre.charAt(0) }}
                     </div>
-                    
-                    <!-- Botones de Acción -->
-                    <div class="flex space-x-4">
-                         <button id="btn-agregar-cliente" class="bg-secondary-teal text-white font-semibold py-2 px-5 rounded-lg text-sm shadow-md hover:bg-opacity-80 transition duration-300 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                            Agregar Cliente
+                    <div class="flex-1">
+                        <h4 class="text-2xl font-bold text-gray-800 leading-tight">{{ clienteSeleccionado.nombre }}</h4>
+                        
+                        <!-- CAMBIO AQUÍ: Estado en el Drawer -->
+                        <span class="inline-block mt-1 px-2 py-0.5 text-xs font-bold uppercase rounded-md"
+                              [ngClass]="clienteSeleccionado.estado === 'Inactivo' ? 'bg-gray-200 text-gray-600' : 'bg-green-100 text-green-700'">
+                            {{ clienteSeleccionado.estado || 'Activo' }}
+                        </span>
+
+                        <div class="mt-3 space-y-1">
+                            <p class="text-sm text-gray-500 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                {{ clienteSeleccionado.email }}
+                            </p>
+                            <p class="text-sm text-gray-500 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                                {{ clienteSeleccionado.telefono || 'Sin teléfono' }}
+                            </p>
+                            <p class="text-sm text-gray-500 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                {{ clienteSeleccionado.direccion || 'Sin dirección' }}
+                            </p>
+                        </div>
+                        <button (click)="abrirModalEditar(clienteSeleccionado)" class="mt-4 text-sm font-semibold text-secondary-teal hover:underline">
+                            Editar Información
                         </button>
                     </div>
                 </div>
+                
+                <hr class="border-gray-100">
 
-                <!-- Tabla de Clientes (Simplificada) -->
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Contacto</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"># Mascotas</th>
-                                    <!-- Columna "Estado" ELIMINADA -->
-                                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200">
-                                <!-- Fila 1 -->
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <!-- Botón para abrir vista rápida -->
-                                        <button class="btn-vista-rapida font-semibold text-blue-600 hover:text-blue-800 hover:underline">
-                                            Ana Gomez
-                                        </button>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-800">ana.gomezmail.com</div>
-                                        <div class="text-sm text-gray-500">479 290 6521</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-800 text-center font-semibold">2</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                        <button class="btn-editar-cliente p-2 text-secondary-teal hover:bg-gray-100 rounded-full" title="Editar">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                        </button>
-                                        <!-- Botón "Eliminar" ELIMINADO -->
-                                    </td>
-                                </tr>
-                                <!-- Fila 2 -->
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <button class="btn-vista-rapida font-semibold text-blue-600 hover:text-blue-800 hover:underline">
-                                            Carlos Ruiz
-                                        </button>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-800">carlos.ruizmail.com</div>
-                                        <div class="text-sm text-gray-500">479 290 5521</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-800 text-center font-semibold">1</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                        <button class="btn-editar-cliente p-2 text-secondary-teal hover:bg-gray-100 rounded-full" title="Editar">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <!-- Mascotas Registradas -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h5 class="text-lg font-bold text-gray-800">Mascotas ({{ mascotasCliente.length }})</h5>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div *ngFor="let mascota of mascotasCliente" class="flex items-center p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                            <!-- Foto Mascota -->
+                            <div class="h-12 w-12 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden relative border border-gray-200">
+                                <img *ngIf="mascota.foto_url && mascota.foto_url.length > 10" [src]="mascota.foto_url" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'">
+                                <div class="absolute inset-0 flex items-center justify-center text-gray-400 font-bold bg-gray-100 uppercase">{{ mascota.nombre.charAt(0) }}</div>
+                            </div>
+                            
+                            <div class="ml-3 flex-1">
+                                <p class="font-bold text-gray-800">{{ mascota.nombre }}</p>
+                                <p class="text-xs text-gray-500">{{ mascota.especie }} • {{ mascota.raza }}</p>
+                            </div>
+                            
+                            <!-- CAMBIO AQUÍ: Badge Estado Mascota -->
+                            <span class="px-2 py-1 text-[10px] font-bold uppercase rounded-md"
+                                  [ngClass]="mascota.estado === 'archivado' ? 'bg-gray-200 text-gray-500' : 'bg-green-100 text-green-600'">
+                                {{ mascota.estado === 'archivado' ? 'Archivado' : 'Activo' }}
+                            </span>
+                        </div>
+
+                        <div *ngIf="mascotasCliente.length === 0" class="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                            <p class="text-gray-400 text-sm">Este cliente no tiene mascotas registradas.</p>
+                        </div>
                     </div>
                 </div>
 
-            </main>
+                <!-- Estadísticas -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 bg-blue-50 rounded-xl text-center">
+                        <p class="text-2xl font-bold text-blue-600">{{ mascotasCliente.length }}</p>
+                        <p class="text-xs text-blue-800 uppercase font-bold tracking-wide">Mascotas</p>
+                    </div>
+                    <div class="p-4 rounded-xl text-center" [ngClass]="clienteSeleccionado.estado === 'Inactivo' ? 'bg-gray-100' : 'bg-purple-50'">
+                        <p class="text-2xl font-bold" [ngClass]="clienteSeleccionado.estado === 'Inactivo' ? 'text-gray-500' : 'text-purple-600'">
+                            {{ clienteSeleccionado.estado || 'Activo' }}
+                        </p>
+                        <p class="text-xs uppercase font-bold tracking-wide" [ngClass]="clienteSeleccionado.estado === 'Inactivo' ? 'text-gray-400' : 'text-purple-800'">
+                            Estado
+                        </p>
+                    </div>
+                </div>
 
-
-    <!-- =================================================================
-         Panel Lateral (Drawer) - VISTA RÁPIDA (¡MODIFICADO!)
-    ================================================================== -->
-    <div id="modal-vista-rapida" class="fixed inset-0 z-40 drawer-backdrop opacity-0 pointer-events-none">
-        <!-- Fondo oscuro -->
-        <div id="drawer-backdrop" class="fixed inset-0 bg-black bg-opacity-30"></div>
-        
-        <!-- Contenido del Panel -->
-        <div class="drawer-content fixed top-0 right-0 w-full max-w-lg h-full bg-white shadow-2xl z-50 flex flex-col">
-            <!-- Header del Panel -->
-            <div class="flex justify-between items-center p-5 border-b">
-                <h3 class="text-xl font-bold text-primary-dark">Perfil del Cliente</h3>
-                <button id="btn-close-vista-rapida" class="text-gray-400 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
             </div>
             
-            <!-- Cuerpo del Panel -->
-            <div class="flex-1 p-6 overflow-y-auto space-y-6">
-                
-                <!-- Sección 1: Perfil -->
-                <div class="flex items-center space-x-4">
-                    <img class="h-20 w-20 rounded-full" src="https://placehold.co/80x80/48C9B0/ffffff?text=AG&font=poppins" alt="Cliente">
-                    <div>
-                        <h4 id="vista-nombre" class="text-2xl font-bold text-primary-dark">Ana Gomez</h4>
-                        <p id="vista-email" class="text-sm text-gray-500">ana.gomezmail.com</p>
-                        <p id="vista-telefono" class="text-sm text-gray-500">479 290 6521</p>
-                        <p id="vista-direccion" class="text-sm text-gray-500">Av. Siempre Viva 123</p>
-                    </div>
-                </div>
-                
-                <!-- Sección 2: Mascotas Registradas (¡MODIFICADO!) -->
-                <div>
-                    <h5 class="text-lg font-semibold text-primary-dark mb-3">Mascotas (Pacientes)</h5>
-                    <div class="space-y-3">
-                        <!-- Mascota 1 (Con Alerta) -->
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div class="flex items-center">
-                                <img class="h-12 w-12 rounded-full" src="https://placehold.co/48x48/F4D03F/ffffff?text=M&font=poppins" alt="Mascota">
-                                <div class="ml-3">
-                                    <p class="font-semibold text-gray-800">Max (Perro)</p>
-                                    <span class="px-2 py-0.5 text-xs font-bold text-red-800 bg-red-200 rounded-full">¡ALERGIAS!</span>
-                                </div>
-                            </div>
-                            <a href="#" class="text-secondary-teal font-semibold text-sm hover:underline">Ir al Historial →</a>
-                        </div>
-                        <!-- Mascota 2 (Sin Alerta) -->
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div class="flex items-center">
-                                <img class="h-12 w-12 rounded-full" src="https://placehold.co/48x48/2C3E50/ffffff?text=L&font=poppins" alt="Mascota">
-                                <div class="ml-3">
-                                    <p class="font-semibold text-gray-800">Mishi (Gato)</p>
-                                    <p class="text-sm text-gray-500">Doméstico</p>
-                                </div>
-                            </div>
-                             <a href="#" class="text-secondary-teal font-semibold text-sm hover:underline">Ir al Historial →</a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Sección 3: Próximas Citas -->
-                <div>
-                    <h5 class="text-lg font-semibold text-primary-dark mb-3">Próximas Citas</h5>
-                    <div class="space-y-3">
-                        <div class="p-3 border border-dashed border-gray-300 rounded-lg">
-                            <div class="flex justify-between items-center">
-                                <p class="font-semibold text-gray-800">Vacuna Anual (Max)</p>
-                                <span class="text-xs font-medium bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full">Programada</span>
-                            </div>
-                            <p class="text-sm text-gray-500">15 de Nov, 2025 - 10:00 AM con Dr. Salas</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer del Panel (¡MODIFICADO!) -->
-            <div class="flex justify-end p-5 border-t space-x-4 bg-gray-50">
-                <button type="button" class="btn-editar-cliente bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
-                    Editar Contacto
-                </button>
-                <button id="btn-agregar-mascota-drawer" type="button" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-opacity-80 transition duration-300">
-                    + Registrar Mascota (a Ana)
-                </button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- =================================================================
-         MODALS (Pop-ups) (Simplificados)
-    ================================================================== -->
-
-    <!-- Modal 1: Agregar Cliente -->
-    <div id="modal-agregar-cliente" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg">
-            <!-- Header -->
-            <div class="flex justify-between items-center p-5 border-b">
-                <h3 class="text-xl font-bold text-primary-dark">Agregar Nuevo Cliente</h3>
-                <button id="btn-close-agregar-cliente" class="text-gray-400 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <!-- Cuerpo -->
-            <div class="p-6">
-                <form id="form-agregar-cliente" class="space-y-4">
-                    <div>
-                        <label for="cliente-nombre" class="block text-gray-700 mb-1 font-semibold">Nombre Completo</label>
-                        <input id="cliente-nombre" type="text" placeholder="Ej. Ana Gomez" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal" required>
-                    </div>
-                    <div>
-                        <label for="cliente-email" class="block text-gray-700 mb-1 font-semibold">Correo Electrónico</label>
-                        <input id="cliente-email" type="email" placeholder="Ej. ana.gomezmail.com" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal" required>
-                    </div>
-                    <div>
-                        <label for="cliente-telefono" class="block text-gray-700 mb-1 font-semibold">Teléfono</label>
-                        <input id="cliente-telefono" type="tel" placeholder="Ej. 477 123 4567" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                    </div>
-                    <div>
-                        <label for="cliente-direccion" class="block text-gray-700 mb-1 font-semibold">Dirección</label>
-                        <input id="cliente-direccion" type="text" placeholder="Ej. Av. Siempre Viva 123" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                    </div>
-                </form>
-            </div>
             <!-- Footer -->
-            <div class="flex justify-end p-5 border-t space-x-4">
-                <button id="btn-cancel-agregar-cliente" type="button" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
-                    Cancelar
-                </button>
-                <button type="submit" form="form-agregar-cliente" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-opacity-80 transition duration-300">
-                    Guardar Cliente
+            <div class="p-5 border-t bg-gray-50">
+                <button (click)="cerrarVistaRapida()" class="w-full py-3 bg-white border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-100 transition">
+                    Cerrar
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal 2: Editar Cliente -->
-    <!-- ... (código existente del modal 2) ... -->
-
-
-    <!-- Modal 3: Filtros Avanzados (ELIMINADO) -->
-    <!-- Modal 4: Confirmar Eliminación (ELIMINADO) -->
-
-    <!-- ¡NUEVO! Modal 5: Agregar Mascota -->
-    <div id="modal-agregar-mascota" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-[60]"> <!-- z-60 para estar sobre el drawer -->
-        <!-- Contenedor del Modal -->
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
-            <!-- Header del Modal -->
-            <div class="flex justify-between items-center p-5 border-b">
-                <h3 class="text-xl font-bold text-primary-dark">Registrar Nueva Mascota</h3>
-                <button id="btn-close-agregar-mascota" class="text-gray-400 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
+    <!-- Modal Agregar (Sin cambios) -->
+    <div *ngIf="mostrarModalAgregar" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg animate-fade-in-down">
+            <div class="flex justify-between items-center p-5 border-b"><h3 class="text-xl font-bold text-primary-dark">Agregar Cliente</h3><button (click)="cerrarModalAgregar()">X</button></div>
+            <div class="p-6 space-y-4">
+                <input [(ngModel)]="nuevoCliente.nombre" placeholder="Nombre Completo" class="w-full p-2 border rounded">
+                <input [(ngModel)]="nuevoCliente.email" placeholder="Correo" class="w-full p-2 border rounded">
+                <input [(ngModel)]="nuevoCliente.telefono" placeholder="Teléfono" class="w-full p-2 border rounded">
+                <input [(ngModel)]="nuevoCliente.direccion" placeholder="Dirección" class="w-full p-2 border rounded">
             </div>
-            
-            <!-- Cuerpo del Modal -->
-            <div class="p-6 max-h-[70vh] overflow-y-auto">
-                <form id="form-registrar-mascota" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Columna de Foto -->
-                        <div class="md:col-span-1 flex flex-col items-center">
-                            <label class="block text-gray-700 mb-2 font-semibold">Foto de la Mascota</label>
-                            <div class="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center mb-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l-1.586-1.586a2 2 0 00-2.828 0L6 14m6-6l.25-.25a2 2 0 012.828 0l.25.25m-3 3l.25.25a2 2 0 002.828 0l.25-.25m-3-3l.25-.25a2 2 0 012.828 0l.25.25m0 0l-3 3m0 0l-3-3m3 3V3" /></svg>
-                            </div>
-                            <input type="file" id="mascota-foto" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-secondary-teal file:text-white hover:file:bg-opacity-80"/>
-                        </div>
-                        
-                        <!-- Columna de Campos Principales -->
-                        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="md:col-span-2">
-                                <label for="mascota-nombre" class="block text-gray-700 mb-1 font-semibold">Nombre de la Mascota</label>
-                                <input id="mascota-nombre" type="text" placeholder="Ej. Max" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal" required>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label for="mascota-duenio" class="block text-gray-700 mb-1 font-semibold">Duenio (Cliente)</label>
-                                <select id="mascota-duenio" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal" required>
-                                    <option value="">Buscar y seleccionar cliente...</option>
-                                    <option value="1">Ana Gomez</option>
-                                    <option value="2">Carlos Ruiz</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="mascota-especie" class="block text-gray-700 mb-1 font-semibold">Especie</label>
-                                <input id="mascota-especie" type="text" placeholder="Ej. Perro" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                            </div>
-                            <div>
-                                <label for="mascota-raza" class="block text-gray-700 mb-1 font-semibold">Raza</label>
-                                <input id="mascota-raza" type="text" placeholder="Ej. Golden Retriever" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                            </div>
-                            <div>
-                                <label for="mascota-fecha-nac" class="block text-gray-700 mb-1 font-semibold">Fecha de Nacimiento</label>
-                                <input id="mascota-fecha-nac" type="date" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                            </div>
-                            <div>
-                                <label for="mascota-sexo" class="block text-gray-700 mb-1 font-semibold">Sexo</label>
-                                <select id="mascota-sexo" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                                    <option value="Macho">Macho</option>
-                                    <option value="Hembra">Hembra</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="mascota-peso" class="block text-gray-700 mb-1 font-semibold">Peso (kg)</label>
-                                <input id="mascota-peso" type="number" step="0.1" placeholder="Ej. 5.2" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                            </div>
-                             <div>
-                                <label for="mascota-esterilizado" class="block text-gray-700 mb-1 font-semibold">Esterilizado</label>
-                                <select id="mascota-esterilizado" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                                    <option value="Si">Sí</option>
-                                    <option value="No">No</option>
-                                    <option value="No Aplica">No Aplica</option>
-                                </select>
-                            </div>
-                        </div>
+            <div class="flex justify-end p-5 border-t space-x-4">
+                <button (click)="cerrarModalAgregar()" class="px-4 py-2 border rounded">Cancelar</button>
+                <button (click)="guardarCliente()" class="bg-secondary-teal text-white px-4 py-2 rounded">Guardar</button>
+            </div>
+        </div>
+    </div>
 
-                        <!-- Campo de Alergias (ancho completo) -->
-                        <div class="md:col-span-3">
-                            <label for="mascota-alergias" class="block text-gray-700 mb-1 font-semibold">Alergias Conocidas</label>
-                            <textarea id="mascota-alergias" rows="3" placeholder="Ej. Alergia al pollo, polvo..." class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal"></textarea>
-                        </div>
+    <!-- Modal Editar (Sin cambios) -->
+    <div *ngIf="mostrarModalEditar" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg animate-fade-in-down">
+            <div class="flex justify-between items-center p-5 border-b"><h3 class="text-xl font-bold text-primary-dark">Editar Cliente</h3><button (click)="cerrarModalEditar()">X</button></div>
+            <div class="p-6 space-y-4">
+                <input [(ngModel)]="clienteEditando.nombre" placeholder="Nombre" class="w-full p-2 border rounded">
+                <input [(ngModel)]="clienteEditando.email" placeholder="Correo" class="w-full p-2 border rounded">
+                <input [(ngModel)]="clienteEditando.telefono" placeholder="Teléfono" class="w-full p-2 border rounded">
+                <input [(ngModel)]="clienteEditando.direccion" placeholder="Dirección" class="w-full p-2 border rounded">
+            </div>
+            <div class="flex justify-end p-5 border-t space-x-4">
+                <button (click)="cerrarModalEditar()" class="px-4 py-2 border rounded">Cancelar</button>
+                <button (click)="guardarEdicion()" class="bg-secondary-teal text-white px-4 py-2 rounded">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Archivar (MODIFICADO) -->
+
+
+    <!-- Modal Filtros -->
+    <div *ngIf="mostrarModalFiltros" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg animate-fade-in-down">
+            <div class="flex justify-between items-center p-5 border-b"><h3 class="text-xl font-bold text-primary-dark">Filtros Avanzados</h3><button (click)="cerrarModalFiltros()">X</button></div>
+            <div class="p-6">
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 mb-1 font-semibold">Filtrar por Estado</label>
+                        <select class="w-full px-3 py-2 border rounded-lg">
+                            <option value="todos">Todos</option>
+                            <option value="Activo">Activos</option>
+                            <option value="Inactivo">Archivados</option>
+                        </select>
                     </div>
                 </form>
             </div>
-            <!-- Footer del Modal -->
             <div class="flex justify-end p-5 border-t space-x-4">
-                <button id="btn-cancel-agregar-mascota" type="button" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
-                    Cancelar
-                </button>
-                <button type="submit" form="form-registrar-mascota" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-opacity-80 transition duration-300">
-                    Guardar Mascota
-                </button>
+                <button (click)="cerrarModalFiltros()" class="bg-white border border-gray-300 px-4 py-2 rounded-lg">Cancelar</button>
+                <button (click)="cerrarModalFiltros()" class="bg-secondary-teal text-white px-4 py-2 rounded-lg">Aplicar</button>
             </div>
         </div>
     </div>
 
-
-    <!-- =================================================================
-         SCRIPT (Simplificado para el Veterinario)
-    ================================================================== -->
-    <script>
-        // --- Modal Helpers ---
-        const pageBody = document.body;
-        function openModal(modal) {
-            if (modal) modal.classList.remove('hidden');
-        }
-        function closeModal(modal) {
-            if (modal) modal.classList.add('hidden');
-        }
-        function openDrawer(drawer) {
-            if (drawer) {
-                drawer.classList.add('drawer-open');
-                if (pageBody) pageBody.classList.add('overflow-hidden');
-            }
-        }
-        function closeDrawer(drawer) {
-            if (drawer) {
-                drawer.classList.remove('drawer-open');
-                if (pageBody) pageBody.classList.remove('overflow-hidden');
-            }
-        }
-
-        // --- Modal 1: Agregar Cliente ---
-        const btnAgregarCliente = document.getElementById('btn-agregar-cliente');
-        const modalAgregarCliente = document.getElementById('modal-agregar-cliente');
-        
-        if (btnAgregarCliente && modalAgregarCliente) {
-            const btnCloseAgregarCliente = document.getElementById('btn-close-agregar-cliente');
-            const btnCancelAgregarCliente = document.getElementById('btn-cancel-agregar-cliente');
-            const formAgregarCliente = document.getElementById('form-agregar-cliente');
-
-            btnAgregarCliente.addEventListener('click', () => openModal(modalAgregarCliente));
-            
-            if (btnCloseAgregarCliente) {
-                btnCloseAgregarCliente.addEventListener('click', () => closeModal(modalAgregarCliente));
-            }
-            if (btnCancelAgregarCliente) {
-                btnCancelAgregarCliente.addEventListener('click', () => closeModal(modalAgregarCliente));
-            }
-            if (formAgregarCliente) {
-                formAgregarCliente.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    console.log('Cliente Agregado por Vet');
-                    closeModal(modalAgregarCliente);
-                });
-            }
-        }
-
-        // --- Modal 2: Editar Cliente ---
-        const modalEditarCliente = document.getElementById('modal-editar-cliente');
-        const btnsEditarCliente = document.querySelectorAll('.btn-editar-cliente');
-
-        if (modalEditarCliente && btnsEditarCliente.length > 0) {
-            const btnCloseEditarCliente = document.getElementById('btn-close-editar-cliente');
-            const btnCancelEditarCliente = document.getElementById('btn-cancel-editar-cliente');
-            const formEditarCliente = document.getElementById('form-editar-cliente');
-
-            btnsEditarCliente.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    openModal(modalEditarCliente);
-                    closeDrawer(document.getElementById('modal-vista-rapida'));
-                });
-            });
-
-            if(btnCloseEditarCliente) {
-                btnCloseEditarCliente.addEventListener('click', () => closeModal(modalEditarCliente));
-            }
-            if(btnCancelEditarCliente) {
-                btnCancelEditarCliente.addEventListener('click', () => closeModal(modalEditarCliente));
-            }
-            if(formEditarCliente) {
-                formEditarCliente.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    console.log('Cliente Editado por Vet');
-                    closeModal(modalEditarCliente);
-                });
-            }
-        }
-
-        // --- Modal 3: Filtros (ELIMINADO) ---
-        // --- Modal 4: Eliminar (ELIMINADO) ---
-        
-        // --- Drawer: Vista Rápida ---
-        const modalVistaRapida = document.getElementById('modal-vista-rapida');
-        const btnsVistaRapida = document.querySelectorAll('.btn-vista-rapida');
-        
-        if (modalVistaRapida && btnsVistaRapida.length > 0) {
-            const btnCloseVistaRapida = document.getElementById('btn-close-vista-rapida');
-            const drawerBackdrop = document.getElementById('drawer-backdrop');
-
-            btnsVistaRapida.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    openDrawer(modalVistaRapida);
-                });
-            });
-
-            if (btnCloseVistaRapida) {
-                btnCloseVistaRapida.addEventListener('click', () => closeDrawer(modalVistaRapida));
-            }
-            if (drawerBackdrop) {
-                drawerBackdrop.addEventListener('click', () => closeDrawer(modalVistaRapida));
-            }
-        }
-        
-        // --- ¡NUEVO! Modal 5: Agregar Mascota (desde Drawer y otros) ---
-        const modalAgregarMascota = document.getElementById('modal-agregar-mascota');
-        const btnAgregarMascotaDrawer = document.getElementById('btn-agregar-mascota-drawer');
-        const selectMascotaDuenio = document.getElementById('mascota-duenio');
-
-        if (modalAgregarMascota) {
-            const btnCloseMascota = document.getElementById('btn-close-agregar-mascota');
-            const btnCancelMascota = document.getElementById('btn-cancel-agregar-mascota');
-            const formMascota = document.getElementById('form-registrar-mascota');
-
-            // Botón del Drawer (inteligente)
-            if (btnAgregarMascotaDrawer) {
-                btnAgregarMascotaDrawer.addEventListener('click', () => {
-                    // Pre-selecciona al cliente del drawer (simulado)
-                    if (selectMascotaDuenio) {
-                        selectMascotaDuenio.value = "1"; // Asume que "Ana Gomez" es el valor 1
-                    }
-                    closeDrawer(modalVistaRapida); // Cierra el drawer
-                    openModal(modalAgregarMascota); // Abre el modal de mascota
-                });
-            }
-            
-            // Botones de cerrar
-            if(btnCloseMascota) btnCloseMascota.addEventListener('click', () => closeModal(modalAgregarMascota));
-            if(btnCancelMascota) btnCancelMascota.addEventListener('click', () => closeModal(modalAgregarMascota));
-
-            // Submit del form
-            if (formMascota) {
-                formMascota.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    console.log('Mascota Agregada');
-                    closeModal(modalAgregarMascota);
-                });
-            }
-        }
-
-    </script>
-
+</div>
