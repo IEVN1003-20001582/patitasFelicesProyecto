@@ -20,7 +20,7 @@ import { VeterinariosService } from '../../../service/veterinarios.service'; // 
 export class AgendaComponent implements OnInit {
 
   usuarioActual: any = null;
-  perfilVeterinario: any = null; // <--- Aquí guardamos el perfil real
+  perfilVeterinario: any = null; 
 
   todasCitas: any[] = [];
   citasHoy: any[] = [];
@@ -34,14 +34,14 @@ export class AgendaComponent implements OnInit {
   mascotas: any[] = [];
   tiposCita: any[] = []; 
 
-  // Listas para filtrado (NUEVO)
+
   todosVeterinarios: any[] = [];
   veterinariosDisponibles: any[] = [];
 
   mostrarModalCita = false;
-  mostrarModalDetalle = false; // Variable para controlar el modal de detalle
+  mostrarModalDetalle = false; 
   
-  citaSeleccionada: any = null; // Aquí guardamos la cita que se abre
+  citaSeleccionada: any = null; 
   
   nuevaCita = {
     mascota_id: 0,
@@ -49,7 +49,7 @@ export class AgendaComponent implements OnInit {
     fecha: '',
     hora: '',
     tipo_cita_id: 0,
-    veterinario_id: 0, // Añadido para compatibilidad, aunque se sobreescribirá
+    veterinario_id: 0, 
     motivo: ''
   };
 
@@ -58,7 +58,7 @@ export class AgendaComponent implements OnInit {
     private authService: AuthService,
     private mascotasService: MascotasService,
     private configService: ConfiguracionService, 
-    private veterinariosService: VeterinariosService, // Inyectar servicio
+    private veterinariosService: VeterinariosService,
     private router: Router
   ) {}
 
@@ -68,37 +68,37 @@ export class AgendaComponent implements OnInit {
     const hoy = new Date().toISOString().split('T')[0];
     this.nuevaCita.fecha = hoy;
 
-    // Cargar perfil primero, luego datos
+  
     this.cargarPerfilYDatos();
   }
 
   cargarPerfilYDatos() {
     if (!this.usuarioActual) return;
 
-    // 1. Obtener perfil veterinario real y lista completa
+   
     this.veterinariosService.getVeterinarios().subscribe((res: any) => {
         this.todosVeterinarios = res.veterinarios || [];
         
-        // Buscamos el vet que tenga el mismo user_id que el logueado
+      
         this.perfilVeterinario = this.todosVeterinarios.find((v: any) => v.user_id === this.usuarioActual.id);
 
         if (this.perfilVeterinario) {
             console.log('Perfil Veterinario Encontrado:', this.perfilVeterinario);
-            // Cargar agenda usando el ID correcto
+      
             this.cargarCitas();
             
-            // Autoasignar el veterinario actual al formulario
+         
             this.nuevaCita.veterinario_id = this.perfilVeterinario.id;
         } else {
             console.error('No se encontró perfil veterinario para usuario', this.usuarioActual.id);
             Swal.fire('Error de Cuenta', 'Tu usuario no tiene un perfil de veterinario asociado. Contacta al administrador.', 'error');
         }
         
-        // Inicializar la lista de disponibles con todos (o solo el actual si quisieras restringir)
+        
         this.veterinariosDisponibles = [...this.todosVeterinarios];
     });
 
-    // Cargar catálogos
+    
     this.mascotasService.getMascotas().subscribe((res: any) => {
       this.mascotas = res.mascotas || [];
     });
@@ -114,7 +114,7 @@ export class AgendaComponent implements OnInit {
   cargarCitas() {
     if (!this.perfilVeterinario) return;
     
-    // Usar ID de perfil
+
     this.citasService.getCitas({ veterinario_id: this.perfilVeterinario.id }).subscribe((res: any) => {
       this.todasCitas = res.citas || [];
       this.procesarCitas();
@@ -129,7 +129,7 @@ export class AgendaComponent implements OnInit {
     this.pacientesPorVer = this.citasHoy.filter(c => c.estado === 'pendiente' || c.estado === 'confirmada').length;
   }
 
-  // --- NUEVO: FUNCIÓN DE FILTRADO ---
+  
   filtrarVeterinariosPorHora() {
     if (!this.nuevaCita.hora) {
         this.veterinariosDisponibles = [...this.todosVeterinarios];
@@ -145,15 +145,12 @@ export class AgendaComponent implements OnInit {
         return false;
     });
     
-    // Si el veterinario actual (el usuario logueado) sigue disponible a esa hora, lo mantenemos seleccionado.
-    // Si no, podríamos avisarle o dejar que seleccione otro si quisiera (aunque la idea es que se autoasigne).
-    // En este caso, como es "Mi Agenda", lo lógico es que él quiera agendarse a SÍ MISMO.
-    // Si él no está disponible a esa hora (por su turno), quizás debería saberlo.
+ 
     
     const seleccionadoSigueDisponible = this.veterinariosDisponibles.find(v => v.id == this.nuevaCita.veterinario_id);
     
     if (!seleccionadoSigueDisponible && this.veterinariosDisponibles.length > 0) {
-        // Si el usuario actual no está disponible, seleccionamos el primero de la lista (opcional)
+  
         this.nuevaCita.veterinario_id = this.veterinariosDisponibles[0].id;
     } else if (!seleccionadoSigueDisponible) {
         this.nuevaCita.veterinario_id = 0;
@@ -204,12 +201,7 @@ export class AgendaComponent implements OnInit {
           Swal.fire('Atención', 'Completa los campos obligatorios', 'warning');
           return;
       }
-      
-      // VALIDACIÓN CRÍTICA
-      // En este caso, permitimos que guarde la cita incluso si es para otro veterinario (si lo seleccionó en el dropdown)
-      // o forzamos a que sea para él mismo si así lo prefieres.
-      // Usaremos el veterinario_id que esté en el modelo 'nuevaCita'.
-
+ 
       const fechaHora = `${this.nuevaCita.fecha} ${this.nuevaCita.hora}:00`;
       
       const payload = {
@@ -227,7 +219,7 @@ export class AgendaComponent implements OnInit {
               this.cargarCitas(); 
               
               const hoy = new Date().toISOString().split('T')[0];
-              // Reseteamos form pero mantenemos al veterinario actual seleccionado
+       
               this.nuevaCita = { 
                   mascota_id: 0, 
                   cliente_nombre: '', 
@@ -247,7 +239,7 @@ export class AgendaComponent implements OnInit {
       this.router.navigate(['/veterinario/pacientes'], { queryParams: { mascota_id: mascotaId } });
   }
 
-  // --- NUEVAS FUNCIONES DE CONFIRMACIÓN ---
+
   confirmarCita() {
       if (!this.citaSeleccionada) return;
       this.citasService.actualizarCita(this.citaSeleccionada.id, { estado: 'confirmada' }).subscribe(res => {
