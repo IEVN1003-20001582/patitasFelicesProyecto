@@ -1,12 +1,9 @@
 
-    <!-- =================================================================
-         PÁGINA 17: DASHBOARD DE CLIENTE (CONTENIDO)
-    ================================================================== -->
+
     <main class="container mx-auto max-w-7xl p-6 md:p-8">
 
         <h1 class="text-3xl font-bold text-primary-dark mb-6">Bienvenido, Israel</h1>
 
-        <!-- Pestañas (Tabs) -->
         <div class="border-b border-gray-200 mb-6">
             <nav class="flex space-x-4 -mb-px">
                 <button id="tab-btn-mascotas" class="tab-btn active py-4 px-3 border-b-4 text-sm font-semibold">
@@ -18,12 +15,9 @@
             </nav>
         </div>
 
-        <!-- Contenido de Pestañas -->
         <div>
-            <!-- Pestaña 1: Mis Mascotas (Activa por defecto) -->
             <div id="tab-content-mascotas" class="tab-content active">
                 
-                <!-- ¡NUEVO! Boton de Agregar Mascota -->
                 <div class="flex justify-end mb-4">
                     <button id="btn-agregar-mascota-cliente" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg text-sm shadow-md hover:bg-opacity-80 transition duration-300 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
@@ -32,7 +26,6 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <!-- Tarjeta de Mascota (Clickeable) -->
                     <div class="btn-detalle-mascota-cliente bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 hover:shadow-xl transition duration-300 cursor-pointer">
                         <div class="h-40 bg-gray-200">
                             <img src="https://th.bing.com/th/id/R.9003028d7ec6ff58a70a2be15a05ffed?rik=9cLEFO6s9oiGeg&riu=http%3a%2f%2fwww.publicdomainpictures.net%2fpictures%2f40000%2fvelka%2fgolden-retriever-dog-1364426710r9x.jpg&ehk=Z8ZK9mRUJe0rT61EYByfWPUGg1BEToYpGPK3bCz1aTU%3d&risl=&pid=ImgRaw&r=0" alt="Foto de Max" class="h-full w-full object-cover">
@@ -45,7 +38,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Tarjeta de Mascota (Clickeable) -->
                     <div class="btn-detalle-mascota-cliente bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 hover:shadow-xl transition duration-300 cursor-pointer">
                         <div class="h-40 bg-gray-200">
                              <img src="https://placehold.co/400x300/2C3E50/ffffff?text=Mishi&font=poppins" alt="Foto de Mishi" class="h-full w-full object-cover">
@@ -61,12 +53,9 @@
                 </div>
             </div>
 
-            <!-- Pestaña 2: Mis Citas (Oculta) -->
             <div id="tab-content-citas" class="tab-content hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Calendario -->
                     <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <!-- Nombres de los Días -->
                         <div class="grid grid-cols-7 border-b">
                             <div class="p-4 text-gray-600 text-xs font-semibold uppercase">Dom</div>
                             <div class="p-4 text-gray-600 text-xs font-semibold uppercase">Lun</div>
@@ -76,7 +65,6 @@
                             <div class="p-4 text-gray-600 text-xs font-semibold uppercase">Vie</div>
                             <div class="p-4 text-gray-600 text-xs font-semibold uppercase">Sab</div>
                         </div>
-                        <!-- Días (Simulación) -->
                         <div class="grid grid-cols-7 divide-x divide-y">
                             <div class="p-2 calendar-day relative text-gray-400"><span class="text-sm">26</span></div>
                             <div class="p-2 calendar-day relative text-gray-400"><span class="text-sm">27</span></div>
@@ -93,10 +81,8 @@
                                 <span class="text-sm font-bold">3</span>
                                 <div class="mt-1 text-xs bg-secondary-teal text-white p-1 rounded truncate">Vacuna (Max)</div>
                             </div>
-                            <!-- ... etc ... -->
                         </div>
                     </div>
-                    <!-- ¡NUEVO! Widget de Estado de Citas -->
                     <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-lg">
                         <h3 class="text-xl font-semibold text-primary-dark mb-4">Mis Solicitudes Pendientes</h3>
                         <div class="space-y-3">
@@ -118,21 +104,16 @@
 
     </main>
 
-    <!-- =================================================================
-         MODALS (Pop-ups)
-    ================================================================== -->
 
-    <!-- Modal 1: Solicitar Cita -->
+
     <div id="modal-solicitar-cita" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg">
-            <!-- Header -->
             <div class="flex justify-between items-center p-5 border-b">
                 <h3 class="text-xl font-bold text-primary-dark">Solicitar Nueva Cita</h3>
                 <button id="btn-close-solicitar-cita" class="text-gray-400 hover:text-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
-            <!-- Cuerpo -->
             <div class="p-6">
                 <form id="form-solicitar-cita" class="space-y-4">
                     <div>
@@ -170,7 +151,6 @@
                     </div>
                 </form>
             </div>
-            <!-- Footer -->
             <div class="flex justify-end p-5 border-t space-x-4">
                 <button id="btn-cancel-solicitar-cita" type="button" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
                     Cancelar
@@ -182,17 +162,14 @@
         </div>
     </div>
 
-    <!-- Modal 2: Mis Facturas -->
     <div id="modal-mis-facturas" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
-            <!-- Header -->
             <div class="flex justify-between items-center p-5 border-b">
                 <h3 class="text-xl font-bold text-primary-dark">Mis Facturas</h3>
                 <button id="btn-close-mis-facturas" class="text-gray-400 hover:text-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
-            <!-- Cuerpo -->
             <div class="p-6 max-h-[70vh] overflow-y-auto">
                 <div class="overflow-x-auto">
                     <table class="w-full">
@@ -235,19 +212,15 @@
         </div>
     </div>
 
-    <!-- Modal 3: Mi Perfil -->
     <div id="modal-mi-perfil" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-xl">
-            <!-- Header -->
             <div class="flex justify-between items-center p-5 border-b">
                 <h3 class="text-xl font-bold text-primary-dark">Mi Perfil</h3>
                 <button id="btn-close-mi-perfil" class="text-gray-400 hover:text-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
-            <!-- Cuerpo -->
             <div class="p-6 max-h-[70vh] overflow-y-auto space-y-6">
-                <!-- Card: Datos Personales -->
                 <form class="space-y-4">
                     <h4 class="text-lg font-semibold text-primary-dark">Mis Datos</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -275,7 +248,6 @@
                     </div>
                 </form>
 
-                <!-- Card: Cambiar Contrasena -->
                 <form class="space-y-4 pt-6 border-t">
                     <h4 class="text-lg font-semibold text-primary-dark">Cambiar Contrasena</h4>
                     <div>
@@ -296,10 +268,8 @@
         </div>
     </div>
 
-    <!-- Modal 4: Detalle de Mascota (¡VERSIÓN CLIENTE: SOLO LECTURA!) -->
     <div id="modal-detalle-mascota-cliente" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl">
-            <!-- Header (Con Botón PDF) -->
             <div class="flex justify-between items-center p-5 border-b">
                 <div class="flex items-center space-x-3">
                     <img class="h-16 w-16 rounded-full" src="https://placehold.co/80x80/F4D03F/ffffff?text=M&font=poppins" alt="Mascota">
@@ -319,7 +289,6 @@
                 </div>
             </div>
             
-            <!-- Tabs (4 Pestanias) -->
             <div class="border-b border-gray-200">
                 <nav class="flex space-x-4 md:space-x-8 px-6 -mb-px">
                     <button id="tab-btn-info-cliente" class="tab-btn active py-4 px-1 border-b-4 text-sm font-medium">Info General</button>
@@ -329,10 +298,8 @@
                 </nav>
             </div>
 
-            <!-- Contenido de las Pestanias -->
             <div class="p-6 max-h-[60vh] overflow-y-auto">
                 
-                <!-- Pestania 1: Info General -->
                 <div id="tab-content-info-cliente" class="tab-content active space-y-4">
                     <div class="p-4 bg-red-100 border border-red-300 rounded-lg">
                         <h4 class="font-bold text-red-800">¡Alerta de Alergia!</h4>
@@ -346,7 +313,6 @@
                     </div>
                 </div>
                 
-                <!-- Pestania 2: Historial Clínico -->
                 <div id="tab-content-historial-cliente" class="tab-content space-y-4">
                     <h4 class="text-lg font-semibold text-primary-dark">Tratamientos Anteriores</h4>
                     <div class="space-y-3">
@@ -354,7 +320,6 @@
                             <p class="font-semibold text-gray-800">Consulta por Alergia</p>
                             <span class="text-sm text-gray-500">01/10/2025 - Dr. Israel</span>
                             <p class="text-sm text-gray-700 mt-2">Medicación recetada: Loratadina Pediátrica.</p>
-                            <!-- ¡NUEVO! Boton de Resurtir -->
                             <button class="mt-2 bg-secondary-teal text-white font-semibold py-1 px-3 rounded-lg text-xs shadow hover:bg-opacity-80 transition duration-300">
                                 Solicitar Resurtido
                             </button>
@@ -366,7 +331,6 @@
                     </div>
                 </div>
 
-                <!-- Pestania 3: Vacunación -->
                 <div id="tab-content-vacunacion-cliente" class="tab-content space-y-4">
                     <h4 class="text-lg font-semibold text-primary-dark">Calendario de Vacunación</h4>
                     <div class="overflow-x-auto">
@@ -389,7 +353,6 @@
                     </div>
                 </div>
 
-                <!-- Pestania 4: Próximas Citas -->
                 <div id="tab-content-citas-cliente" class="tab-content space-y-4">
                     <h4 class="text-lg font-semibold text-primary-dark">Próximas Citas Programadas</h4>
                     <div class="p-4 border border-secondary-teal rounded-lg">
@@ -402,7 +365,6 @@
                 </div>
             </div>
             
-            <!-- Footer del Modal (Solo cerrar) -->
             <div class="flex justify-end p-5 border-t">
                 <button id="btn-cerrar-footer-detalle-cliente" type="button" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
                     Cerrar
@@ -411,17 +373,14 @@
         </div>
     </div>
 
-    <!-- ¡NUEVO! Modal 5: Notificaciones -->
     <div id="modal-notificaciones" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
-            <!-- Header -->
             <div class="flex justify-between items-center p-5 border-b">
                 <h3 class="text-xl font-bold text-primary-dark">Notificaciones</h3>
                 <button id="btn-close-notificaciones" class="text-gray-400 hover:text-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
-            <!-- Cuerpo -->
             <div class="p-6 max-h-[70vh] overflow-y-auto divide-y">
                 <div class="py-3">
                     <p class="font-semibold text-secondary-teal">Cita Confirmada</p>
@@ -439,17 +398,14 @@
         </div>
     </div>
     
-    <!-- ¡NUEVO! Modal 6: Agregar Mascota (Cliente) -->
     <div id="modal-agregar-mascota-cliente" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg">
-            <!-- Header -->
             <div class="flex justify-between items-center p-5 border-b">
                 <h3 class="text-xl font-bold text-primary-dark">Registrar Nueva Mascota</h3>
                 <button id="btn-close-agregar-mascota-cliente" class="text-gray-400 hover:text-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
-            <!-- Cuerpo -->
             <div class="p-6">
                 <form id="form-agregar-mascota-cliente" class="space-y-4">
                     <div>
@@ -472,7 +428,6 @@
                     </div>
                 </form>
             </div>
-            <!-- Footer -->
             <div class="flex justify-end p-5 border-t space-x-4">
                 <button id="btn-cancel-agregar-mascota-cliente" type="button" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
                     Cancelar
@@ -485,15 +440,11 @@
     </div>
 
 
-    <!-- =================================================================
-         SCRIPT
-    ================================================================== -->
+
     <script>
-        // --- Modal Helpers ---
         function openModal(modal) { if (modal) modal.classList.remove('hidden'); }
         function closeModal(modal) { if (modal) modal.classList.add('hidden'); }
 
-        // --- Lógica de Pestañas Principales ---
         const mainTabBtnMascotas = document.getElementById('tab-btn-mascotas');
         const mainTabBtnCitas = document.getElementById('tab-btn-citas');
         const mainTabContentMascotas = document.getElementById('tab-content-mascotas');
@@ -514,13 +465,12 @@
             });
         }
 
-        // --- Lógica de Pestañas del Modal Detalle (CLIENTE) ---
         const modalTabBtns = document.querySelectorAll('.tab-btn[id$="-cliente"]');
         const modalTabContents = document.querySelectorAll('.tab-content[id$="-cliente"]');
 
         modalTabBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                const tabName = btn.id.replace('tab-btn-', ''); // ej. "info-cliente"
+                const tabName = btn.id.replace('tab-btn-', ''); 
                 
                 modalTabBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
@@ -537,7 +487,6 @@
             });
         });
 
-        // --- Modal 1: Solicitar Cita ---
         const btnSolicitarCita = document.getElementById('btn-solicitar-cita');
         const modalSolicitarCita = document.getElementById('modal-solicitar-cita');
         if (btnSolicitarCita && modalSolicitarCita) {
@@ -548,7 +497,6 @@
             if(btnCancel) btnCancel.addEventListener('click', () => closeModal(modalSolicitarCita));
         }
         
-        // --- Modal 2: Mis Facturas ---
         const btnMisFacturas = document.getElementById('btn-mis-facturas');
         const modalMisFacturas = document.getElementById('modal-mis-facturas');
         if (btnMisFacturas && modalMisFacturas) {
@@ -557,7 +505,6 @@
             if(btnClose) btnClose.addEventListener('click', () => closeModal(modalMisFacturas));
         }
 
-        // --- Modal 3: Mi Perfil ---
         const btnMiPerfil = document.getElementById('btn-mi-perfil');
         const modalMiPerfil = document.getElementById('modal-mi-perfil');
         if (btnMiPerfil && modalMiPerfil) {
@@ -566,7 +513,6 @@
             if(btnClose) btnClose.addEventListener('click', () => closeModal(modalMiPerfil));
         }
 
-        // --- Modal 4: Detalle de Mascota (Read-Only) ---
         const btnsDetalleMascotaCliente = document.querySelectorAll('.btn-detalle-mascota-cliente');
         const modalDetalleMascotaCliente = document.getElementById('modal-detalle-mascota-cliente');
         if (btnsDetalleMascotaCliente.length > 0 && modalDetalleMascotaCliente) {
@@ -576,19 +522,15 @@
 
             btnsDetalleMascotaCliente.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    // Cargar datos de la mascota...
-                    // Resetear a la primera pestania
                     if(firstTabBtn) firstTabBtn.click();
                     openModal(modalDetalleMascotaCliente);
                 });
             });
             
-            // CORREGIDO: El nombre de la variable estaba mal escrito
             if(btnClose) btnClose.addEventListener('click', () => closeModal(modalDetalleMascotaCliente));
             if(btnFooterClose) btnFooterClose.addEventListener('click', () => closeModal(modalDetalleMascotaCliente));
         }
 
-        // --- ¡NUEVO! Modal 5: Notificaciones ---
         const btnNotificaciones = document.getElementById('btn-notificaciones');
         const modalNotificaciones = document.getElementById('modal-notificaciones');
         if (btnNotificaciones && modalNotificaciones) {
@@ -597,7 +539,6 @@
             if(btnClose) btnClose.addEventListener('click', () => closeModal(modalNotificaciones));
         }
         
-        // --- ¡NUEVO! Modal 6: Agregar Mascota (Cliente) ---
         const btnAgregarMascotaCliente = document.getElementById('btn-agregar-mascota-cliente');
         const modalAgregarMascotaCliente = document.getElementById('modal-agregar-mascota-cliente');
         if (btnAgregarMascotaCliente && modalAgregarMascotaCliente) {

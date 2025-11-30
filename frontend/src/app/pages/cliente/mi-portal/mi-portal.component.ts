@@ -8,13 +8,12 @@ import { CommonModule } from '@angular/common';
   templateUrl: './mi-portal.component.html'
 })
 export class MiPortalComponent {
-  pestanaActiva: string = 'mascotas'; // 'mascotas' o 'citas'
+  pestanaActiva: string = 'mascotas';
 
   cambiarPestana(pestana: string) {
     this.pestanaActiva = pestana;
   }
   
-  // Datos simulados del cliente logueado
   misMascotas = [
     { nombre: 'Max', especie: 'Perro', foto: '...' },
     { nombre: 'Mishi', especie: 'Gato', foto: '...' }

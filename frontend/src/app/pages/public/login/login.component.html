@@ -1,1 +1,105 @@
-<p>login works!</p>
+<div class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+  
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-gray-100">
+    
+    <div class="bg-teal-50 pt-8 pb-6 flex flex-col items-center justify-center">
+      <div class="w-20 h-20 bg-teal-500 rounded-full flex items-center justify-center shadow-md mb-3">
+        <span class="text-white text-2xl font-bold">PF</span>
+      </div>
+      <h2 class="text-gray-700 font-bold text-xl">
+        {{ activeTab === 'login' ? 'Bienvenido de nuevo' : 'Crea tu cuenta' }}
+      </h2>
+    </div>
+
+    <div class="flex border-b border-gray-200">
+      
+      <button 
+        (click)="switchTab('login')"
+        [ngClass]="activeTab === 'login' ? 'border-teal-500 text-teal-600' : 'border-transparent text-gray-400 hover:text-gray-600'"
+        class="flex-1 py-4 text-center font-semibold border-b-2 transition duration-200 focus:outline-none">
+        Iniciar Sesión
+      </button>
+
+      <button 
+        *ngIf="!isPersonal"
+        (click)="switchTab('register')"
+        [ngClass]="activeTab === 'register' ? 'border-teal-500 text-teal-600' : 'border-transparent text-gray-400 hover:text-gray-600'"
+        class="flex-1 py-4 text-center font-semibold border-b-2 transition duration-200 focus:outline-none">
+        Registrarse
+      </button>
+    </div>
+
+    <div class="p-8">
+
+      <form *ngIf="activeTab === 'login'" [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-5">
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Correo Electrónico</label>
+          <input 
+            type="email" 
+            formControlName="email"
+            placeholder="tu@correo.com"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition duration-200">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Contraseña</label>
+          <input 
+            type="password" 
+            formControlName="password"
+            placeholder="••••••••"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition duration-200">
+            <div class="text-right mt-1">
+              <a href="#" class="text-xs text-teal-500 hover:underline">¿Olvidaste tu contraseña?</a>
+            </div>
+        </div>
+
+        <button 
+          type="submit" 
+          [disabled]="loginForm.invalid"
+          class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 rounded-lg transition duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+          Entrar
+        </button>
+      </form>
+
+
+      <form *ngIf="activeTab === 'register'" [formGroup]="registerForm" (ngSubmit)="onRegister()" class="space-y-5">
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Nombre Completo</label>
+          <input 
+            type="text" 
+            formControlName="fullName"
+            placeholder="Tu Nombre Completo"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition duration-200">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Correo Electrónico</label>
+          <input 
+            type="email" 
+            formControlName="email"
+            placeholder="tu@correo.com"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition duration-200">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Crear Contraseña</label>
+          <input 
+            type="password" 
+            formControlName="password"
+            placeholder="Mínimo 8 caracteres"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition duration-200">
+        </div>
+
+        <button 
+          type="submit" 
+          [disabled]="registerForm.invalid"
+          class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 rounded-lg transition duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+          Registrarse
+        </button>
+      </form>
+
+    </div>
+  </div>
+</div>
