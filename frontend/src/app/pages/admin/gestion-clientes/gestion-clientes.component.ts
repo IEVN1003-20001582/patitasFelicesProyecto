@@ -12,20 +12,20 @@ import { MascotasService } from '../../../service/mascotas.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './gestion-clientes.component.html',
-  
+
 })
 export class GestionClientesComponent implements OnInit {
 
   clientes: any[] = [];
   clientesFiltrados: any[] = [];
 
-  mascotasCliente: any[] = []; 
-  
+  mascotasCliente: any[] = [];
+
   kpis = { total: 0, nuevos: 0, activos: 0 };
 
   mostrarModalAgregar = false;
   mostrarModalEditar = false;
-  mostrarModalEliminar = false; // Modal para confirmar archivado
+  mostrarModalEliminar = false;
   mostrarModalFiltros = false;
   mostrarModalVistaRapida = false;
 
@@ -37,7 +37,7 @@ export class GestionClientesComponent implements OnInit {
   constructor(
     private clientesService: ClientesService,
     private mascotasService: MascotasService
-  
+
   ) {}
 
   ngOnInit(): void {
@@ -47,7 +47,7 @@ export class GestionClientesComponent implements OnInit {
   cargarClientes() {
     this.clientesService.getClientes().subscribe((res: any) => {
       const listaRaw = res.clientes || (Array.isArray(res) ? res : []);
-      
+
       this.clientes = listaRaw.map((c: any) => ({
         id: c.id,
         nombre: c.nombre_completo,
@@ -55,7 +55,7 @@ export class GestionClientesComponent implements OnInit {
         telefono: c.telefono,
         direccion: c.direccion,
         num_mascotas: c.num_mascotas || 0,
-        estado: c.estado || 'Activo' // Dato importante
+        estado: c.estado || 'Activo'
       }));
 
       this.clientesFiltrados = [...this.clientes];
@@ -66,25 +66,25 @@ export class GestionClientesComponent implements OnInit {
   calcularKPIs() {
     this.kpis.total = this.clientes.length;
     this.kpis.activos = this.clientes.filter(c => c.estado === 'Activo').length;
-    this.kpis.nuevos = Math.floor(this.clientes.length * 0.1); 
+    this.kpis.nuevos = Math.floor(this.clientes.length * 0.1);
   }
 
   filtrarClientes() {
     const texto = this.textoBusqueda.toLowerCase();
-    this.clientesFiltrados = this.clientes.filter(c => 
-      c.nombre.toLowerCase().includes(texto) || 
+    this.clientesFiltrados = this.clientes.filter(c =>
+      c.nombre.toLowerCase().includes(texto) ||
       c.email.toLowerCase().includes(texto)
     );
   }
 
-  // --- CRUD ---
+
 
   guardarCliente() {
     if (!this.nuevoCliente.nombre || !this.nuevoCliente.email) {
       Swal.fire('Error', 'Nombre y Email son obligatorios', 'warning');
       return;
     }
-    
+
     this.clientesService.agregarCliente(this.nuevoCliente).subscribe(res => {
       if (res.exito) {
         Swal.fire('Guardado', 'Cliente registrado', 'success');
@@ -112,14 +112,14 @@ export class GestionClientesComponent implements OnInit {
   }
 
   confirmarEliminar() {
-    // Aunque la función se llama 'eliminar', la API ahora ARCHIVA
+
     if (!this.clienteSeleccionado) return;
 
     this.clientesService.eliminarCliente(this.clienteSeleccionado.id).subscribe(res => {
       if (res.exito) {
         Swal.fire('Archivado', 'Cliente marcado como inactivo', 'success');
         this.cerrarModalEliminar();
-        this.cargarClientes(); // Recarga para ver el cambio de estado
+        this.cargarClientes();
       } else {
         Swal.fire('Error', res.mensaje, 'error');
       }
@@ -128,24 +128,22 @@ export class GestionClientesComponent implements OnInit {
 
   abrirVistaRapida(cliente: any) {
     this.clienteSeleccionado = cliente;
-    this.mascotasCliente = []; // Limpiar lista anterior
+    this.mascotasCliente = [];
     this.mostrarModalVistaRapida = true;
 
-    // Llamar al servicio para obtener las mascotas de ESTE cliente
-    // Usamos el método getMascotas filtrando por ID
+
     this.mascotasService.getMascotas(cliente.id).subscribe((res: any) => {
-        // Adaptamos la respuesta según cómo venga de tu API (puede ser res.mascotas o res directo)
+
         const lista = res.mascotas || (Array.isArray(res) ? res : []);
         this.mascotasCliente = lista;
     });
   }
 
-  cerrarVistaRapida() { 
-    this.mostrarModalVistaRapida = false; 
+  cerrarVistaRapida() {
+    this.mostrarModalVistaRapida = false;
     this.clienteSeleccionado = null;
   }
 
-  // --- MODALES ---
   abrirModalAgregar() { this.mostrarModalAgregar = true; }
   cerrarModalAgregar() { this.mostrarModalAgregar = false; }
 
@@ -161,8 +159,6 @@ export class GestionClientesComponent implements OnInit {
   }
   cerrarModalEliminar() { this.mostrarModalEliminar = false; }
 
-
-  
   abrirModalFiltros() { this.mostrarModalFiltros = true; }
   cerrarModalFiltros() { this.mostrarModalFiltros = false; }
 
