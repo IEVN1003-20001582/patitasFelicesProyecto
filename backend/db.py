@@ -1,5 +1,6 @@
 import mysql.connector
 import os
+import certifi  # <--- IMPORTANTE: Importar certifi
 from dotenv import load_dotenv
 
 # Cargar variables de entorno una sola vez al importar el módulo
@@ -18,9 +19,8 @@ def get_db_connection():
             database=os.getenv('DB_DATABASE'),
             # Opciones de SSL requeridas por TiDB Cloud
             ssl_verify_identity=True,
-            ssl_ca="/etc/ssl/certs/ca-certificates.crt" if os.name != 'nt' else None
-            # Nota: En Windows (os.name == 'nt'), a veces es mejor dejar que Python maneje el SSL por defecto
-            # o descargar el certificado .pem de TiDB y poner la ruta exacta.
+            # SOLUCIÓN: Usar certifi.where() para dar la ruta exacta del certificado en Windows/Linux
+            ssl_ca=certifi.where() 
         )
         return connection
     except mysql.connector.Error as err:
