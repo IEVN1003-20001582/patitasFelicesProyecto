@@ -1,1 +1,240 @@
-<p>reportes works!</p>
+<div class="w-full p-6 md:p-8"> 
+    
+    <!-- Barra de Filtros -->
+    <div class="bg-white p-4 rounded-2xl shadow-lg mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex flex-wrap items-center gap-2">
+            <div class="flex items-center bg-gray-50 rounded-lg px-3 py-2 border">
+                <span class="text-xs font-bold text-gray-500 uppercase mr-2">Periodo:</span>
+                <input [(ngModel)]="fechaInicio" type="date" class="bg-transparent text-sm outline-none text-gray-700">
+                <span class="mx-2 text-gray-400">-</span>
+                <input [(ngModel)]="fechaFin" type="date" class="bg-transparent text-sm outline-none text-gray-700">
+            </div>
+            <button (click)="aplicarFiltros()" class="bg-secondary-teal text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-opacity-80 transition flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM7 11a1 1 0 011-1h8a1 1 0 011 1v2a1 1 0 01-1 1H8a1 1 0 01-1-1v-2zM11 18a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1v-2z" /></svg>
+                Filtrar
+            </button>
+        </div>
+        <div class="flex space-x-2">
+            <button (click)="exportarPDF()" class="bg-blue-50 text-blue-600 border border-blue-100 font-semibold py-2 px-4 rounded-lg text-sm hover:bg-blue-100 transition flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                PDF
+            </button>
+            <button (click)="exportarExcel()" class="bg-green-50 text-green-600 border border-green-100 font-semibold py-2 px-4 rounded-lg text-sm hover:bg-green-100 transition flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                Excel
+            </button>
+        </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-2xl shadow-lg border-b-4 border-secondary-teal">
+            <p class="text-gray-500 text-xs uppercase font-bold flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-secondary-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM12 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM12 6c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2z" /></svg>
+                Ingresos Totales
+            </p>
+            <p class="text-3xl font-bold text-primary-dark mt-1">{{ data.kpis.ingresos | currency }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-lg border-b-4 border-blue-400">
+            <p class="text-gray-500 text-xs uppercase font-bold flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                Citas Completadas
+            </p>
+            <p class="text-3xl font-bold text-primary-dark mt-1">{{ data.kpis.citas }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-lg border-b-4 border-accent-yellow">
+            <p class="text-gray-500 text-xs uppercase font-bold flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-accent-yellow" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+                Clientes Nuevos
+            </p>
+            <p class="text-3xl font-bold text-primary-dark mt-1">{{ data.kpis.nuevos_clientes }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-lg border-b-4 border-purple-400">
+            <p class="text-gray-500 text-xs uppercase font-bold flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" /></svg>
+                Ticket Promedio
+            </p>
+            <p class="text-3xl font-bold text-primary-dark mt-1">{{ data.kpis.ticket_promedio | currency }}</p>
+        </div>
+    </div>
+
+    <!-- GRÁFICOS -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        
+        <!-- Gráfico 1: Ingresos Mensuales -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold text-primary-dark flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    Ingresos Mensuales
+                </h3>
+            </div>
+            <div class="flex items-end justify-between h-64 space-x-2 pt-4 border-b border-l border-gray-200 pl-2 pb-2">
+                <div *ngFor="let item of data.graficos.ingresos_mensuales" class="flex flex-col items-center w-full group relative h-full justify-end">
+                 
+                    <div class="opacity-0 group-hover:opacity-100 transition duration-300 mb-1 text-[10px] font-bold bg-gray-800 text-white px-2 py-1 rounded absolute -top-8 z-10 whitespace-nowrap shadow-lg transform -translate-y-1">
+                        {{ item.valor | currency }}
+                        <div class="w-2 h-2 bg-gray-800 rotate-45 absolute -bottom-1 left-1/2 transform -translate-x-1/2"></div>
+                    </div>
+                 
+                    <div class="w-4/5 bg-secondary-teal rounded-t-md transition-all duration-700 ease-out hover:bg-teal-600 hover:shadow-md" 
+                         [style.height.%]="item.porcentaje"></div>
+              
+                    <p class="text-[10px] text-gray-500 mt-2 font-medium">{{ item.etiqueta }}</p>
+                </div>
+                 <div *ngIf="data.graficos.ingresos_mensuales.length === 0" class="w-full h-full flex items-center justify-center text-gray-400 italic text-sm">
+                    Sin datos para mostrar
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico 2: Tipos de Cita -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <h3 class="text-lg font-bold text-primary-dark mb-6 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+                Distribución de Servicios
+            </h3>
+            <div class="space-y-5 h-64 overflow-y-auto pr-2 custom-scrollbar">
+                <div *ngFor="let item of data.graficos.tipos_cita">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="font-medium text-gray-700">{{ item.etiqueta }}</span>
+                        <span class="text-gray-500 font-semibold">{{ item.valor }} citas</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div class="bg-blue-500 h-3 rounded-full transition-all duration-1000 ease-out" 
+                             [style.width.%]="item.porcentaje"></div>
+                    </div>
+                </div>
+                 <div *ngIf="data.graficos.tipos_cita.length === 0" class="h-full flex items-center justify-center text-gray-400 italic text-sm">
+                    Sin datos para mostrar
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico 3: -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg lg:col-span-2">
+            <h3 class="text-lg font-bold text-primary-dark mb-6 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                Productos Más Vendidos
+            </h3>
+            <div class="space-y-4">
+                <div *ngFor="let item of data.graficos.top_productos; let i = index">
+                    <div class="flex justify-between text-sm mb-1 items-end">
+                        <span class="font-medium text-gray-700 flex items-center">
+                            <span class="w-6 h-6 rounded-full bg-gray-100 text-gray-600 text-xs font-bold flex items-center justify-center mr-3 border border-gray-200">{{i+1}}</span>
+                            {{ item.etiqueta }}
+                        </span>
+                        <span class="font-bold text-primary-dark text-xs bg-yellow-50 px-2 py-1 rounded border border-yellow-100">{{ item.valor }} vendidos</span>
+                    </div>
+                    <div class="w-full bg-gray-50 rounded-full h-2 overflow-hidden">
+                        <div class="bg-accent-yellow h-2 rounded-full transition-all duration-1000 ease-out shadow-sm" 
+                             [style.width.%]="item.porcentaje"></div>
+                    </div>
+                </div>
+                <div *ngIf="data.graficos.top_productos.length === 0" class="p-8 text-center text-gray-400 italic text-sm">
+                    Sin datos de ventas registrados.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tablas de Datos Detallados -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+        <div class="border-b border-gray-200 bg-gray-50">
+            <nav class="flex space-x-1 -mb-px px-6 overflow-x-auto">
+                <!-- Tab Facturación -->
+                <button (click)="cambiarTab('facturacion')" 
+                        [class.border-secondary-teal]="tabActiva==='facturacion'" 
+                        class="py-4 px-4 border-b-4 text-sm font-medium transition-colors flex items-center whitespace-nowrap focus:outline-none" 
+                        [ngClass]="tabActiva==='facturacion' ? 'text-secondary-teal font-bold bg-white rounded-t-lg border-x border-t border-b-0 -mb-1' : 'text-gray-500 hover:text-gray-700 border-transparent'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    Reporte de Facturación
+                </button>
+                
+                <!-- Tab Citas -->
+                <button (click)="cambiarTab('citas')" 
+                        [class.border-secondary-teal]="tabActiva==='citas'" 
+                        class="py-4 px-4 border-b-4 text-sm font-medium transition-colors flex items-center whitespace-nowrap focus:outline-none" 
+                        [ngClass]="tabActiva==='citas' ? 'text-secondary-teal font-bold bg-white rounded-t-lg border-x border-t border-b-0 -mb-1' : 'text-gray-500 hover:text-gray-700 border-transparent'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    Reporte de Citas
+                </button>
+                
+                <!-- Tab Inventario -->
+                <button (click)="cambiarTab('inventario')" 
+                        [class.border-secondary-teal]="tabActiva==='inventario'" 
+                        class="py-4 px-4 border-b-4 text-sm font-medium transition-colors flex items-center whitespace-nowrap focus:outline-none" 
+                        [ngClass]="tabActiva==='inventario' ? 'text-secondary-teal font-bold bg-white rounded-t-lg border-x border-t border-b-0 -mb-1' : 'text-gray-500 hover:text-gray-700 border-transparent'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                    Reporte de Inventario
+                </button>
+            </nav>
+        </div>
+
+        <div class="p-0 max-h-96 overflow-y-auto custom-scrollbar bg-white">
+            <!-- Tabla Facturas -->
+            <table *ngIf="tabActiva === 'facturacion'" class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-gray-500 uppercase font-bold text-xs sticky top-0 shadow-sm">
+                    <tr><th class="px-6 py-3 font-semibold">Folio</th><th class="px-6 py-3 font-semibold">Cliente</th><th class="px-6 py-3 font-semibold">Fecha</th><th class="px-6 py-3 font-semibold">Total</th></tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <tr *ngFor="let f of listaFacturas" class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-3 text-primary-dark font-medium font-mono">{{ f.folio_factura }}</td>
+                        <td class="px-6 py-3 text-gray-700">{{ f.nombre_cliente }}</td>
+                        <td class="px-6 py-3 text-gray-500">{{ f.fecha_emision | date:'shortDate' }}</td>
+                        <td class="px-6 py-3 font-bold text-gray-800">{{ f.total | currency }}</td>
+                    </tr>
+                     <tr *ngIf="listaFacturas.length === 0">
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-400 italic">No se encontraron facturas en este periodo.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Tabla Citas -->
+            <table *ngIf="tabActiva === 'citas'" class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-gray-500 uppercase font-bold text-xs sticky top-0 shadow-sm">
+                    <tr><th class="px-6 py-3 font-semibold">Fecha</th><th class="px-6 py-3 font-semibold">Paciente</th><th class="px-6 py-3 font-semibold">Motivo</th><th class="px-6 py-3 font-semibold">Estado</th></tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <tr *ngFor="let c of listaCitas" class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-3 text-gray-500">{{ c.fecha_hora | date:'short' }}</td>
+                        <td class="px-6 py-3 font-medium text-gray-700">{{ c.nombre_mascota }}</td>
+                        <td class="px-6 py-3 text-gray-600">{{ c.motivo }}</td>
+                        <td class="px-6 py-3">
+                            <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide"
+                                  [ngClass]="{
+                                    'bg-blue-100 text-blue-700': c.estado === 'pendiente',
+                                    'bg-green-100 text-green-700': c.estado === 'confirmada',
+                                    'bg-gray-200 text-gray-600': c.estado === 'completada',
+                                    'bg-red-100 text-red-700': c.estado === 'cancelada'
+                                  }">
+                                {{ c.estado }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr *ngIf="listaCitas.length === 0">
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-400 italic">No se encontraron citas en este periodo.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+             <!-- Tabla Inventario -->
+             <table *ngIf="tabActiva === 'inventario'" class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-gray-500 uppercase font-bold text-xs sticky top-0 shadow-sm">
+                    <tr><th class="px-6 py-3 font-semibold">Producto</th><th class="px-6 py-3 font-semibold">SKU</th><th class="px-6 py-3 font-semibold">Stock</th><th class="px-6 py-3 font-semibold">Precio</th></tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <tr *ngFor="let p of listaInventario" class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-3 font-medium text-gray-700">{{ p.nombre }}</td>
+                        <td class="px-6 py-3 text-gray-400 font-mono text-xs">{{ p.sku }}</td>
+                        <td class="px-6 py-3 font-bold" [ngClass]="{'text-red-500': p.stock_actual <= p.stock_minimo, 'text-green-600': p.stock_actual > p.stock_minimo}">{{ p.stock_actual }}</td>
+                        <td class="px-6 py-3 text-gray-600">{{ p.precio_venta | currency }}</td>
+                    </tr>
+                    <tr *ngIf="listaInventario.length === 0">
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-400 italic">Inventario vacío.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

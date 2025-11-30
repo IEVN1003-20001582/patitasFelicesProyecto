@@ -1,38 +1,72 @@
-<!-- Quitamos 'sticky', 'top-0' y los márgenes 'ml-64'. Ahora es un bloque normal -->
-<header class="bg-white shadow-sm p-4 flex justify-between items-center z-20 relative w-full">
+<header class="bg-white shadow-sm p-4 flex justify-between items-center h-16 z-40 relative">
     
-    <!-- SECCIÓN IZQUIERDA -->
-    <div class="flex items-center">
-        <h1 class="text-xl font-bold text-primary-dark hidden sm:block font-poppins">
-            Patitas Felices
-        </h1>
-        
-        <button class="md:hidden text-gray-600 hover:text-primary-dark mr-4 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-        </button>
-    </div>
+    <h1 class="text-2xl font-bold text-primary-dark">
+        Patitas Felices
+    </h1>
     
-    <!-- SECCIÓN DERECHA -->
     <div class="flex items-center space-x-4">
-        <span class="text-sm font-semibold text-gray-600 hidden md:block font-poppins">
-            Hola, {{ usuarioNombre }}
-        </span>
-
-        <button (click)="limpiarNotificaciones()" 
-                class="relative p-2 rounded-full hover:bg-gray-100 focus:outline-none transition-colors duration-200 group">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 group-hover:text-primary-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-4-5.659V5a2 2 0 10-4 0v.341A6 6 0 006 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            <span *ngIf="notificacionesCount > 0" 
-                  class="absolute top-1 right-1 h-3 w-3 bg-light-red rounded-full border-2 border-white animate-pulse">
-            </span>
-        </button>
         
-        <div class="relative cursor-pointer">
-            <img [src]="usuarioFoto" 
-                 class="h-9 w-9 rounded-full border-2 border-gray-200 hover:border-secondary-teal object-cover">
+    
+        <div class="hidden md:block text-right">
+   
+            <p class="text-sm font-semibold text-gray-700">Hola, {{ primerNombre }}</p>
+            <p class="text-xs text-gray-500 capitalize">{{ usuario?.role }}</p>
         </div>
+
+
+        <div class="relative">
+            <button (click)="toggleDropdown()" class="relative p-2 rounded-full hover:bg-gray-100 focus:outline-none transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-4-5.659V5a2 2 0 10-4 0v.341A6 6 0 006 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span *ngIf="noLeidas > 0" class="absolute top-1 right-1 flex h-3 w-3">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-white"></span>
+                </span>
+            </button>
+
+      
+            <div *ngIf="mostrarDropdown" class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl overflow-hidden z-50 border border-gray-100 animate-fade-in-down">
+                <div class="p-3 border-b bg-gray-50 flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-gray-700">Notificaciones</h3>
+                    <span class="text-xs bg-secondary-teal text-white px-2 py-0.5 rounded-full">{{ noLeidas }} nuevas</span>
+                </div>
+                
+                <div class="max-h-80 overflow-y-auto">
+                    <div *ngIf="notificaciones.length === 0" class="p-6 text-center text-gray-400 text-sm">
+                        No tienes notificaciones.
+                    </div>
+
+                    <div *ngFor="let notif of notificaciones" 
+                         (click)="marcarComoLeida(notif)"
+                         class="p-3 border-b hover:bg-gray-50 cursor-pointer transition-colors flex items-start space-x-3"
+                         [ngClass]="{'bg-blue-50': !notif.leido}">
+                        
+                        <div class="p-2 rounded-full flex-shrink-0" [ngClass]="getIconColor(notif.tipo)">
+                            <svg *ngIf="notif.tipo === 'Stock'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                            <svg *ngIf="notif.tipo === 'Cita'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            <svg *ngIf="notif.tipo !== 'Stock' && notif.tipo !== 'Cita'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-gray-800 flex justify-between">
+                                {{ notif.titulo }}
+                                <span *ngIf="!notif.leido" class="h-2 w-2 bg-blue-500 rounded-full"></span>
+                            </p>
+                            <p class="text-xs text-gray-600 mt-0.5">{{ notif.mensaje }}</p>
+                            <p class="text-[10px] text-gray-400 mt-1">{{ notif.created_at | date:'short' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+  
+        <div class="h-9 w-9 rounded-full bg-secondary-teal flex items-center justify-center text-white font-bold shadow-sm">
+            {{ usuario?.nombre?.charAt(0) || 'U' }}
+        </div>
+
     </div>
 </header>
+
+<div *ngIf="mostrarDropdown" (click)="toggleDropdown()" class="fixed inset-0 z-30 cursor-default"></div>

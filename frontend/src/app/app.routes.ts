@@ -18,7 +18,7 @@ import { ConfiguracionComponent } from './pages/admin/configuracion/configuracio
 // --- 3. IMPORTACIÓN DE COMPONENTES VETERINARIO ---
 import { AgendaComponent } from './pages/veterinario/agenda/agenda.component';
 import { MiInventarioComponent } from './pages/veterinario/mi-inventario/mi-inventario.component';
-import { MiPerfilComponent } from './pages/veterinario/mi-perfil/mi-perfil.component';
+import { ConfiguracionVeterinarioComponent } from './pages/veterinario/mi-perfil/mi-perfil.component';
 import { ClientesVetComponent } from './pages/veterinario/mis-clientes/mis-clientes.component';
 import { MisMascotasComponent } from './pages/veterinario/mis-mascotas/mis-mascotas.component';
 
@@ -30,18 +30,21 @@ import { MisMascotasComponent } from './pages/veterinario/mis-mascotas/mis-masco
 import { MiPortalComponent } from './pages/cliente/mi-portal/mi-portal.component';
 
 
+
+
 // --- DEFINICIÓN DE RUTAS ---
 export const routes: Routes = [
     
-    // RUTA POR DEFECTO: Redirigir a bienvenida
+    
     { path: '', redirectTo: 'bienvenida', pathMatch: 'full' },
 
     // --- ÁREA PÚBLICA ---
+    
     { path: 'bienvenida', component: BienvenidaComponent, title: 'Bienvenido a Patitas Felices' },
     { path: 'login', component: LoginComponent, title: 'Iniciar Sesión' },
 
     // --- ÁREA ADMINISTRADOR ---
-    // Agrupamos bajo 'admin/' para mantener orden
+   
     { path: 'admin/dashboard', component: DashboardComponent, title: 'Dashboard Admin' },
     { path: 'admin/citas', component: GestionCitasComponent, title: 'Gestión de Citas' },
     { path: 'admin/clientes', component: GestionClientesComponent, title: 'Gestión de Clientes' },
@@ -57,12 +60,12 @@ export const routes: Routes = [
     { path: 'veterinario/clientes', component: ClientesVetComponent, title: 'Clientes' },
     { path: 'veterinario/mascotas', component: MisMascotasComponent, title: 'Mascotas' },
     { path: 'veterinario/inventario', component: MiInventarioComponent, title: 'Consulta de Inventario' },
-    { path: 'veterinario/perfil', component: MiPerfilComponent, title: 'Mi Perfil Profesional' },
+    { path: 'veterinario/perfil', component: ConfiguracionVeterinarioComponent, title: 'Mi Perfil Profesional' },
 
     // --- ÁREA CLIENTE ---
     { path: 'cliente/portal', component: MiPortalComponent, title: 'Mi Portal' },
 
     // --- RUTA COMODÍN (404) ---
-    // Si el usuario escribe algo raro, lo mandamos a bienvenida o login
+   
     { path: '**', redirectTo: 'bienvenida' }
 ];

@@ -1,1 +1,42 @@
-<p>bienvenida works!</p>
+<div class="flex items-center justify-center min-h-screen p-4 relative overflow-hidden bg-light-bg">
+
+
+    <div class="absolute inset-0 opacity-10 pointer-events-none pattern-bg"></div>
+
+
+    <div class="text-center p-12 bg-white rounded-2xl shadow-xl max-w-lg mx-auto relative z-10 animate-fade-in-up">
+
+        <div class="mx-auto h-32 w-32 rounded-full border-4 border-secondary-teal mb-6 overflow-hidden flex items-center justify-center bg-gray-100">
+        
+             <img src="assets/logo.jpg" 
+                  alt="Logo Patitas Felices" 
+                  class="h-full w-full object-cover"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+             <div style="display:none" class="text-4xl font-bold text-secondary-teal">PF</div>
+        </div>
+
+        <h1 class="text-4xl font-bold text-primary-dark mb-3 font-poppins">
+            Bienvenido a Patitas Felices
+        </h1>
+
+ 
+        <p class="text-lg text-gray-600 mb-10 font-poppins">
+            La gestión de tu veterinaria, en un solo lugar.
+        </p>
+
+
+        <div class="space-y-4">
+
+            <a routerLink="/login" [queryParams]="{view: 'cliente'}" 
+               class="block w-full bg-secondary-teal text-white font-semibold py-4 px-6 rounded-lg text-lg shadow-md hover:bg-opacity-90 transition duration-300 cursor-pointer">
+                Soy Cliente
+            </a>
+
+            <a routerLink="/login" [queryParams]="{view: 'personal'}"
+               class="block w-full bg-white text-secondary-teal border-2 border-secondary-teal font-semibold py-4 px-6 rounded-lg text-lg hover:bg-gray-50 transition duration-300 cursor-pointer">
+                Soy Personal de la Clínica
+            </a>
+        </div>
+
+    </div>
+</div>

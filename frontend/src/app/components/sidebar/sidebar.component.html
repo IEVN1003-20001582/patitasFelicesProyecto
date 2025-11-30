@@ -1,99 +1,112 @@
-<aside class="w-64 bg-primary-dark text-white flex-col hidden md:flex h-screen fixed left-0 top-0 overflow-y-auto z-30 shadow-2xl font-poppins">
+<aside class="w-64 bg-primary-dark text-white flex flex-col h-screen fixed left-0 top-0 bottom-0 z-40 shadow-xl">
     
-    <!-- LOGO -->
-    <div class="flex items-center justify-center p-6 shadow-md bg-primary-dark z-10">
-        <!-- Nota: Asegúrate de tener tu logo.png en src/assets/images/ -->
-        <img 
-            src="assets/images/logo.png" 
-            onerror="this.src='https://placehold.co/100x100/48C9B0/ffffff?text=PF&font=poppins'; this.onerror=null;" 
-            alt="Logo" 
-            class="h-12 w-12 rounded-full border-2 border-secondary-teal"
-        >
-        <span class="ml-3 text-xl font-bold tracking-wide">Patitas Felices</span>
+    <!-- Logo -->
+    <div class="flex items-center justify-center p-6 border-b border-gray-700">
+        <div class="h-10 w-10 rounded-full bg-secondary-teal flex items-center justify-center text-white font-bold border-2 border-white">PF</div>
+        <span class="ml-3 text-xl font-bold">Patitas Felices</span>
     </div>
 
-    <!-- MENÚ DE NAVEGACIÓN -->
-    <nav class="flex-1 mt-6 px-4 space-y-2 pb-24">
+    <!-- Menú Navegación -->
+    <nav class="flex-1 mt-6 px-4 space-y-2 overflow-y-auto custom-scrollbar">
         
-        <!-- =======================
+        <!-- ============================
              MENÚ DE ADMINISTRADOR
-        ======================== -->
-        <ng-container *ngIf="rolUsuario === 'admin'">
-            <a routerLink="/admin/dashboard" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Dashboard
+             ============================ -->
+        <ng-container *ngIf="usuarioActual?.role === 'admin'">
+            <p class="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mt-4 mb-2">Administración</p>
+            
+            <a routerLink="/admin/dashboard" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                Dashboard
             </a>
-            <a routerLink="/admin/citas" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Gestión de Citas
+            <a routerLink="/admin/citas" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                Gestión de Citas
             </a>
-            <a routerLink="/admin/clientes" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Clientes
+            <a routerLink="/admin/clientes" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                Clientes
             </a>
-            <a routerLink="/admin/mascotas" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Mascotas
+            <a routerLink="/admin/mascotas" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                Mascotas
             </a>
-            <a routerLink="/admin/veterinarios" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Veterinarios
+            <a routerLink="/admin/veterinarios" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>
+                Veterinarios
             </a>
-            <a routerLink="/admin/inventario" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Inventario
+            <a routerLink="/admin/inventario" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                Inventario
             </a>
-            <a routerLink="/admin/facturacion" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Facturación
+            <a routerLink="/admin/facturacion" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM12 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM12 6c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2z" /></svg>
+                Facturación
             </a>
-            <a routerLink="/admin/reportes" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Reportes
+            <a routerLink="/admin/reportes" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" /></svg>
+                Reportes
             </a>
-            <a routerLink="/admin/configuracion" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Configuración
+            <a routerLink="/admin/configuracion" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                Configuración
             </a>
         </ng-container>
 
-        <!-- =======================
+        <!-- ============================
              MENÚ DE VETERINARIO
-        ======================== -->
-        <ng-container *ngIf="rolUsuario === 'veterinario'">
-            <a routerLink="/veterinario/agenda" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Mi Agenda
+             ============================ -->
+        <ng-container *ngIf="usuarioActual?.role === 'veterinario'">
+            <p class="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mt-4 mb-2">Clínica</p>
+            
+            <a routerLink="veterinario/agenda" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                Mi Agenda
             </a>
-            <a routerLink="/veterinario/clientes" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Clientes
+              <a routerLink="veterinario/clientes" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                Clientes
             </a>
-            <a routerLink="/veterinario/mascotas" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Mascotas
+            <a routerLink="veterinario/mascotas" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                Mascotas
             </a>
-            <a routerLink="/veterinario/inventario" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Consultar Stock
+            <a routerLink="veterinario/inventario" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                Consultar Stock
             </a>
-            <div class="border-t border-gray-600 my-2"></div>
-            <a routerLink="/veterinario/perfil" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Mi Perfil
+
+            <a routerLink="veterinario/perfil" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                Mi perfil
             </a>
         </ng-container>
 
-        <!-- =======================
-             MENÚ DE CLIENTE (Opcional si usa el layout con sidebar)
-        ======================== -->
-        <ng-container *ngIf="rolUsuario === 'cliente'">
-            <a routerLink="/cliente/portal" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition duration-200">
-                <span class="mr-3"></span> Mi Portal
+        <!-- ============================
+             MENÚ DE CLIENTE
+             ============================ -->
+        <ng-container *ngIf="usuarioActual?.role === 'cliente'">
+            <p class="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mt-4 mb-2">Mi Portal</p>
+            
+            <a routerLink="/cliente/portal" routerLinkActive="bg-secondary-teal text-primary-dark font-bold" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                Mi informacion
             </a>
         </ng-container>
 
     </nav>
 
-    <!-- FOOTER DEL SIDEBAR (Usuario y Logout) -->
-    <div class="p-4 border-t border-gray-700 bg-primary-dark absolute bottom-0 w-full">
-        <div class="flex items-center mb-4">
-            <img class="h-10 w-10 rounded-full object-cover border border-gray-500" src="https://placehold.co/40x40/ffffff/2C3E50?text=U" alt="User">
+    <!-- Footer Usuario -->
+    <div class="p-4 border-t border-gray-700 bg-gray-800">
+        <div class="flex items-center mb-3">
+            
             <div class="ml-3 overflow-hidden">
-                <p class="text-sm font-semibold text-white truncate">Usuario</p>
-                <p class="text-xs text-gray-400 capitalize">{{ rolUsuario }}</p>
+                <p class="text-sm font-semibold truncate">{{ usuarioActual?.nombre || 'Usuario' }}</p>
+                <p class="text-xs text-gray-400 capitalize">{{ usuarioActual?.role || 'Invitado' }}</p>
             </div>
         </div>
-        <button (click)="logout()" class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded transition duration-300 flex items-center justify-center group">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
+        <button (click)="logout()" class="w-full text-center bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-md flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
             Cerrar Sesión
         </button>
     </div>

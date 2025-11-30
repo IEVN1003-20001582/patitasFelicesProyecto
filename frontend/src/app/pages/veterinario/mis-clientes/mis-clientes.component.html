@@ -17,7 +17,7 @@
             </div>
         </div>
 
-        <!-- Toolbar -->
+ 
         <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
             <div class="relative w-full max-w-md">
                 <input type="text" [(ngModel)]="textoBusqueda" (input)="filtrarClientes()" placeholder="Buscar cliente..." class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal">
@@ -71,7 +71,7 @@
                                 <button (click)="abrirModalEditar(cliente)" class="p-2 text-secondary-teal hover:bg-gray-100 rounded-full" title="Editar">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                 </button>
-                                <!-- Botón Archivar solo si está activo -->
+                          
                             
                             </td>
                         </tr>
@@ -81,9 +81,9 @@
         </div>
     </main>
 
-    <!-- ============================ -->
-    <!-- DRAWER - VISTA RÁPIDA -->
-    <!-- ============================ -->
+
+    <!-- DRAWER  -->
+
     <div *ngIf="mostrarModalVistaRapida" class="fixed inset-0 z-40 flex justify-end">
         <div (click)="cerrarVistaRapida()" class="fixed inset-0 bg-black bg-opacity-30 transition-opacity cursor-pointer"></div>
         
@@ -96,16 +96,14 @@
             </div>
             
             <div class="flex-1 p-6 overflow-y-auto space-y-8" *ngIf="clienteSeleccionado">
-                
-                <!-- Info Cliente -->
+      
                 <div class="flex items-start space-x-4">
                     <div class="h-20 w-20 rounded-full bg-secondary-teal flex items-center justify-center text-3xl text-white font-bold shadow-md flex-shrink-0 uppercase">
                         {{ clienteSeleccionado.nombre.charAt(0) }}
                     </div>
                     <div class="flex-1">
                         <h4 class="text-2xl font-bold text-gray-800 leading-tight">{{ clienteSeleccionado.nombre }}</h4>
-                        
-                        <!-- CAMBIO AQUÍ: Estado en el Drawer -->
+            
                         <span class="inline-block mt-1 px-2 py-0.5 text-xs font-bold uppercase rounded-md"
                               [ngClass]="clienteSeleccionado.estado === 'Inactivo' ? 'bg-gray-200 text-gray-600' : 'bg-green-100 text-green-700'">
                             {{ clienteSeleccionado.estado || 'Activo' }}
@@ -133,7 +131,7 @@
                 
                 <hr class="border-gray-100">
 
-                <!-- Mascotas Registradas -->
+    
                 <div>
                     <div class="flex justify-between items-center mb-4">
                         <h5 class="text-lg font-bold text-gray-800">Mascotas ({{ mascotasCliente.length }})</h5>
@@ -141,7 +139,7 @@
                     
                     <div class="space-y-3">
                         <div *ngFor="let mascota of mascotasCliente" class="flex items-center p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                            <!-- Foto Mascota -->
+         
                             <div class="h-12 w-12 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden relative border border-gray-200">
                                 <img *ngIf="mascota.foto_url && mascota.foto_url.length > 10" [src]="mascota.foto_url" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'">
                                 <div class="absolute inset-0 flex items-center justify-center text-gray-400 font-bold bg-gray-100 uppercase">{{ mascota.nombre.charAt(0) }}</div>
@@ -152,7 +150,7 @@
                                 <p class="text-xs text-gray-500">{{ mascota.especie }} • {{ mascota.raza }}</p>
                             </div>
                             
-                            <!-- CAMBIO AQUÍ: Badge Estado Mascota -->
+                
                             <span class="px-2 py-1 text-[10px] font-bold uppercase rounded-md"
                                   [ngClass]="mascota.estado === 'archivado' ? 'bg-gray-200 text-gray-500' : 'bg-green-100 text-green-600'">
                                 {{ mascota.estado === 'archivado' ? 'Archivado' : 'Activo' }}
@@ -165,7 +163,7 @@
                     </div>
                 </div>
 
-                <!-- Estadísticas -->
+   
                 <div class="grid grid-cols-2 gap-4">
                     <div class="p-4 bg-blue-50 rounded-xl text-center">
                         <p class="text-2xl font-bold text-blue-600">{{ mascotasCliente.length }}</p>
@@ -183,7 +181,7 @@
 
             </div>
             
-            <!-- Footer -->
+
             <div class="p-5 border-t bg-gray-50">
                 <button (click)="cerrarVistaRapida()" class="w-full py-3 bg-white border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-100 transition">
                     Cerrar
@@ -192,7 +190,7 @@
         </div>
     </div>
 
-    <!-- Modal Agregar (Sin cambios) -->
+    <!-- Modal Agregar  -->
     <div *ngIf="mostrarModalAgregar" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg animate-fade-in-down">
             <div class="flex justify-between items-center p-5 border-b"><h3 class="text-xl font-bold text-primary-dark">Agregar Cliente</h3><button (click)="cerrarModalAgregar()">X</button></div>
@@ -209,7 +207,7 @@
         </div>
     </div>
 
-    <!-- Modal Editar (Sin cambios) -->
+   
     <div *ngIf="mostrarModalEditar" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg animate-fade-in-down">
             <div class="flex justify-between items-center p-5 border-b"><h3 class="text-xl font-bold text-primary-dark">Editar Cliente</h3><button (click)="cerrarModalEditar()">X</button></div>
@@ -226,10 +224,8 @@
         </div>
     </div>
 
-    <!-- Modal Archivar (MODIFICADO) -->
 
 
-    <!-- Modal Filtros -->
     <div *ngIf="mostrarModalFiltros" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg animate-fade-in-down">
             <div class="flex justify-between items-center p-5 border-b"><h3 class="text-xl font-bold text-primary-dark">Filtros Avanzados</h3><button (click)="cerrarModalFiltros()">X</button></div>

@@ -12,7 +12,7 @@ export class MascotasService {
 
   constructor(private http: HttpClient) { }
 
-  // --- MASCOTAS ---
+
   getMascotas(clienteId?: number): Observable<any> {
     let url = `${this.apiUrl}/mascotas`;
     if (clienteId) url += `?cliente_id=${clienteId}`;
@@ -31,7 +31,6 @@ export class MascotasService {
   return this.http.put<RespuestaApi>(`${this.apiUrl}/mascotas/${id}`, datos);
 }
 
-  // --- HISTORIAL CLÍNICO ---
   getHistorial(mascotaId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/historial?mascota_id=${mascotaId}`);
   }

@@ -1,1 +1,219 @@
-<p>dashboard works!</p>
+<div class="w-full p-6 md:p-8"> 
+    
+    <!-- Título y Saludo -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-primary-dark">Resumen General</h2>
+        <p class="text-gray-500">Bienvenido al panel de control.</p>
+    </div>
+
+    <!-- ==========================
+         SECCIÓN 1: KPIs
+         ========================== -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- KPI Clientes -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center hover:shadow-xl transition cursor-default border-l-4 border-secondary-teal">
+            <div class="p-3 bg-teal-50 rounded-full text-secondary-teal">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                </div>
+            <div class="ml-4">
+                <p class="text-sm text-gray-500 font-medium">Total Clientes</p>
+                <p class="text-3xl font-bold text-primary-dark">{{ totalClientes }}</p>
+            </div>
+        </div>
+
+        <!-- KPI Mascotas -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center hover:shadow-xl transition cursor-default border-l-4 border-blue-400">
+            <div class="p-3 bg-blue-50 rounded-full text-blue-500">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm text-gray-500 font-medium">Total Pacientes</p>
+                <p class="text-3xl font-bold text-primary-dark">{{ totalMascotas }}</p>
+            </div>
+        </div>
+
+        <!-- KPI Citas Hoy -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center hover:shadow-xl transition cursor-default border-l-4 border-accent-yellow">
+            <div class="p-3 bg-yellow-50 rounded-full text-accent-yellow">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm text-gray-500 font-medium">Citas Hoy</p>
+                <p class="text-3xl font-bold text-primary-dark">{{ citasHoyCount }}</p>
+            </div>
+        </div>
+
+        <!-- KPI Ingresos -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center hover:shadow-xl transition cursor-default border-l-4 border-green-500">
+            <div class="p-3 bg-green-50 rounded-full text-green-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM12 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM12 6c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2z" /></svg>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm text-gray-500 font-medium">Ingresos (Hoy)</p>
+                <p class="text-3xl font-bold text-primary-dark">{{ ingresosDia | currency }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ECCIÓN 2: WIDGETS PRINCIPALE -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        
+        <!-- Próximas Citas -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg lg:col-span-2">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-primary-dark">Próximas Citas</h3>
+                <a routerLink="/admin/citas" class="text-sm text-secondary-teal hover:underline font-medium">Ver Calendario</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 text-xs text-gray-500 uppercase font-bold">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Hora</th>
+                            <th class="px-4 py-2 text-left">Paciente</th>
+                            <th class="px-4 py-2 text-left">Dueño</th>
+                            <th class="px-4 py-2 text-left">Veterinario</th>
+                            <th class="px-4 py-2 text-left">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-sm">
+                        <tr *ngFor="let cita of proximasCitas" class="hover:bg-gray-50">
+                            <td class="px-4 py-3 font-bold text-primary-dark">{{ cita.fecha_hora | date:'shortTime' }}</td>
+                            <td class="px-4 py-3">{{ cita.nombre_mascota }}</td>
+                            <td class="px-4 py-3 text-gray-500">{{ cita.nombre_cliente || '---' }}</td>
+                            <td class="px-4 py-3 text-gray-500">{{ cita.nombre_veterinario || 'Sin asignar' }}</td>
+                            <td class="px-4 py-3">
+                                <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-blue-100 text-blue-700">
+                                    {{ cita.estado }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr *ngIf="proximasCitas.length === 0">
+                            <td colspan="5" class="px-4 py-6 text-center text-gray-400">No hay citas próximas.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Acciones Rápidas -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg flex flex-col justify-between">
+            <h3 class="text-lg font-bold text-primary-dark mb-4">Acciones Rápidas</h3>
+            <div class="space-y-4 flex-1">
+                
+                <a routerLink="/admin/citas" class="block w-full bg-secondary-teal text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-opacity-90 transition text-center flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    Programar Cita
+                </a>
+             
+                <a routerLink="/admin/clientes" class="block w-full bg-secondary-teal text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-opacity-90 transition text-center flex items-center justify-center">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+                      Agregar Cliente
+                </a>
+               
+                <a routerLink="/admin/mascotas" class="block w-full bg-secondary-teal text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-opacity-90 transition text-center flex items-center justify-center">
+                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                    Registrar Mascota
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!--SECCIÓN 3: WIDGETS SECUNDARIOS-->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Gráfico Ingresos (Simulado con CSS) -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg lg:col-span-2">
+            <h3 class="text-lg font-bold text-primary-dark mb-4">Tendencia de Ingresos (Semestral)</h3>
+            <div class="h-48 flex items-end justify-between px-4 pt-8 border-b border-gray-200 relative">
+                <!-- Líneas guía -->
+                <div class="absolute inset-0 border-t border-gray-100" style="top: 25%"></div>
+                <div class="absolute inset-0 border-t border-gray-100" style="top: 50%"></div>
+                <div class="absolute inset-0 border-t border-gray-100" style="top: 75%"></div>
+                
+                <!-- Barras -->
+                <div class="w-1/12 bg-secondary-teal rounded-t h-1/3 hover:opacity-80 transition-all relative group cursor-pointer">
+                    <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs bg-gray-800 text-white px-1 rounded opacity-0 group-hover:opacity-100 transition">$1.2k</span>
+                </div>
+                <div class="w-1/12 bg-secondary-teal rounded-t h-1/2 hover:opacity-80 transition-all relative group cursor-pointer">
+                    <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs bg-gray-800 text-white px-1 rounded opacity-0 group-hover:opacity-100 transition">$2.5k</span>
+                </div>
+                <div class="w-1/12 bg-secondary-teal rounded-t h-2/5 hover:opacity-80 transition-all relative group cursor-pointer">
+                    <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs bg-gray-800 text-white px-1 rounded opacity-0 group-hover:opacity-100 transition">$1.8k</span>
+                </div>
+                <div class="w-1/12 bg-secondary-teal rounded-t h-3/4 hover:opacity-80 transition-all relative group cursor-pointer">
+                    <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs bg-gray-800 text-white px-1 rounded opacity-0 group-hover:opacity-100 transition">$3.2k</span>
+                </div>
+                <div class="w-1/12 bg-secondary-teal rounded-t h-2/3 hover:opacity-80 transition-all relative group cursor-pointer">
+                    <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs bg-gray-800 text-white px-1 rounded opacity-0 group-hover:opacity-100 transition">$2.8k</span>
+                </div>
+                <div class="w-1/12 bg-accent-yellow rounded-t h-4/5 hover:opacity-80 transition-all relative group cursor-pointer"> <!-- Mes actual -->
+                    <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs bg-gray-800 text-white px-1 rounded opacity-0 group-hover:opacity-100 transition">$3.5k</span>
+                </div>
+            </div>
+            <div class="flex justify-between px-4 mt-2 text-xs text-gray-500">
+                <span>Jun</span><span>Jul</span><span>Ago</span><span>Sep</span><span>Oct</span><span class="font-bold text-primary-dark">Nov</span>
+            </div>
+        </div>
+
+        <!-- Alertas de Inventario -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-primary-dark">Alertas de Stock</h3>
+                <a routerLink="/admin/inventario" class="text-xs text-blue-500 hover:underline">Ver todo</a>
+            </div>
+            <div class="space-y-3 max-h-48 overflow-y-auto">
+                <div *ngFor="let prod of alertasInventario" class="p-3 rounded-lg flex justify-between items-center"
+                     [ngClass]="prod.stock_actual <= 0 ? 'bg-red-50 border border-red-100' : 'bg-yellow-50 border border-yellow-100'">
+                    <div>
+                        <p class="text-sm font-bold" [ngClass]="prod.stock_actual <= 0 ? 'text-red-800' : 'text-yellow-800'">{{ prod.nombre }}</p>
+                        <p class="text-xs text-gray-500">Min: {{ prod.stock_minimo }}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="block text-lg font-bold" [ngClass]="prod.stock_actual <= 0 ? 'text-red-600' : 'text-yellow-600'">{{ prod.stock_actual }}</span>
+                        <span class="text-[10px] uppercase font-bold tracking-wide opacity-70">{{ prod.stock_actual <= 0 ? 'Agotado' : 'Bajo' }}</span>
+                    </div>
+                </div>
+                <p *ngIf="alertasInventario.length === 0" class="text-center text-gray-400 text-sm py-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Inventario saludable
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALES SIMPLES PARA ACCIONES RÁPIDAS -->
+    
+    <!-- Modal Cliente Rápido -->
+    <div *ngIf="mostrarModalCliente" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md">
+            <h3 class="text-lg font-bold mb-4">Nuevo Cliente Rápido</h3>
+            <div class="space-y-3">
+                <input [(ngModel)]="nuevoCliente.nombre" placeholder="Nombre" class="w-full border p-2 rounded">
+                <input [(ngModel)]="nuevoCliente.email" placeholder="Email" class="w-full border p-2 rounded">
+            </div>
+            <div class="mt-4 flex justify-end space-x-2">
+                <button (click)="cerrarModalCliente()" class="px-4 py-2 border rounded">Cancelar</button>
+                <button (click)="guardarClienteRapido()" class="bg-secondary-teal text-white px-4 py-2 rounded">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Mascota Rápida -->
+    <div *ngIf="mostrarModalMascota" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md">
+            <h3 class="text-lg font-bold mb-4">Nueva Mascota Rápida</h3>
+            <div class="space-y-3">
+                <input [(ngModel)]="nuevaMascota.nombre" placeholder="Nombre Mascota" class="w-full border p-2 rounded">
+                <select [(ngModel)]="nuevaMascota.cliente_id" class="w-full border p-2 rounded">
+                    <option [value]="0">Seleccionar Dueño...</option>
+                    <option *ngFor="let c of clientesList" [value]="c.id">{{ c.nombre_completo || c.nombre }}</option>
+                </select>
+            </div>
+            <div class="mt-4 flex justify-end space-x-2">
+                <button (click)="cerrarModalMascota()" class="px-4 py-2 border rounded">Cancelar</button>
+                <button (click)="guardarMascotaRapida()" class="bg-secondary-teal text-white px-4 py-2 rounded">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,24 +1,33 @@
-import { Component, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { AuthService, Usuario } from '../../service/auth.service';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule], // Importante: RouterModule permite usar routerLink
-  templateUrl: './sidebar.component.html'
-})
-export class SidebarComponent {
-  // Recibimos el rol desde el padre (app.component)
-  // Puede ser: 'admin' | 'veterinario' | 'cliente'
-  @Input() rolUsuario: string = 'admin'; 
+  imports: [CommonModule, RouterModule],
+  templateUrl: './sidebar.component.html',
 
-  constructor(private router: Router) {}
+})
+export class SidebarComponent implements OnInit {
+  
+  // ESTA ES LA VARIABLE QUE FALTABA:
+  usuarioActual: Usuario | null = null;
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    // Nos suscribimos para recibir los datos del usuario logueado
+    this.authService.currentUser$.subscribe(user => {
+      this.usuarioActual = user;
+    });
+  }
 
   logout() {
-    // Aquí borras el token del localStorage
-    // localStorage.removeItem('token');
-    console.log('Cerrando sesión...');
-    this.router.navigate(['/login']);
+    this.authService.logout();
   }
 }

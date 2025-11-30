@@ -10,5 +10,5 @@ export interface Mascota {
   alergias?: string;
   foto_url?: string;
   estado?: string; // 'activo', 'archivado', 'en_memoria'
-  nombre_dueno?: string; // Campo extra que viene del JOIN en el backend
+  nombre_dueno?: string; 
 }

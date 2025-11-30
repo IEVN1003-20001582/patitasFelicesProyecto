@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';   
 import Swal from 'sweetalert2';
 
-// --- INTERFACES ---
+
 import { Mascota } from '../../../interfaces/mascota.interface';
 import { Historial } from '../../../interfaces/historial.interface';
 import { Vacuna } from '../../../interfaces/vacuna.interface';
 
-// --- SERVICIOS ---
+
 import { MascotasService } from '../../../service/mascotas.service';
 import { ClientesService } from '../../../service/clientes.service';
 import { VeterinariosService } from '../../../service/veterinarios.service';
@@ -24,26 +24,25 @@ import { CitasService } from '../../../service/citas.service';
 })
 export class GestionMascotasComponent implements OnInit {
 
-  // --- VARIABLES DE DATOS ---
+
   mascotas: any[] = [];
   mascotasFiltradas: any[] = [];
   veterinarios: any[] = [];
   productos: any[] = []; 
   clientes: any[] = []; 
 
-  // --- VARIABLES DE DATOS DETALLADOS (FASE 2) ---
+
   historialMascota: any[] = [];
   vacunasMascota: any[] = [];
   citasMascota: any[] = [];
 
-  // --- KPIs ---
   kpis = {
     total: 0,
     nuevas: 0,
     alergias: 0
   };
 
-  // --- MODALES ---
+
   mostrarModalAgregar = false;
   mostrarModalDetalle = false;
   mostrarModalEditar = false; 
@@ -55,7 +54,7 @@ export class GestionMascotasComponent implements OnInit {
   tabActiva: string = 'info'; 
   textoBusqueda: string = '';
   
-  // --- OBJETOS ---
+ 
   nuevaMascota: Mascota = this.initMascota();
   mascotaEditando: Mascota = this.initMascota(); 
   nuevoHistorial: Historial = this.initHistorial();
@@ -75,9 +74,7 @@ export class GestionMascotasComponent implements OnInit {
     this.cargarDatosIniciales();
   }
 
-  // ==========================================
-  // 1. CARGA INICIAL
-  // ==========================================
+
   cargarDatosIniciales() {
     this.mascotasService.getMascotas().subscribe((data: any) => {
       const lista = data.mascotas || (Array.isArray(data) ? data : []);
@@ -100,41 +97,37 @@ export class GestionMascotasComponent implements OnInit {
     });
   }
 
-  // ==========================================
-  // 2. LÓGICA DEL DETALLE (CORREGIDA)
-  // ==========================================
+  
   abrirModalDetalle(mascota: any) {
     this.mascotaSeleccionada = mascota;
     this.tabActiva = 'info'; 
     this.mostrarModalDetalle = true;
     
-    // CORRECCIÓN IMPORTANTE: Cargar datos al abrir el modal
+    
     this.cargarDetalleMascota(mascota.id);
   }
 
   cargarDetalleMascota(id: number) {
-    // Limpiamos primero para que no se vean datos de la mascota anterior mientras carga
+  
     this.historialMascota = [];
     this.vacunasMascota = [];
     this.citasMascota = [];
 
-    // 1. Historial
+
     this.mascotasService.getHistorial(id).subscribe((res: any) => {
         this.historialMascota = res.historial || (Array.isArray(res) ? res : []);
     });
-    // 2. Vacunas
+
     this.mascotasService.getVacunas(id).subscribe((res: any) => {
         this.vacunasMascota = res.vacunas || (Array.isArray(res) ? res : []);
     });
-    // 3. Citas
+
     this.citasService.getCitas(id).subscribe((res: any) => {
         this.citasMascota = res.citas || (Array.isArray(res) ? res : []);
     });
   }
 
-  // ==========================================
-  // 3. EDICIÓN Y CRUD
-  // ==========================================
+
   
   abrirModalEditar() {
     this.mascotaEditando = { ...this.mascotaSeleccionada };
@@ -166,7 +159,6 @@ export class GestionMascotasComponent implements OnInit {
     }
   }
 
-  // --- GUARDAR TRATAMIENTO ---
   guardarTratamiento() {
     this.nuevoHistorial.mascota_id = this.mascotaSeleccionada.id;
     
@@ -187,7 +179,7 @@ export class GestionMascotasComponent implements OnInit {
     });
   }
 
-  // --- GUARDAR VACUNA ---
+
   guardarVacuna() {
     this.nuevaVacuna.mascota_id = this.mascotaSeleccionada.id;
     
@@ -208,7 +200,6 @@ export class GestionMascotasComponent implements OnInit {
     });
   }
 
-  // --- CREAR MASCOTA ---
   guardarMascota() {
     if (!this.nuevaMascota.nombre || !this.nuevaMascota.cliente_id) {
         Swal.fire('Atención', 'Nombre y Dueño son obligatorios', 'warning');
@@ -227,7 +218,6 @@ export class GestionMascotasComponent implements OnInit {
     });
   }
 
-  // --- ARCHIVAR ---
   archivarMascotaConfirmado() {
     if (!this.mascotaSeleccionada) return;
     
@@ -243,9 +233,7 @@ export class GestionMascotasComponent implements OnInit {
     });
   }
 
-  // ==========================================
-  // 4. UTILIDADES
-  // ==========================================
+  
   calcularKPIs() {
     if (!this.mascotas) return;
     this.kpis.total = this.mascotas.length;
@@ -265,14 +253,14 @@ export class GestionMascotasComponent implements OnInit {
 
   cambiarTab(tab: string) { this.tabActiva = tab; }
 
-  // Inicializadores
+
   initMascota(): Mascota { return { cliente_id: 0, nombre: '', especie: '', raza: '', fecha_nacimiento: '', sexo: 'Macho', peso: 0, alergias: '' }; }
   
-  // Corrección de nombres para que coincidan con tu interface y BD
+
   initHistorial(): Historial { return { mascota_id: 0, veterinario_id: 0, tratamiento_aplicado: '', medicamentos_recetados: '' }; }
   initVacuna(): Vacuna { return { mascota_id: 0, veterinario_id: 0, producto_id: 0, fecha_aplicacion: '' }; }
 
-  // Modales
+
   abrirModalAgregar() { this.mostrarModalAgregar = true; }
   cerrarModalAgregar() { this.mostrarModalAgregar = false; }
   cerrarModalDetalle() { this.mostrarModalDetalle = false; this.mascotaSeleccionada = null; }

@@ -1,10 +1,12 @@
 export interface Veterinario {
   id?: number;
-  usuario_id: number;
+  user_id?: number;
   nombre_completo: string;
-  cedula: string;
+  email: string;       
+  cedula: string;       
   especialidad: string;
-  turno?: string;
-  estado?: 'Activo' | 'Inactivo' | 'Vacaciones';
-  email?: string;
+  turno: string;        // 'Matutino', 'Vespertino', 'Completo'
+  foto_url?: string;
+  is_active?: number;   // 1 = Activo, 0 = Inactivo
+  password?: string;    
 }

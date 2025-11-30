@@ -2,11 +2,11 @@ export interface Historial {
     id?: number;
     mascota_id: number;
     veterinario_id: number;
-    veterinario?: string; // Nombre del vet
+    veterinario?: string; 
     fecha?: string;
     
-    // CAMBIOS AQUÍ PARA COINCIDIR CON LA BD:
-    diagnostico?: string; // Agregamos diagnostico
-    tratamiento_aplicado: string; // Antes era 'notas'
-    medicamentos_recetados?: string; // Antes era 'medicamentos'
+    
+    diagnostico?: string;
+    tratamiento_aplicado: string; 
+    medicamentos_recetados?: string;
 }

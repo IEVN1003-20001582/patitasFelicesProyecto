@@ -1,10 +1,10 @@
 export interface Usuario {
   id?: number;
   email: string;
-  password?: string; // Opcional, solo se envía al crear/loguear
+  password?: string; 
   rol: 'admin' | 'veterinario' | 'cliente';
-  nombre?: string; // Nombre del perfil asociado
-  perfil_id?: number; // ID del cliente o veterinario asociado
+  nombre?: string; 
+  perfil_id?: number; 
 }
 
 export interface LoginResponse {

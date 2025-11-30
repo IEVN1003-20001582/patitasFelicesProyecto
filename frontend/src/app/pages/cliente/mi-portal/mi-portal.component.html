@@ -1,611 +1,255 @@
 
-    <!-- =================================================================
-         PÁGINA 17: DASHBOARD DE CLIENTE (CONTENIDO)
-    ================================================================== -->
-    <main class="container mx-auto max-w-7xl p-6 md:p-8">
-
-        <h1 class="text-3xl font-bold text-primary-dark mb-6">Bienvenido, Israel</h1>
-
-        <!-- Pestañas (Tabs) -->
-        <div class="border-b border-gray-200 mb-6">
-            <nav class="flex space-x-4 -mb-px">
-                <button id="tab-btn-mascotas" class="tab-btn active py-4 px-3 border-b-4 text-sm font-semibold">
-                    🐾 Mis Mascotas
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button (click)="abrirModalSolicitar()" class="bg-secondary-teal text-white font-semibold py-2 px-3 sm:px-4 rounded-lg text-sm shadow-md hover:bg-opacity-80 transition duration-300 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-0 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                    <span class="hidden sm:block">Solicitar Cita</span>
                 </button>
-                <button id="tab-btn-citas" class="tab-btn py-4 px-3 border-b-4 text-sm font-semibold text-gray-500 hover:text-gray-700">
-                    📅 Mis Citas
+                <button (click)="abrirModalFacturas()" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-3 sm:px-4 rounded-lg text-sm hover:bg-gray-50 transition duration-300 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-0 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    <span class="hidden sm:block">Mis Facturas</span>
                 </button>
-            </nav>
-        </div>
-
-        <!-- Contenido de Pestañas -->
-        <div>
-            <!-- Pestaña 1: Mis Mascotas (Activa por defecto) -->
-            <div id="tab-content-mascotas" class="tab-content active">
                 
-                <!-- ¡NUEVO! Boton de Agregar Mascota -->
-                <div class="flex justify-end mb-4">
-                    <button id="btn-agregar-mascota-cliente" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg text-sm shadow-md hover:bg-opacity-80 transition duration-300 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                        Registrar Nueva Mascota
-                    </button>
-                </div>
+                <button (click)="abrirModalPerfil()" class="bg-white text-gray-700 border border-gray-300 font-semibold p-2 rounded-lg hover:bg-gray-50 transition duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                </button>
+            </div>
+      
+    
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <!-- Tarjeta de Mascota (Clickeable) -->
-                    <div class="btn-detalle-mascota-cliente bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 hover:shadow-xl transition duration-300 cursor-pointer">
-                        <div class="h-40 bg-gray-200">
-                            <img src="https://th.bing.com/th/id/R.9003028d7ec6ff58a70a2be15a05ffed?rik=9cLEFO6s9oiGeg&riu=http%3a%2f%2fwww.publicdomainpictures.net%2fpictures%2f40000%2fvelka%2fgolden-retriever-dog-1364426710r9x.jpg&ehk=Z8ZK9mRUJe0rT61EYByfWPUGg1BEToYpGPK3bCz1aTU%3d&risl=&pid=ImgRaw&r=0" alt="Foto de Max" class="h-full w-full object-cover">
-                        </div>
-                        <div class="p-5">
-                            <h3 class="text-xl font-bold text-primary-dark truncate">Max</h3>
-                            <p class="text-gray-600 text-sm">Perro - Golden Retriever</p>
-                            <div class="my-3">
-                                <span class="px-3 py-1 text-xs font-bold text-red-800 bg-red-200 rounded-full animate-pulse">¡ALERGIAS!</span>
-                            </div>
-                        </div>
+    <main class="container mx-auto max-w-7xl p-6 md:p-8">
+        <h1 class="text-3xl font-bold text-primary-dark mb-6">Bienvenido, {{ clientePerfil?.nombre_completo?.split(' ')[0] }}</h1>
+
+
+        <!-- MIS MASCOTAS -->
+        <div class="mb-10">
+             <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-700">Mis Mascotas</h2>
+                <button (click)="abrirModalAgregarMascota()" class="text-secondary-teal hover:underline font-semibold">+ Registrar Nueva</button>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div *ngFor="let mascota of misMascotas" (click)="abrirModalDetalle(mascota)" class="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer transform hover:-translate-y-1 transition duration-300">
+                    <div class="h-40 bg-gray-200 relative">
+                         <img [src]="mascota.foto_url || 'https://placehold.co/400x300?text=' + mascota.nombre" class="w-full h-full object-cover">
                     </div>
-                    <!-- Tarjeta de Mascota (Clickeable) -->
-                    <div class="btn-detalle-mascota-cliente bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 hover:shadow-xl transition duration-300 cursor-pointer">
-                        <div class="h-40 bg-gray-200">
-                             <img src="https://placehold.co/400x300/2C3E50/ffffff?text=Mishi&font=poppins" alt="Foto de Mishi" class="h-full w-full object-cover">
-                        </div>
-                        <div class="p-5">
-                            <h3 class="text-xl font-bold text-primary-dark truncate">Mishi</h3>
-                            <p class="text-gray-600 text-sm">Gato - Doméstico</p>
-                            <div class="my-3">
-                                <span class="px-3 py-1 text-xs font-semibold text-gray-700 bg-gray-100 rounded-full">Sin Alertas</span>
-                            </div>
-                        </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-bold text-primary-dark">{{ mascota.nombre }}</h3>
+                        <p class="text-gray-600 text-sm">{{ mascota.especie }} - {{ mascota.raza }}</p>
                     </div>
+                </div>
+            
+                <div *ngIf="misMascotas.length === 0" class="col-span-full text-center py-8 bg-gray-50 rounded-lg border border-dashed">
+                    No tienes mascotas registradas. ¡Agrega una!
                 </div>
             </div>
+        </div>
 
-            <!-- Pestaña 2: Mis Citas (Oculta) -->
-            <div id="tab-content-citas" class="tab-content hidden">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Calendario -->
-                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <!-- Nombres de los Días -->
-                        <div class="grid grid-cols-7 border-b">
-                            <div class="p-4 text-gray-600 text-xs font-semibold uppercase">Dom</div>
-                            <div class="p-4 text-gray-600 text-xs font-semibold uppercase">Lun</div>
-                            <div class="p-4 text-gray-600 text-xs font-semibold uppercase">Mar</div>
-                            <div class="p-4 text-gray-600 text-xs font-semibold uppercase">Mie</div>
-                            <div class="p-4 text-gray-600 text-xs font-semibold uppercase">Jue</div>
-                            <div class="p-4 text-gray-600 text-xs font-semibold uppercase">Vie</div>
-                            <div class="p-4 text-gray-600 text-xs font-semibold uppercase">Sab</div>
-                        </div>
-                        <!-- Días (Simulación) -->
-                        <div class="grid grid-cols-7 divide-x divide-y">
-                            <div class="p-2 calendar-day relative text-gray-400"><span class="text-sm">26</span></div>
-                            <div class="p-2 calendar-day relative text-gray-400"><span class="text-sm">27</span></div>
-                            <div class="p-2 calendar-day relative"><span class="text-sm">28</span></div>
-                            <div class="p-2 calendar-day relative"><span class="text-sm">29</span></div>
-                            <div class="p-2 calendar-day relative"><span class="text-sm">30</span></div>
-                            <div class="p-2 calendar-day relative bg-gray-100">
-                                <span class="text-sm">31</span>
-                                <div class="mt-1 text-xs bg-gray-300 text-gray-700 p-1 rounded truncate">Consulta (Pasada)</div>
-                            </div>
-                            <div class="p-2 calendar-day relative"><span class="text-sm">1</span></div>
-                            <div class="p-2 calendar-day relative"><span class="text-sm">2</span></div>
-                            <div class="p-2 calendar-day relative bg-green-50 border-2 border-green-300">
-                                <span class="text-sm font-bold">3</span>
-                                <div class="mt-1 text-xs bg-secondary-teal text-white p-1 rounded truncate">Vacuna (Max)</div>
-                            </div>
-                            <!-- ... etc ... -->
-                        </div>
-                    </div>
-                    <!-- ¡NUEVO! Widget de Estado de Citas -->
-                    <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 class="text-xl font-semibold text-primary-dark mb-4">Mis Solicitudes Pendientes</h3>
-                        <div class="space-y-3">
-                            <div class="p-3 bg-yellow-100 text-yellow-800 rounded-lg">
-                                <p class="font-semibold">Solicitud para Max (Vacunación)</p>
-                                <p class="text-sm">Fecha deseada: 15/11/2025</p>
-                                <p class="text-sm font-bold">[Estado: Pendiente de Aprobación]</p>
-                            </div>
-                            <div class="p-3 bg-green-100 text-green-800 rounded-lg">
-                                <p class="font-semibold">Solicitud para Mishi (Revisión)</p>
-                                <p class="text-sm">¡Aprobada!</p>
-                                <p class="text-sm font-bold">[Estado: Confirmada para 16/11/2025]</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- MIS CITAS -->
+        <div>
+            <h2 class="text-xl font-bold text-gray-700 mb-4">Mis Citas</h2>
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                 <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-50 text-gray-600 border-b">
+                        <tr><th class="p-4">Fecha</th><th class="p-4">Mascota</th><th class="p-4">Motivo</th><th class="p-4">Estado</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let cita of misCitas" class="border-b hover:bg-gray-50">
+                            <td class="p-4">{{ cita.fecha_hora | date:'longDate':'':'es' }}</td>
+                            <td class="p-4 font-semibold">{{ cita.nombre_mascota }}</td>
+                            <td class="p-4">{{ cita.motivo }}</td>
+                            <td class="p-4">
+                                <span class="px-2 py-1 rounded text-xs font-bold uppercase" [ngClass]="{'bg-yellow-100 text-yellow-800': cita.estado=='pendiente', 'bg-green-100 text-green-800': cita.estado=='confirmada'}">
+                                    {{ cita.estado }}
+                                </span>
+                            </td>
+                        </tr>
+                         <tr *ngIf="misCitas.length === 0"><td colspan="4" class="p-6 text-center text-gray-400">No tienes citas programadas.</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
     </main>
 
-    <!-- =================================================================
-         MODALS (Pop-ups)
-    ================================================================== -->
-
-    <!-- Modal 1: Solicitar Cita -->
-    <div id="modal-solicitar-cita" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg">
-            <!-- Header -->
-            <div class="flex justify-between items-center p-5 border-b">
-                <h3 class="text-xl font-bold text-primary-dark">Solicitar Nueva Cita</h3>
-                <button id="btn-close-solicitar-cita" class="text-gray-400 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <!-- Cuerpo -->
-            <div class="p-6">
-                <form id="form-solicitar-cita" class="space-y-4">
-                    <div>
-                        <label for="cita-mascota" class="block text-gray-700 mb-1 font-semibold">¿Para qué mascota?</label>
-                        <select id="cita-mascota" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                            <option value="max">Max (Perro)</option>
-                            <option value="mishi">Mishi (Gato)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="cita-motivo" class="block text-gray-700 mb-1 font-semibold">Motivo</label>
-                        <select id="cita-motivo" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                            <option value="revision">Revisión General</option>
-                            <option value="vacunacion">Vacunación</option>
-                            <option value="urgencia">Urgencia (No grave)</option>
-                            <option value="seguimiento">Seguimiento</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="cita-fecha" class="block text-gray-700 mb-1 font-semibold">Fecha Deseada</label>
-                            <input id="cita-fecha" type="date" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                        </div>
-                        <div>
-                            <label for="cita-hora" class="block text-gray-700 mb-1 font-semibold">Hora Deseada</label>
-                            <select id="cita-hora" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                                <option value="maniana">Por la maniana (9am - 12pm)</option>
-                                <option value="tarde">Por la tarde (2pm - 6pm)</option>
-                            </select>
-                        </div>
-                    </div>
-                     <div>
-                        <label for="cita-comentarios" class="block text-gray-700 mb-1 font-semibold">Comentarios Adicionales</label>
-                        <textarea id="cita-comentarios" rows="3" placeholder="Ej. Max ha estado tosiendo por las noches..." class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal"></textarea>
-                    </div>
-                </form>
-            </div>
-            <!-- Footer -->
-            <div class="flex justify-end p-5 border-t space-x-4">
-                <button id="btn-cancel-solicitar-cita" type="button" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
-                    Cancelar
-                </button>
-                <button type="submit" form="form-solicitar-cita" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-opacity-80 transition duration-300">
-                    Enviar Solicitud
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal 2: Mis Facturas -->
-    <div id="modal-mis-facturas" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
-            <!-- Header -->
-            <div class="flex justify-between items-center p-5 border-b">
-                <h3 class="text-xl font-bold text-primary-dark">Mis Facturas</h3>
-                <button id="btn-close-mis-facturas" class="text-gray-400 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <!-- Cuerpo -->
-            <div class="p-6 max-h-[70vh] overflow-y-auto">
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Factura #</th>
-                                <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Fecha</th>
-                                <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Monto</th>
-                                <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Estado</th>
-                                <th class="px-4 py-2 text-right text-xs font-semibold text-gray-600 uppercase">Accion</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y">
-                            <tr>
-                                <td class="px-4 py-3 text-sm font-semibold text-primary-dark">#PF-001</td>
-                                <td class="px-4 py-3 text-sm text-gray-500">12/11/2025</td>
-                                <td class="px-4 py-3 text-sm text-gray-800 font-semibold">$750.00</td>
-                                <td class="px-4 py-3"><span class="px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Pagada</span></td>
-                                <td class="px-4 py-3 text-right">
-                                    <button class="text-secondary-teal p-1 rounded-lg hover:bg-gray-100" title="Descargar PDF">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-3 text-sm font-semibold text-primary-dark">#PF-002</td>
-                                <td class="px-4 py-3 text-sm text-gray-500">12/11/2025</td>
-                                <td class="px-4 py-3 text-sm text-gray-800 font-semibold">$350.00</td>
-                                <td class="px-4 py-3"><span class="px-3 py-1 text-xs font-semibold text-yellow-800 bg-yellow-200 rounded-full">Pendiente</span></td>
-                                <td class="px-4 py-3 text-right">
-                                    <button class="text-secondary-teal p-1 rounded-lg hover:bg-gray-100" title="Descargar PDF">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+<!-- MODAL DETALLE MASCOTA  -->
+<div *ngIf="mostrarModalDetalleMascota && mascotaSeleccionada" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl h-auto max-h-[90vh] flex flex-col animate-fade-in-down">
+   
+        <div class="flex justify-between items-center p-5 border-b">
+            <div class="flex items-center space-x-3">
+                <div class="h-14 w-14 rounded-full overflow-hidden bg-gray-200">
+                    <img [src]="mascotaSeleccionada.foto_url" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-primary-dark">{{ mascotaSeleccionada.nombre }}</h3>
+                    <p class="text-gray-500">{{ mascotaSeleccionada.especie }}</p>
                 </div>
             </div>
+            <button (click)="cerrarModalDetalle()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
         </div>
-    </div>
+        
 
-    <!-- Modal 3: Mi Perfil -->
-    <div id="modal-mi-perfil" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-xl">
-            <!-- Header -->
-            <div class="flex justify-between items-center p-5 border-b">
-                <h3 class="text-xl font-bold text-primary-dark">Mi Perfil</h3>
-                <button id="btn-close-mi-perfil" class="text-gray-400 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <!-- Cuerpo -->
-            <div class="p-6 max-h-[70vh] overflow-y-auto space-y-6">
-                <!-- Card: Datos Personales -->
-                <form class="space-y-4">
-                    <h4 class="text-lg font-semibold text-primary-dark">Mis Datos</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="perfil-nombre" class="block text-sm font-semibold text-gray-700 mb-1">Nombre Completo</label>
-                            <input type="text" id="perfil-nombre" value="Israel Gonzalez" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                        </div>
-                        <div>
-                            <label for="perfil-email" class="block text-sm font-semibold text-gray-700 mb-1">Correo Electrónico</label>
-                            <input type="email" id="perfil-email" value="israel@mail.com" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="perfil-telefono" class="block text-sm font-semibold text-gray-700 mb-1">Telefono</label>
-                        <input type="tel" id="perfil-telefono" value="479 123 4567" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                    </div>
-                    <div>
-                        <label for="perfil-direccion" class="block text-sm font-semibold text-gray-700 mb-1">Direccion</label>
-                        <textarea id="perfil-direccion" rows="2" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">Av. Siempre Viva 123</textarea>
-                    </div>
-                    <div class="text-right">
-                        <button type="submit" class="bg-secondary-teal text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-opacity-80 transition duration-300">
-                            Guardar Datos
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Card: Cambiar Contrasena -->
-                <form class="space-y-4 pt-6 border-t">
-                    <h4 class="text-lg font-semibold text-primary-dark">Cambiar Contrasena</h4>
-                    <div>
-                        <label for="pass-actual" class="block text-sm font-semibold text-gray-700 mb-1">Contrasena Actual</label>
-                        <input type="password" id="pass-actual" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                    </div>
-                    <div>
-                        <label for="pass-nueva" class="block text-sm font-semibold text-gray-700 mb-1">Nueva Contrasena</label>
-                        <input type="password" id="pass-nueva" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                    </div>
-                    <div class="text-right">
-                        <button type="submit" class="bg-secondary-teal text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-opacity-80 transition duration-300">
-                            Actualizar Contrasena
-                        </button>
-                    </div>
-                </form>
-            </div>
+        <div class="border-b px-6 flex space-x-6">
+            <button (click)="cambiarTabMascota('info')" [class.border-secondary-teal]="tabActivaMascota=='info'" class="py-3 border-b-2 font-medium transition" [ngClass]="tabActivaMascota=='info'?'text-secondary-teal':'border-transparent text-gray-500'">Info</button>
+            <button (click)="cambiarTabMascota('historial')" [class.border-secondary-teal]="tabActivaMascota=='historial'" class="py-3 border-b-2 font-medium transition" [ngClass]="tabActivaMascota=='historial'?'text-secondary-teal':'border-transparent text-gray-500'">Historial</button>
+            <button (click)="cambiarTabMascota('vacunas')" [class.border-secondary-teal]="tabActivaMascota=='vacunas'" class="py-3 border-b-2 font-medium transition" [ngClass]="tabActivaMascota=='vacunas'?'text-secondary-teal':'border-transparent text-gray-500'">Vacunas</button>
         </div>
-    </div>
 
-    <!-- Modal 4: Detalle de Mascota (¡VERSIÓN CLIENTE: SOLO LECTURA!) -->
-    <div id="modal-detalle-mascota-cliente" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl">
-            <!-- Header (Con Botón PDF) -->
-            <div class="flex justify-between items-center p-5 border-b">
-                <div class="flex items-center space-x-3">
-                    <img class="h-16 w-16 rounded-full" src="https://placehold.co/80x80/F4D03F/ffffff?text=M&font=poppins" alt="Mascota">
-                    <div>
-                        <h3 class="text-2xl font-bold text-primary-dark">Max</h3>
-                        <p class="text-gray-600">Perro - Golden Retriever</p>
-                    </div>
-                </div>
-                <div class="flex space-x-3">
-                    <button class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg text-sm hover:bg-gray-50 transition duration-300 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                        Exportar Ficha PDF
-                    </button>
-                    <button id="btn-close-detalle-mascota-cliente" class="text-gray-400 hover:text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
-                </div>
+  
+        <div class="p-6 overflow-y-auto">
+   
+            <div *ngIf="tabActivaMascota === 'info'" class="grid grid-cols-2 gap-4">
+                <div><label class="text-xs text-gray-400 uppercase font-bold">Raza</label><p>{{ mascotaSeleccionada.raza }}</p></div>
+                <div><label class="text-xs text-gray-400 uppercase font-bold">Sexo</label><p>{{ mascotaSeleccionada.sexo }}</p></div>
+                <div><label class="text-xs text-gray-400 uppercase font-bold">Peso</label><p>{{ mascotaSeleccionada.peso }} kg</p></div>
+                <div><label class="text-xs text-gray-400 uppercase font-bold">Nacimiento</label><p>{{ mascotaSeleccionada.fecha_nacimiento | date:'longDate':'':'es' }}</p></div>
+                <div class="col-span-2"><label class="text-xs text-gray-400 uppercase font-bold">Alergias</label><p class="text-red-500 font-medium">{{ mascotaSeleccionada.alergias || 'Ninguna' }}</p></div>
             </div>
             
-            <!-- Tabs (4 Pestanias) -->
-            <div class="border-b border-gray-200">
-                <nav class="flex space-x-4 md:space-x-8 px-6 -mb-px">
-                    <button id="tab-btn-info-cliente" class="tab-btn active py-4 px-1 border-b-4 text-sm font-medium">Info General</button>
-                    <button id="tab-btn-historial-cliente" class="tab-btn py-4 px-1 border-b-4 text-sm font-medium text-gray-500 hover:text-gray-700">Historial Clínico</button>
-                    <button id="tab-btn-vacunacion-cliente" class="tab-btn py-4 px-1 border-b-4 text-sm font-medium text-gray-500 hover:text-gray-700">Vacunacion</button>
-                    <button id="tab-btn-citas-cliente" class="tab-btn py-4 px-1 border-b-4 text-sm font-medium text-gray-500 hover:text-gray-700">Próximas Citas</button>
-                </nav>
+  
+            <div *ngIf="tabActivaMascota === 'historial'" class="space-y-3">
+                <div *ngFor="let h of historialMascota" class="p-3 border rounded-lg bg-gray-50">
+                    <div class="flex justify-between mb-1"><span class="font-bold">{{ h.diagnostico }}</span><span class="text-xs text-gray-500">{{ h.fecha | date:'longDate':'':'es' }}</span></div>
+                    <p class="text-sm">{{ h.tratamiento_aplicado }}</p>
+                    <p class="text-xs text-gray-400 mt-1">Vet: {{ h.veterinario }}</p>
+                </div>
+                <p *ngIf="historialMascota.length===0" class="text-center text-gray-400">Sin historial.</p>
             </div>
 
-            <!-- Contenido de las Pestanias -->
-            <div class="p-6 max-h-[60vh] overflow-y-auto">
-                
-                <!-- Pestania 1: Info General -->
-                <div id="tab-content-info-cliente" class="tab-content active space-y-4">
-                    <div class="p-4 bg-red-100 border border-red-300 rounded-lg">
-                        <h4 class="font-bold text-red-800">¡Alerta de Alergia!</h4>
-                        <p class="text-sm text-red-700">Alergia al pollo.</p>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
-                        <div><label class="block text-sm font-medium text-gray-500">Fecha de Nacimiento</label><p class="text-md text-gray-800">10/05/2023 (2 anios)</p></div>
-                        <div><label class="block text-sm font-medium text-gray-500">Peso</label><p class="text-md text-gray-800">25.4 kg</p></div>
-                        <div><label class="block text-sm font-medium text-gray-500">Sexo</label><p class="text-md text-gray-800">Macho</p></div>
-                        <div><label class="block text-sm font-medium text-gray-500">Esterilizado</label><p class="text-md text-gray-800">Sí</p></div>
-                    </div>
-                </div>
-                
-                <!-- Pestania 2: Historial Clínico -->
-                <div id="tab-content-historial-cliente" class="tab-content space-y-4">
-                    <h4 class="text-lg font-semibold text-primary-dark">Tratamientos Anteriores</h4>
-                    <div class="space-y-3">
-                        <div class="p-4 border rounded-lg">
-                            <p class="font-semibold text-gray-800">Consulta por Alergia</p>
-                            <span class="text-sm text-gray-500">01/10/2025 - Dr. Israel</span>
-                            <p class="text-sm text-gray-700 mt-2">Medicación recetada: Loratadina Pediátrica.</p>
-                            <!-- ¡NUEVO! Boton de Resurtir -->
-                            <button class="mt-2 bg-secondary-teal text-white font-semibold py-1 px-3 rounded-lg text-xs shadow hover:bg-opacity-80 transition duration-300">
-                                Solicitar Resurtido
-                            </button>
-                        </div>
-                        <div class="p-4 border rounded-lg">
-                            <p class="font-semibold text-gray-800">Vacunación Anual</p>
-                            <span class="text-sm text-gray-500">10/11/2025 - Dr. Salas</span>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Pestania 3: Vacunación -->
-                <div id="tab-content-vacunacion-cliente" class="tab-content space-y-4">
-                    <h4 class="text-lg font-semibold text-primary-dark">Calendario de Vacunación</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Vacuna</th>
-                                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Fecha Aplicacion</th>
-                                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Próxima Dosis</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y">
-                                <tr>
-                                    <td class="px-4 py-3 text-sm font-medium text-gray-800">Rabia</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">10/11/2025</td>
-                                    <td class="px-4 py-3 text-sm font-semibold text-light-red">10/11/2026 (Pendiente)</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+             <div *ngIf="tabActivaMascota === 'vacunas'" class="space-y-2">
+                <div *ngFor="let v of vacunasMascota" class="flex justify-between items-center p-3 border-b">
+                    <span class="font-medium">{{ v.nombre_vacuna }}</span>
+                    <span class="text-sm text-gray-600">{{ v.fecha_aplicacion | date:'longDate':'':'es' }}</span>
                 </div>
+                 <p *ngIf="vacunasMascota.length===0" class="text-center text-gray-400">Sin vacunas.</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-                <!-- Pestania 4: Próximas Citas -->
-                <div id="tab-content-citas-cliente" class="tab-content space-y-4">
-                    <h4 class="text-lg font-semibold text-primary-dark">Próximas Citas Programadas</h4>
-                    <div class="p-4 border border-secondary-teal rounded-lg">
-                            <div class="flex justify-between items-center mb-1">
-                                <p class="font-semibold text-gray-800">Vacunación Anual</p>
-                                <span class="text-sm text-gray-500">15 Nov 2025 - 10:00 AM</span>
-                            </div>
-                            <p class="text-sm text-gray-600">Con: <span class="font-medium">Dr. Salas</span></p>
-                    </div>
+<!-- MODAL SOLICITAR CITA -->
+<div *ngIf="mostrarModalSolicitar" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 animate-fade-in-down">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-primary-dark">Solicitar Cita</h3>
+            <button (click)="cerrarModalSolicitar()" class="text-gray-400 hover:text-gray-600">X</button>
+        </div>
+        
+        <form class="space-y-4">
+     
+            <div>
+                <label class="block mb-1 text-sm font-bold text-gray-700">Mascota</label>
+                <select [(ngModel)]="solicitudCita.mascota_id" name="mascota" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none">
+                    <option [value]="0">Seleccionar...</option>
+                    <option *ngFor="let m of misMascotas" [value]="m.id">{{ m.nombre }}</option>
+                </select>
+            </div>
+
+
+            <div>
+                <label class="block mb-1 text-sm font-bold text-gray-700">Tipo de Cita</label>
+                <select [(ngModel)]="solicitudCita.tipo_cita_id" name="tipo_cita" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none bg-white">
+                    <option [value]="0">Seleccionar motivo...</option>
+                    <!-- Itera sobre los tipos reales de la BD -->
+                    <option *ngFor="let tipo of tiposCita" [value]="tipo.id">
+                        {{ tipo.nombre }} ({{ tipo.duracion_minutos }} min)
+                    </option>
+                </select>
+            </div>
+
+  
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block mb-1 text-sm font-bold text-gray-700">Fecha</label>
+                    <input [(ngModel)]="solicitudCita.fecha" name="fecha" type="date" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none">
                 </div>
+                <div>
+                    <label class="block mb-1 text-sm font-bold text-gray-700">Hora</label>
+
+                    <input [(ngModel)]="solicitudCita.hora" (change)="filtrarVeterinarios()" name="hora" type="time" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none">
+                </div>
+            </div>
+
+       
+            <div>
+                <label class="block mb-1 text-sm font-bold text-gray-700">Veterinario Disponible</label>
+                <select [(ngModel)]="solicitudCita.veterinario_id" name="veterinario" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none bg-white" [disabled]="!solicitudCita.hora">
+                    <option [value]="0">
+                        {{ !solicitudCita.hora ? 'Elige una hora primero' : 'Seleccionar veterinario...' }}
+                    </option>
+                    <option *ngFor="let v of veterinariosDisponibles" [value]="v.id">
+                        {{ v.nombre_completo }} ({{ v.turno }})
+                    </option>
+                </select>
+                <p *ngIf="solicitudCita.hora && veterinariosDisponibles.length === 0" class="text-xs text-red-500 mt-1">
+                    No hay veterinarios disponibles a esta hora.
+                </p>
+            </div>
+
+
+            <div>
+                <label class="block mb-1 text-sm font-bold text-gray-700">Comentarios Adicionales</label>
+                <textarea [(ngModel)]="solicitudCita.comentarios" name="coments" placeholder="Ej. Ha estado decaído..." class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none" rows="2"></textarea>
             </div>
             
-            <!-- Footer del Modal (Solo cerrar) -->
-            <div class="flex justify-end p-5 border-t">
-                <button id="btn-cerrar-footer-detalle-cliente" type="button" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
-                    Cerrar
-                </button>
+            <div class="flex justify-end space-x-2 pt-2">
+                <button (click)="cerrarModalSolicitar()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 text-gray-700">Cancelar</button>
+                <button (click)="solicitarCita()" class="bg-secondary-teal text-white px-4 py-2 rounded-lg shadow-md hover:bg-opacity-90 font-semibold transition">Enviar Solicitud</button>
             </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL AGREGAR MASCOTA -->
+<div *ngIf="mostrarModalAgregarMascota" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-fade-in-down">
+        <h3 class="text-xl font-bold mb-4">Nueva Mascota</h3>
+        <form class="space-y-3">
+            <input [(ngModel)]="nuevaMascota.nombre" name="nom" placeholder="Nombre" class="w-full border p-2 rounded">
+            <div class="grid grid-cols-2 gap-2">
+                <input [(ngModel)]="nuevaMascota.especie" name="esp" placeholder="Especie (Perro/Gato)" class="border p-2 rounded">
+                <input [(ngModel)]="nuevaMascota.raza" name="raz" placeholder="Raza" class="border p-2 rounded">
+            </div>
+             <input [(ngModel)]="nuevaMascota.fecha_nacimiento" name="fec" type="date" class="w-full border p-2 rounded">
+             <input [(ngModel)]="nuevaMascota.foto_url" name="foto" placeholder="URL Foto" class="w-full border p-2 rounded">
+             
+             <div class="flex justify-end space-x-2 pt-2">
+                <button (click)="cerrarModalAgregarMascota()" class="px-4 py-2 border rounded">Cancelar</button>
+                <button (click)="registrarMascota()" class="bg-secondary-teal text-white px-4 py-2 rounded">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL MIS FACTURAS -->
+<div *ngIf="mostrarModalFacturas" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 animate-fade-in-down">
+        <div class="flex justify-between mb-4"><h3 class="text-xl font-bold">Mis Facturas</h3><button (click)="cerrarModalFacturas()">X</button></div>
+        <div class="max-h-60 overflow-y-auto">
+            <table class="w-full text-sm">
+                <tr *ngFor="let f of misFacturas" class="border-b">
+                    <td class="py-2 font-mono">{{ f.folio_factura }}</td>
+                    <td class="py-2">{{ f.fecha_emision | date }}</td>
+                    <td class="py-2 font-bold">{{ f.total | currency }}</td>
+                    <td class="py-2"><span class="bg-gray-100 px-2 rounded text-xs">{{ f.estado }}</span></td>
+                </tr>
+                 <p *ngIf="misFacturas.length===0" class="text-center text-gray-400 py-4">No hay facturas.</p>
+            </table>
         </div>
     </div>
+</div>
 
-    <!-- ¡NUEVO! Modal 5: Notificaciones -->
-    <div id="modal-notificaciones" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
-            <!-- Header -->
-            <div class="flex justify-between items-center p-5 border-b">
-                <h3 class="text-xl font-bold text-primary-dark">Notificaciones</h3>
-                <button id="btn-close-notificaciones" class="text-gray-400 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <!-- Cuerpo -->
-            <div class="p-6 max-h-[70vh] overflow-y-auto divide-y">
-                <div class="py-3">
-                    <p class="font-semibold text-secondary-teal">Cita Confirmada</p>
-                    <p class="text-sm text-gray-700">Tu cita para <span class="font-bold">Mishi</span> ha sido confirmada para el 16/11/2025 a las 10:00 AM.</p>
-                </div>
-                <div class="py-3">
-                    <p class="font-semibold text-accent-yellow">Recordatorio de Vacuna</p>
-                    <p class="text-sm text-gray-700">La próxima vacuna de <span class="font-bold">Max</span> (Rabia) vence en 30 días.</p>
-                </div>
-                 <div class="py-3">
-                    <p class="font-semibold text-primary-dark">Factura Lista</p>
-                    <p class="text-sm text-gray-700">Tu factura #PF-002 por $350.00 ya está lista para ver.</p>
-                </div>
-            </div>
-        </div>
+<!-- MODAL PERFIL -->
+<div *ngIf="mostrarModalPerfil" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-fade-in-down">
+        <h3 class="text-xl font-bold mb-4">Mi Perfil</h3>
+        <form class="space-y-3" *ngIf="clientePerfil">
+            <input [(ngModel)]="clientePerfil.nombre_completo" name="p_nom" class="w-full border p-2 rounded">
+            <input [(ngModel)]="clientePerfil.telefono" name="p_tel" class="w-full border p-2 rounded">
+            <input [(ngModel)]="clientePerfil.direccion" name="p_dir" class="w-full border p-2 rounded">
+            <button (click)="guardarPerfil()" class="w-full bg-secondary-teal text-white py-2 rounded mt-4">Actualizar Datos</button>
+        </form>
+        <div class="text-right mt-2"><button (click)="cerrarModalPerfil()" class="text-gray-500 text-sm underline">Cerrar</button></div>
     </div>
-    
-    <!-- ¡NUEVO! Modal 6: Agregar Mascota (Cliente) -->
-    <div id="modal-agregar-mascota-cliente" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg">
-            <!-- Header -->
-            <div class="flex justify-between items-center p-5 border-b">
-                <h3 class="text-xl font-bold text-primary-dark">Registrar Nueva Mascota</h3>
-                <button id="btn-close-agregar-mascota-cliente" class="text-gray-400 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <!-- Cuerpo -->
-            <div class="p-6">
-                <form id="form-agregar-mascota-cliente" class="space-y-4">
-                    <div>
-                        <label for="mascota-nombre" class="block text-gray-700 mb-1 font-semibold">Nombre de la Mascota</label>
-                        <input id="mascota-nombre" type="text" placeholder="Ej. Felix" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="mascota-especie" class="block text-gray-700 mb-1 font-semibold">Especie</label>
-                            <input id="mascota-especie" type="text" placeholder="Ej. Gato" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                        </div>
-                        <div>
-                            <label for="mascota-raza" class="block text-gray-700 mb-1 font-semibold">Raza</label>
-                            <input id="mascota-raza" type="text" placeholder="Ej. Siames" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal">
-                        </div>
-                    </div>
-                     <div>
-                        <label class="block text-gray-700 mb-1 font-semibold">Foto (Opcional)</label>
-                        <input type="file" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-secondary-teal file:text-white hover:file:bg-opacity-80"/>
-                    </div>
-                </form>
-            </div>
-            <!-- Footer -->
-            <div class="flex justify-end p-5 border-t space-x-4">
-                <button id="btn-cancel-agregar-mascota-cliente" type="button" class="bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-300">
-                    Cancelar
-                </button>
-                <button type="submit" form="form-agregar-mascota-cliente" class="bg-secondary-teal text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-opacity-80 transition duration-300">
-                    Registrar Mascota
-                </button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- =================================================================
-         SCRIPT
-    ================================================================== -->
-    <script>
-        // --- Modal Helpers ---
-        function openModal(modal) { if (modal) modal.classList.remove('hidden'); }
-        function closeModal(modal) { if (modal) modal.classList.add('hidden'); }
-
-        // --- Lógica de Pestañas Principales ---
-        const mainTabBtnMascotas = document.getElementById('tab-btn-mascotas');
-        const mainTabBtnCitas = document.getElementById('tab-btn-citas');
-        const mainTabContentMascotas = document.getElementById('tab-content-mascotas');
-        const mainTabContentCitas = document.getElementById('tab-content-citas');
-        
-        if (mainTabBtnMascotas && mainTabBtnCitas && mainTabContentMascotas && mainTabContentCitas) {
-            mainTabBtnMascotas.addEventListener('click', () => {
-                mainTabBtnMascotas.classList.add('active');
-                mainTabBtnCitas.classList.remove('active');
-                mainTabContentMascotas.classList.add('active');
-                mainTabContentCitas.classList.remove('active');
-            });
-            mainTabBtnCitas.addEventListener('click', () => {
-                mainTabBtnCitas.classList.add('active');
-                mainTabBtnMascotas.classList.remove('active');
-                mainTabContentCitas.classList.add('active');
-                mainTabContentMascotas.classList.remove('active');
-            });
-        }
-
-        // --- Lógica de Pestañas del Modal Detalle (CLIENTE) ---
-        const modalTabBtns = document.querySelectorAll('.tab-btn[id$="-cliente"]');
-        const modalTabContents = document.querySelectorAll('.tab-content[id$="-cliente"]');
-
-        modalTabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tabName = btn.id.replace('tab-btn-', ''); // ej. "info-cliente"
-                
-                modalTabBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                modalTabContents.forEach(content => {
-                    if (content.id === `tab-content-${tabName}`) {
-                        content.classList.add('active');
-                        content.classList.remove('hidden');
-                    } else {
-                        content.classList.remove('active');
-                        content.classList.add('hidden');
-                    }
-                });
-            });
-        });
-
-        // --- Modal 1: Solicitar Cita ---
-        const btnSolicitarCita = document.getElementById('btn-solicitar-cita');
-        const modalSolicitarCita = document.getElementById('modal-solicitar-cita');
-        if (btnSolicitarCita && modalSolicitarCita) {
-            const btnClose = document.getElementById('btn-close-solicitar-cita');
-            const btnCancel = document.getElementById('btn-cancel-solicitar-cita');
-            btnSolicitarCita.addEventListener('click', () => openModal(modalSolicitarCita));
-            if(btnClose) btnClose.addEventListener('click', () => closeModal(modalSolicitarCita));
-            if(btnCancel) btnCancel.addEventListener('click', () => closeModal(modalSolicitarCita));
-        }
-        
-        // --- Modal 2: Mis Facturas ---
-        const btnMisFacturas = document.getElementById('btn-mis-facturas');
-        const modalMisFacturas = document.getElementById('modal-mis-facturas');
-        if (btnMisFacturas && modalMisFacturas) {
-            const btnClose = document.getElementById('btn-close-mis-facturas');
-            btnMisFacturas.addEventListener('click', () => openModal(modalMisFacturas));
-            if(btnClose) btnClose.addEventListener('click', () => closeModal(modalMisFacturas));
-        }
-
-        // --- Modal 3: Mi Perfil ---
-        const btnMiPerfil = document.getElementById('btn-mi-perfil');
-        const modalMiPerfil = document.getElementById('modal-mi-perfil');
-        if (btnMiPerfil && modalMiPerfil) {
-            const btnClose = document.getElementById('btn-close-mi-perfil');
-            btnMiPerfil.addEventListener('click', () => openModal(modalMiPerfil));
-            if(btnClose) btnClose.addEventListener('click', () => closeModal(modalMiPerfil));
-        }
-
-        // --- Modal 4: Detalle de Mascota (Read-Only) ---
-        const btnsDetalleMascotaCliente = document.querySelectorAll('.btn-detalle-mascota-cliente');
-        const modalDetalleMascotaCliente = document.getElementById('modal-detalle-mascota-cliente');
-        if (btnsDetalleMascotaCliente.length > 0 && modalDetalleMascotaCliente) {
-            const btnClose = document.getElementById('btn-close-detalle-mascota-cliente');
-            const btnFooterClose = document.getElementById('btn-cerrar-footer-detalle-cliente');
-            const firstTabBtn = document.getElementById('tab-btn-info-cliente');
-
-            btnsDetalleMascotaCliente.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // Cargar datos de la mascota...
-                    // Resetear a la primera pestania
-                    if(firstTabBtn) firstTabBtn.click();
-                    openModal(modalDetalleMascotaCliente);
-                });
-            });
-            
-            // CORREGIDO: El nombre de la variable estaba mal escrito
-            if(btnClose) btnClose.addEventListener('click', () => closeModal(modalDetalleMascotaCliente));
-            if(btnFooterClose) btnFooterClose.addEventListener('click', () => closeModal(modalDetalleMascotaCliente));
-        }
-
-        // --- ¡NUEVO! Modal 5: Notificaciones ---
-        const btnNotificaciones = document.getElementById('btn-notificaciones');
-        const modalNotificaciones = document.getElementById('modal-notificaciones');
-        if (btnNotificaciones && modalNotificaciones) {
-            const btnClose = document.getElementById('btn-close-notificaciones');
-            btnNotificaciones.addEventListener('click', () => openModal(modalNotificaciones));
-            if(btnClose) btnClose.addEventListener('click', () => closeModal(modalNotificaciones));
-        }
-        
-        // --- ¡NUEVO! Modal 6: Agregar Mascota (Cliente) ---
-        const btnAgregarMascotaCliente = document.getElementById('btn-agregar-mascota-cliente');
-        const modalAgregarMascotaCliente = document.getElementById('modal-agregar-mascota-cliente');
-        if (btnAgregarMascotaCliente && modalAgregarMascotaCliente) {
-            const btnClose = document.getElementById('btn-close-agregar-mascota-cliente');
-            const btnCancel = document.getElementById('btn-cancel-agregar-mascota-cliente');
-            btnAgregarMascotaCliente.addEventListener('click', () => openModal(modalAgregarMascotaCliente));
-            if(btnClose) btnClose.addEventListener('click', () => closeModal(modalAgregarMascotaCliente));
-            if(btnCancel) btnCancel.addEventListener('click', () => closeModal(modalAgregarMascotaCliente));
-        }
-
-    </script>
+</div>

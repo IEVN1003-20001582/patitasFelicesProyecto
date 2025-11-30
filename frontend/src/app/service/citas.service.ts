@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Cita } from '../interfaces/cita.interface'; // Asegúrate de tener esta interface
+import { RespuestaApi } from '../interfaces/respuesta-api.interface';
 
 @Injectable({ providedIn: 'root' })
 export class CitasService {
@@ -8,10 +10,32 @@ export class CitasService {
 
   constructor(private http: HttpClient) { }
 
-  // Acepta mascota_id opcional para filtrar
-  getCitas(mascotaId?: number): Observable<any> {
+
+getCitas(filtros: any = {}): Observable<any> {
     let url = this.apiUrl;
-    if (mascotaId) url += `?mascota_id=${mascotaId}`;
+    const params = [];
+    
+    if (filtros.mascota_id) params.push(`mascota_id=${filtros.mascota_id}`);
+    if (filtros.veterinario_id) params.push(`veterinario_id=${filtros.veterinario_id}`);
+    
+    if (params.length > 0) {
+      url += '?' + params.join('&');
+    }
+    
     return this.http.get<any>(url);
   }
+
+
+  agendarCita(datos: any): Observable<RespuestaApi> {
+    return this.http.post<RespuestaApi>(this.apiUrl, datos);
+  }
+
+
+  actualizarCita(id: number, datos: any): Observable<RespuestaApi> {
+     return this.http.put<RespuestaApi>(`${this.apiUrl}/${id}`, datos);
+  }
+
+
+
+
 }

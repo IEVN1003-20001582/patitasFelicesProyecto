@@ -25,7 +25,7 @@ export class GestionClientesComponent implements OnInit {
 
   mostrarModalAgregar = false;
   mostrarModalEditar = false;
-  mostrarModalEliminar = false; // Modal para confirmar archivado
+  mostrarModalEliminar = false;
   mostrarModalFiltros = false;
   mostrarModalVistaRapida = false;
 
@@ -77,7 +77,6 @@ export class GestionClientesComponent implements OnInit {
     );
   }
 
-  // --- CRUD ---
 
   guardarCliente() {
     if (!this.nuevoCliente.nombre || !this.nuevoCliente.email) {
@@ -112,14 +111,14 @@ export class GestionClientesComponent implements OnInit {
   }
 
   confirmarEliminar() {
-    // Aunque la función se llama 'eliminar', la API ahora ARCHIVA
+  
     if (!this.clienteSeleccionado) return;
 
     this.clientesService.eliminarCliente(this.clienteSeleccionado.id).subscribe(res => {
       if (res.exito) {
         Swal.fire('Archivado', 'Cliente marcado como inactivo', 'success');
         this.cerrarModalEliminar();
-        this.cargarClientes(); // Recarga para ver el cambio de estado
+        this.cargarClientes(); 
       } else {
         Swal.fire('Error', res.mensaje, 'error');
       }
@@ -128,13 +127,12 @@ export class GestionClientesComponent implements OnInit {
 
   abrirVistaRapida(cliente: any) {
     this.clienteSeleccionado = cliente;
-    this.mascotasCliente = []; // Limpiar lista anterior
+    this.mascotasCliente = [];
     this.mostrarModalVistaRapida = true;
 
-    // Llamar al servicio para obtener las mascotas de ESTE cliente
-    // Usamos el método getMascotas filtrando por ID
+
     this.mascotasService.getMascotas(cliente.id).subscribe((res: any) => {
-        // Adaptamos la respuesta según cómo venga de tu API (puede ser res.mascotas o res directo)
+       
         const lista = res.mascotas || (Array.isArray(res) ? res : []);
         this.mascotasCliente = lista;
     });
