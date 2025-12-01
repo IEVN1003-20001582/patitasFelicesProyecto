@@ -46,7 +46,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
         this.cargarNotificaciones();
          this.intervalo = setInterval(() => {
         this.cargarNotificaciones();
-      }, 60000); 
+      }, 5000); 
       }
     });
 

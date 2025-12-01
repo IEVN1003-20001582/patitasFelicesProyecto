@@ -7,17 +7,25 @@ import json
 import os
 
 app = Flask(__name__)
-# Permitir CORS para que Angular consuma la API sin problemas
-CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-# -----------------------
-# CONFIG / CONSTANTES
-# -----------------------
-ADMIN_ID = 1  # <-- ID del administrador en tu tabla `users`
+app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
-# -----------------------
+
+ADMIN_ID = 1  
+
+
+
+
+
+
+
+
+
+
+
 # UTILITIES / HELPERS
-# -----------------------
+
 
 def format_fecha(data):
     """
@@ -167,9 +175,39 @@ def login():
         return jsonify({'mensaje': 'Error: ' + str(ex), 'exito': False})
     
 
-# ---------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # GESTION DE MASCOTAS
-# ---------------------------------------------------------------------
+# GESTION DE MASCOTAS
+# GESTION DE MASCOTAS
+# GESTION DE MASCOTAS
+# GESTION DE MASCOTAS
+
 
 @app.route('/api/mascotas', methods=['GET'])
 def listar_mascotas():
@@ -209,7 +247,7 @@ def listar_mascotas():
                     pass
                 
         conn.close()
-        # Retornamos estructura escolar: { mascotas: [...], exito: true }
+    
         return jsonify({'mascotas': datos, 'mensaje': 'Mascotas listadas', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': 'Error al listar mascotas: ' + str(ex), 'exito': False})
@@ -240,7 +278,7 @@ def registrar_mascota():
         cursor.execute(sql, valores)
         conn.commit()
 
-        # Notificar al administrador que se registró una nueva mascota
+
         try:
             crear_notificacion(
                 user_id=ADMIN_ID,
@@ -280,7 +318,6 @@ def actualizar_mascota(id):
             cursor.execute(sql, valores)
             conn.commit()
 
-            # Notificar al administrador sobre la actualización
             try:
                 crear_notificacion(
                     user_id=ADMIN_ID,
@@ -312,7 +349,7 @@ def eliminar_mascota(id):
             cursor.execute(sql, (id,))
             conn.commit()
 
-            # Notificar al admin
+        
             try:
                 crear_notificacion(
                     user_id=ADMIN_ID,
@@ -332,9 +369,32 @@ def eliminar_mascota(id):
         return jsonify({'mensaje': 'Error al eliminar: ' + str(ex), 'exito': False})
 
 
-# ---------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # GESTION DE CITAS
-# ---------------------------------------------------------------------
+# GESTION DE CITAS
+# GESTION DE CITAS
+# GESTION DE CITAS
+# GESTION DE CITAS
+# GESTION DE CITAS
+
+
 
 # LISTAR CITAS
 @app.route('/api/citas', methods=['GET'])
@@ -345,7 +405,7 @@ def listar_citas():
         
         ahora = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
-        # Antes de cancelar automáticamente, buscamos las citas que vamos a cancelar
+        
         sql_select_cancelar = """
             SELECT c.id, c.mascota_id, c.veterinario_id, m.nombre as nombre_mascota, cli.id as cliente_id, cli.user_id as cliente_user_id
             FROM citas c
@@ -356,7 +416,7 @@ def listar_citas():
         cursor.execute(sql_select_cancelar, (ahora,))
         citas_a_cancelar = cursor.fetchall() or []
 
-        # Ejecutamos la cancelación automática
+   
         sql_cancelar = """
             UPDATE citas 
             SET estado = 'cancelada' 
@@ -366,10 +426,10 @@ def listar_citas():
         cursor.execute(sql_cancelar, (ahora,))
         conn.commit()
 
-        # Notificamos por cada cita cancelada automáticamente
+
         for c in citas_a_cancelar:
             try:
-                # Notificar al cliente (si tiene user_id)
+         
                 if c.get('cliente_user_id'):
                     crear_notificacion(
                         user_id=c['cliente_user_id'],
@@ -378,7 +438,7 @@ def listar_citas():
                         tipo="Cita",
                         enlace="/dashboard/citas"
                     )
-                # Notificar al veterinario (si existe)
+              
                 if c.get('veterinario_id'):
                     user_vet = get_usuario_id_por_veterinario(c['veterinario_id'])
                     if user_vet:
@@ -389,7 +449,7 @@ def listar_citas():
                             tipo="Cita",
                             enlace="/dashboard/citas"
                         )
-                # Notificar al admin
+          
                 crear_notificacion(
                     user_id=ADMIN_ID,
                     titulo="Cita cancelada automáticamente",
@@ -435,7 +495,29 @@ def listar_citas():
     
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #AGREGAR CITA
+
 @app.route('/api/citas', methods=['POST'])
 def registrar_cita():
     try:
@@ -459,14 +541,14 @@ def registrar_cita():
         cursor.execute(sql, vals)
         conn.commit()
 
-        # Recuperamos info para notificar:
+     
         try:
             mascota = leer_mascota(d['mascota_id'])
             cliente_user_id = None
             if mascota and mascota.get('cliente_user_id'):
                 cliente_user_id = mascota['cliente_user_id']
 
-            # Notificar al veterinario asignado (si aplica)
+
             if d.get('veterinario_id'):
                 vet_user_id = get_usuario_id_por_veterinario(d['veterinario_id'])
                 if vet_user_id:
@@ -478,7 +560,7 @@ def registrar_cita():
                         enlace="/dashboard/citas"
                     )
 
-            # Notificar al cliente (si tiene user_id)
+      
             if cliente_user_id:
                 crear_notificacion(
                     user_id=cliente_user_id,
@@ -488,7 +570,7 @@ def registrar_cita():
                     enlace="/dashboard/citas"
                 )
 
-            # Notificar al administrador
+      
             crear_notificacion(
                 user_id=ADMIN_ID,
                 titulo="Nueva cita registrada",
@@ -514,7 +596,7 @@ def actualizar_cita(id):
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Buscamos estado/vet previo para comparar
+      
         cursor.execute("SELECT veterinario_id, mascota_id, estado FROM citas WHERE id = %s", (id,))
         previo = cursor.fetchone()
         previo_vet = previo[0] if previo else None
@@ -544,14 +626,14 @@ def actualizar_cita(id):
         cursor.execute(sql, tuple(valores))
         conn.commit()
 
-        # Notificaciones según lo que cambió
+
         try:
-            # Información de la mascota y su cliente
+      
             mascota = leer_mascota(previo_mascota_id) if previo_mascota_id else None
             cliente_user_id = mascota.get('cliente_user_id') if mascota else None
             mascota_nombre = mascota.get('nombre') if mascota else 'tu mascota'
 
-            # Si se reasignó veterinario -> notificar al nuevo vet
+          
             if 'veterinario_id' in d and d.get('veterinario_id'):
                 nuevo_vet_user = get_usuario_id_por_veterinario(d['veterinario_id'])
                 if nuevo_vet_user:
@@ -562,7 +644,7 @@ def actualizar_cita(id):
                         tipo="Cita",
                         enlace="/dashboard/citas"
                     )
-                # Notificar admin
+            
                 crear_notificacion(
                     user_id=ADMIN_ID,
                     titulo="Veterinario reasignado a cita",
@@ -570,7 +652,7 @@ def actualizar_cita(id):
                     tipo="Cita",
                     enlace=f"/dashboard/citas/{id}"
                 )
-                # Notificar al cliente que hubo una reasignación (opcional)
+              
                 if cliente_user_id:
                     crear_notificacion(
                         user_id=cliente_user_id,
@@ -580,9 +662,8 @@ def actualizar_cita(id):
                         enlace="/dashboard/citas"
                     )
 
-            # Si se cambió el estado a 'cancelada'
             if 'estado' in d and d['estado'] == 'cancelada':
-                # Notificar cliente
+               
                 if cliente_user_id:
                     crear_notificacion(
                         user_id=cliente_user_id,
@@ -591,7 +672,7 @@ def actualizar_cita(id):
                         tipo="Cita",
                         enlace="/dashboard/citas"
                     )
-                # Notificar veterinario (previo vet y/o nuevo vet)
+              
                 vets_to_notify = set()
                 if previo_vet:
                     vets_to_notify.add(previo_vet)
@@ -607,7 +688,7 @@ def actualizar_cita(id):
                             tipo="Cita",
                             enlace="/dashboard/citas"
                         )
-                # Notificar admin
+               
                 crear_notificacion(
                     user_id=ADMIN_ID,
                     titulo="Cita cancelada",
@@ -624,9 +705,48 @@ def actualizar_cita(id):
         return jsonify({'mensaje': str(ex), 'exito': False})
 
 
-# ---------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # GESTION DE FACTURAS
-# ---------------------------------------------------------------------
+# GESTION DE FACTURAS
+# GESTION DE FACTURAS
+# GESTION DE FACTURAS
+# GESTION DE FACTURAS
+# GESTION DE FACTURAS
+# GESTION DE FACTURAS
+# GESTION DE FACTURAS
+
+
+
 
 # 1. LEER FACTURAS
 @app.route('/api/facturas', methods=['GET'])
@@ -731,7 +851,7 @@ def crear_factura():
         
       
         for item in d['items']:
-            # Guardar detalle
+            
             sql_detalle = """
                 INSERT INTO detalle_factura (factura_id, descripcion, cantidad, precio_unitario, importe)
                 VALUES (%s, %s, %s, %s, %s)
@@ -748,7 +868,7 @@ def crear_factura():
             
         conn.commit()
 
-        # Notificar al admin que hay una factura nueva
+       
         try:
             crear_notificacion(
                 user_id=ADMIN_ID,
@@ -780,9 +900,40 @@ def pagar_factura(id):
         return jsonify({'mensaje': str(ex), 'exito': False})
 
 
-# ---------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # GESTIÓN DE INVENTARIO
-# ---------------------------------------------------------------------
+# GESTIÓN DE INVENTARIO
+# GESTIÓN DE INVENTARIO
+# GESTIÓN DE INVENTARIO
+# GESTIÓN DE INVENTARIO
+# GESTIÓN DE INVENTARIO
+# GESTIÓN DE INVENTARIO
+# GESTIÓN DE INVENTARIO
+# GESTIÓN DE INVENTARIO
+
 
 # LEER 
 @app.route('/api/productos', methods=['GET'])
@@ -805,7 +956,7 @@ def get_productos():
         return jsonify({'mensaje': str(ex), 'exito': False})
 
 
-# CREAR PRODUCTO
+# CREAR
 @app.route('/api/productos', methods=['POST'])
 def crear_producto():
     try:
@@ -876,7 +1027,7 @@ def actualizar_producto(id):
         cursor.execute(sql, vals)
         conn.commit()
 
-        # Notificar si el stock está por debajo del mínimo
+      
         try:
             if 'stock_actual' in d and 'stock_minimo' in d:
                 try:
@@ -898,6 +1049,21 @@ def actualizar_producto(id):
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # AJUSTE RÁPIDO DE STOCK
 @app.route('/api/productos/<id>/stock', methods=['PATCH'])
@@ -921,8 +1087,7 @@ def eliminar_producto(id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        # Ojo: Si hay ventas, el DELETE fallará por FK. Mejor hacer Soft Delete (estado='Inactivo') si tienes la columna.
-        # Si no, DELETE físico.
+  
         cursor.execute("DELETE FROM productos WHERE id = %s", (id,))
         conn.commit()
         conn.close()
@@ -931,9 +1096,38 @@ def eliminar_producto(id):
         return jsonify({'mensaje': 'No se puede eliminar (tiene historial)', 'exito': False})
 
 
-# ---------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # GESTIÓN DE VETERINARIOS
-# ---------------------------------------------------------------------
+# GESTIÓN DE VETERINARIOS
+# GESTIÓN DE VETERINARIOS
+# GESTIÓN DE VETERINARIOS
+# GESTIÓN DE VETERINARIOS
+# GESTIÓN DE VETERINARIOS
+
 
 # LEER
 @app.route('/api/veterinarios', methods=['GET'])
@@ -964,12 +1158,12 @@ def crear_veterinario():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 1. Crear Login (Rol 'veterinario')
-        password = d.get('password', '123456') # Default si no envían
+      
+        password = d.get('password', '123456') 
         cursor.execute("INSERT INTO users (email, password_hash, role, is_active) VALUES (%s, %s, 'veterinario', 1)", (d['email'], password))
         user_id = cursor.lastrowid
         
-        # 2. Crear Perfil
+        
         sql = """
             INSERT INTO veterinarios (user_id, nombre_completo, cedula_profesional, especialidad, turno, foto_url)
             VALUES (%s, %s, %s, %s, %s, %s)
@@ -979,7 +1173,7 @@ def crear_veterinario():
         
         conn.commit()
 
-        # Notificar al admin de nuevo vet
+      
         try:
             crear_notificacion(
                 user_id=ADMIN_ID,
@@ -1047,9 +1241,45 @@ def eliminar_veterinario(id):
         return jsonify({'mensaje': str(ex), 'exito': False})
 
 
-# ---------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # GESTIÓN DE CLIENTES (CRUD)
-# ---------------------------------------------------------------------
+# GESTIÓN DE CLIENTES (CRUD)
+# GESTIÓN DE CLIENTES (CRUD)
+# GESTIÓN DE CLIENTES (CRUD)
+# GESTIÓN DE CLIENTES (CRUD)
+# GESTIÓN DE CLIENTES (CRUD)
+# GESTIÓN DE CLIENTES (CRUD)
+# GESTIÓN DE CLIENTES (CRUD)
+
+
+
 
 @app.route('/api/clientes', methods=['GET'])
 def get_clientes():
@@ -1103,7 +1333,7 @@ def crear_cliente():
         
         conn.commit()
 
-        # Notificar al admin nuevo cliente
+ 
         try:
             crear_notificacion(
                 user_id=ADMIN_ID,
@@ -1186,9 +1416,40 @@ def archivar_cliente(id):
         return jsonify({'mensaje': str(ex), 'exito': False})
 
 
-# ---------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # HISTORIAL MÉDICO Y VACUNAS
-# ---------------------------------------------------------------------
+# HISTORIAL MÉDICO Y VACUNAS
+# HISTORIAL MÉDICO Y VACUNAS
+# HISTORIAL MÉDICO Y VACUNAS
+# HISTORIAL MÉDICO Y VACUNAS
+# HISTORIAL MÉDICO Y VACUNAS
+# HISTORIAL MÉDICO Y VACUNAS
+
 
 @app.route('/api/historial', methods=['GET'])
 def get_historial():
@@ -1223,21 +1484,20 @@ def add_historial():
             INSERT INTO historial_medico (mascota_id, veterinario_id, diagnostico, tratamiento_aplicado, medicamentos_recetados)
             VALUES (%s, %s, %s, %s, %s)
         """
-        # CORRECCIÓN AQUÍ: Usamos las claves que coinciden con la BD
-        # Si no envías diagnóstico, ponemos 'Consulta General' por defecto
+      
         diag = d.get('diagnostico', 'Consulta General')
         vals = (d['mascota_id'], d['veterinario_id'], diag, d['tratamiento_aplicado'], d['medicamentos_recetados'])
         
         cursor.execute(sql, vals)
         conn.commit()
 
-        # Notificar: admin y cliente (cliente sólo si existe user_id)
+        
         try:
             mascota = leer_mascota(d['mascota_id'])
             cliente_user_id = mascota.get('cliente_user_id') if mascota else None
             mascota_nombre = mascota.get('nombre') if mascota else 'tu mascota'
 
-            # Notificar al cliente
+   
             if cliente_user_id:
                 crear_notificacion(
                     user_id=cliente_user_id,
@@ -1247,7 +1507,6 @@ def add_historial():
                     enlace=f"/dashboard/mascotas/{d['mascota_id']}"
                 )
 
-            # Notificar al admin
             crear_notificacion(
                 user_id=ADMIN_ID,
                 titulo="Historial actualizado",
@@ -1302,12 +1561,12 @@ def add_vacuna():
         vals = (d['mascota_id'], d['veterinario_id'], d['producto_id'], d['fecha_aplicacion'], d.get('fecha_proxima'))
         cursor.execute(sql, vals)
         
-        # Opcional: Descontar stock
+   
         cursor.execute("UPDATE productos SET stock_actual = stock_actual - 1 WHERE id = %s", (d['producto_id'],))
         
         conn.commit()
 
-        # Notificar admin (y opcionalmente cliente/vet si quieres)
+    
         try:
             crear_notificacion(
                 user_id=ADMIN_ID,
@@ -1325,9 +1584,35 @@ def add_vacuna():
         return jsonify({'mensaje': str(ex), 'exito': False})
     
 
-# ---------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # MÓDULO DE REPORTES Y ANALÍTICA
-# ---------------------------------------------------------------------
+# MÓDULO DE REPORTES Y ANALÍTICA
+# MÓDULO DE REPORTES Y ANALÍTICA
+# MÓDULO DE REPORTES Y ANALÍTICA
+# MÓDULO DE REPORTES Y ANALÍTICA
+# MÓDULO DE REPORTES Y ANALÍTICA
+
 
 @app.route('/api/reportes/dashboard', methods=['GET'])
 def get_reportes_dashboard():
@@ -1349,29 +1634,23 @@ def get_reportes_dashboard():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
-        # 1. KPIS PRINCIPALES
-
-        # Ingresos Totales
+    
         sql_ingresos = f"SELECT SUM(total) as total FROM facturas WHERE estado='pagada' {where_date_facturas}"
         cursor.execute(sql_ingresos, params if fecha_inicio else ())
         ingresos = cursor.fetchone()['total'] or 0
 
-        # Citas Completadas
         sql_citas = f"SELECT COUNT(*) as total FROM citas WHERE estado='completada' {where_date_citas}"
         cursor.execute(sql_citas, params if fecha_inicio else ())
         citas_total = cursor.fetchone()['total'] or 0
 
-        # Ticket Promedio
+      
         ticket_promedio = (ingresos / citas_total) if citas_total > 0 else 0
 
-        # Nuevos Clientes
         cursor.execute("SELECT COUNT(*) as total FROM clientes")
         nuevos_clientes = cursor.fetchone()['total']
 
 
-        # 2. DATOS PARA GRÁFICOS
-        
-        # Gráfico 1: Ingresos por Mes (Últimos 6 meses o rango)
+   
         
         sql_graf_ingresos = """
             SELECT DATE_FORMAT(fecha_emision, '%Y-%m') as etiqueta, SUM(total) as valor 
@@ -1381,9 +1660,9 @@ def get_reportes_dashboard():
             ORDER BY etiqueta DESC LIMIT 6
         """
         cursor.execute(sql_graf_ingresos)
-        graf_ingresos = cursor.fetchall()[::-1] # Invertir para cronológico
+        graf_ingresos = cursor.fetchall()[::-1] 
 
-        # Gráfico 2: Tipos de Cita (Distribución)
+      
         sql_graf_citas = """
             SELECT ctc.nombre as etiqueta, COUNT(*) as valor
             FROM citas c
@@ -1393,7 +1672,7 @@ def get_reportes_dashboard():
         cursor.execute(sql_graf_citas)
         graf_citas = cursor.fetchall()
 
-        # Gráfico 3: Productos Más Vendidos (Top 5)
+  
         sql_graf_productos = """
             SELECT descripcion as etiqueta, SUM(cantidad) as valor
             FROM detalle_factura
@@ -1422,6 +1701,35 @@ def get_reportes_dashboard():
 
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # ---------------------------------------------------------------------
@@ -1616,6 +1924,36 @@ def actualizar_perfil_usuario(id):
         return jsonify({'mensaje': str(ex), 'exito': False})
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ---------------------------------------------------------------------
 # NOTIFICACIONES
 # ---------------------------------------------------------------------
@@ -1662,6 +2000,29 @@ def marcar_notificacion(id):
         return jsonify({'exito': True, 'mensaje': 'Notificación marcada'})
     except Exception as ex:
         return jsonify({'exito': False, 'mensaje': str(ex)})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # ---------------------------------------------------------------------
