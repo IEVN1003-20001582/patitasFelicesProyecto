@@ -35,7 +35,7 @@ export class DashboardComponent implements OnInit {
   alertasInventario: any[] = [];
 
   // Datos para Gráficos (Simulados visualmente con CSS en el HTML)
-  // En un caso real, usarías una librería como Chart.js, pero aquí usaremos barras CSS simples
+
   ingresosMensuales = [4500, 5200, 4800, 6100, 5900, 7200]; // Ejemplo
 
 

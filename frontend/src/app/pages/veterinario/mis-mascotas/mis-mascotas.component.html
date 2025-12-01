@@ -334,13 +334,13 @@
             </div>
 
     
-            <div *ngIf="tabActiva === 'citas'" class="space-y-4">
+             <div *ngIf="tabActiva === 'citas'" class="space-y-4">
                 <h4 class="text-lg font-semibold text-primary-dark">Próximas Citas</h4>
                 <div *ngIf="citasMascota.length === 0" class="text-center text-gray-400 py-4">No hay citas programadas.</div>
                 
                 <div *ngFor="let cita of citasMascota" class="p-4 border border-gray-200 rounded-lg shadow-sm bg-white">
                     <div class="flex justify-between items-center mb-2">
-                        <p class="font-bold text-gray-800 text-lg">{{ cita.motivo }}</p>
+                        <p class="font-bold text-gray-800 text-lg">{{ cita.nombre }}</p>
                         
                         <!-- ETIQUETA DE ESTADO CON COLORES DINÁMICOS -->
                         <span class="text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide"
@@ -367,7 +367,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
