@@ -8,15 +8,16 @@
 
         <div class="mx-auto h-32 w-32 rounded-full border-4 border-secondary-teal mb-6 overflow-hidden flex items-center justify-center bg-gray-100">
         
-             <img src="assets/logo.jpg" 
-                  alt="Logo Patitas Felices" 
+             <img 
+                  [src]="'assets/logo-clinica.png'" 
+                  alt="Logo {{ nombreClinica }}" 
                   class="h-full w-full object-cover"
                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
              <div style="display:none" class="text-4xl font-bold text-secondary-teal">PF</div>
         </div>
 
         <h1 class="text-4xl font-bold text-primary-dark mb-3 font-poppins">
-            Bienvenido a Patitas Felices
+            Bienvenido a {{ nombreClinica }}
         </h1>
 
  

@@ -1,1 +1,7 @@
-{"nombre": "Israel Vet", "telefono": "", "direccion": "", "iva": 16, "moneda": "$"}
+{
+    "direccion": "San Francisco de As\u00eds #307",
+    "iva": 16,
+    "moneda": "$",
+    "nombre": "Patitas Felices",
+    "telefono": "4792905521"
+}

@@ -79,10 +79,10 @@
             </div>
 
             <!-- PESTAÑA 2: CLÍNICA -->
-            <div *ngIf="tabActiva === 'clinica'" class="max-w-3xl mx-auto space-y-6 animate-fade-in-up">
+            <div *ngIf="tabActiva === 'clinica'" class="max-w-2x1 mx-auto space-y animate-fade-in-up">
                 <form (submit)="guardarInfoClinica()">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Info Básica -->
+                 
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-1">Nombre de la Clínica</label>
@@ -98,23 +98,7 @@
                             </div>
                         </div>
                         
-                        <!-- Config Financiera -->
-                        <div class="bg-yellow-50 p-6 rounded-xl border border-yellow-100">
-                            <h4 class="text-accent-yellow font-bold mb-4 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM12 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM12 6c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2z" /></svg>
-                                Finanzas
-                            </h4>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase">IVA (%)</label>
-                                    <input [(ngModel)]="infoClinica.iva" name="iva" type="number" class="w-full p-2 border rounded-lg bg-white">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase">Moneda</label>
-                                    <input [(ngModel)]="infoClinica.moneda" name="moneda" type="text" class="w-full p-2 border rounded-lg bg-white text-center">
-                                </div>
-                            </div>
-                        </div>
+                      
                     </div>
                     
                     <div class="mt-6 text-right border-t pt-4">

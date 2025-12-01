@@ -5,15 +5,15 @@ import { RespuestaApi } from '../interfaces/respuesta-api.interface';
 
 @Injectable({ providedIn: 'root' })
 export class NotificacionesService {
-  private apiUrl = 'http://127.0.0.1:5000/api/notificaciones';
+  private api = 'http://127.0.0.1:5000/api/notificaciones';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  getNotificaciones(userId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}?user_id=${userId}`);
+  getNotificaciones(userId: number) {
+    return this.http.get(`${this.api}?user_id=${userId}`);
   }
 
-  marcarLeida(id: number): Observable<RespuestaApi> {
-    return this.http.put<RespuestaApi>(`${this.apiUrl}/${id}/leer`, {});
+  marcarLeida(id: number) {
+    return this.http.put(`${this.api}/${id}/leer`, {});
   }
 }

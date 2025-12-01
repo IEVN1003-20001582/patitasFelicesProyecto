@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
 
   loginData = { email: '', password: '' };
   
-  // Datos para registro
+
   registerData = { nombre: '', email: '', password: '', telefono: '', direccion: '' };
 
   constructor(
@@ -46,7 +46,6 @@ export class LoginComponent implements OnInit {
     this.activeTab = tab;
   }
 
-  // --- INICIAR SESIÓN ---
   onLogin() {
     if (!this.loginData.email || !this.loginData.password) {
       Swal.fire('Campos vacíos', 'Por favor completa todos los datos.', 'warning');
@@ -65,7 +64,7 @@ export class LoginComponent implements OnInit {
             timer: 1000,
             showConfirmButton: false
           }).then(() => {
-            // --- LÓGICA DE REDIRECCIÓN MAESTRA ---
+        
             switch (role) {
               case 'admin':
                 this.router.navigate(['/admin/dashboard']);
@@ -92,7 +91,6 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // --- REGISTRARSE ---
   onRegister() {
     if (!this.registerData.nombre || !this.registerData.email || !this.registerData.password) {
         Swal.fire('Faltan datos', 'Nombre, Email y Contraseña son obligatorios', 'warning');
@@ -103,11 +101,11 @@ export class LoginComponent implements OnInit {
         next: (res) => {
             if(res.exito) {
                 Swal.fire('¡Cuenta Creada!', 'Tu registro fue exitoso. Ahora puedes iniciar sesión.', 'success');
-                // Cambiamos a la pestaña de login automáticamente
+           
                 this.switchTab('login');
-                // Pre-llenamos el correo para facilitar
+              
                 this.loginData.email = this.registerData.email;
-                // Limpiamos formulario
+             
                 this.registerData = { nombre: '', email: '', password: '', telefono: '', direccion: '' };
             } else {
                 Swal.fire('Error', res.mensaje, 'error');

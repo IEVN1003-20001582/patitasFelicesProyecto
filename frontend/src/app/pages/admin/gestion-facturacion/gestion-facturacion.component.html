@@ -140,11 +140,17 @@
                     <div>
                         <div class="flex items-center space-x-2 mb-2">
                           
-                             <div class="h-10 w-10 rounded-full bg-secondary-teal flex items-center justify-center text-white font-bold text-sm">PF</div>
-                             <h1 class="text-2xl font-bold text-primary-dark">Patitas Felices</h1>
+                             <div class="h-10 w-10 rounded-full bg-secondary-teal flex items-center justify-center text-white font-bold text-xs overflow-hidden">
+                                 <!-- Si hay logo url, úsala, sino iniciales -->
+                                 <img *ngIf="infoClinica?.logo_url" [src]="infoClinica?.logo_url" class="w-full h-full object-cover">
+                                 <span *ngIf="!infoClinica?.logo_url"></span>
+                             </div>
+                             <h1 class="text-2xl font-bold text-primary-dark">{{ infoClinica?.nombre || 'Mi Veterinaria' }}</h1>
                         </div>
-                        <p class="text-sm text-gray-500">Av. Principal 123, Centro</p>
-                        <p class="text-sm text-gray-500">RFC: PAT123456FEL</p>
+                   
+                        <p class="text-sm text-gray-500">{{ infoClinica?.direccion || 'Dirección no configurada' }}</p>
+                        
+                        <p class="text-sm text-gray-500">{{ infoClinica?.telefono }}</p>
                     </div>
                     <div class="text-right">
                         <h2 class="text-xl font-bold text-gray-400">FACTURA</h2>
@@ -218,7 +224,24 @@
 <div *ngIf="mostrarModalFiltros" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl w-full max-w-sm p-6 animate-fade-in-down">
         <div class="flex justify-between mb-4"><h3 class="font-bold text-lg">Filtros</h3><button (click)="cerrarModalFiltros()">X</button></div>
-        <div class="mb-4"><label class="block mb-2 text-sm font-bold text-gray-700">Estado</label><select class="w-full border rounded p-2"><option>Todas</option><option>Pendientes</option></select></div>
-        <div class="flex justify-end"><button (click)="cerrarModalFiltros()" class="bg-secondary-teal text-white px-4 py-2 rounded">Aplicar</button></div>
+        <div class="p-6">
+            <form class="space-y-4">
+                <div>
+                    <label class="block mb-2 text-sm font-bold text-gray-700">Estado</label>
+          
+                    <select [(ngModel)]="filtroEstado" name="estado" class="w-full border rounded p-2 focus:ring-2 focus:ring-secondary-teal outline-none">
+                        <option value="todos">Todas</option>
+                        <option value="pagada">Pagadas</option>
+                        <option value="pendiente">Pendientes</option>
+                        <option value="cancelada">Canceladas</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="flex justify-end p-5 border-t space-x-4">
+            <button (click)="cerrarModalFiltros()" class="bg-white border px-4 py-2 rounded hover:bg-gray-100">Cancelar</button>
+ 
+            <button (click)="aplicarFiltros()" class="bg-secondary-teal text-white px-4 py-2 rounded shadow hover:bg-opacity-90 transition">Aplicar</button>
+        </div>
     </div>
 </div>

@@ -83,7 +83,7 @@
                 <img *ngIf="mascota.foto_url && mascota.foto_url.length > 10" 
                      [src]="mascota.foto_url" 
                      alt="Foto de {{mascota.nombre}}" 
-                     class="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
+                     class="h-full w-full object-cover transition-transform duration-500 hover:scale-110 z-10"
                      onerror="this.style.display='none'">
                 
           

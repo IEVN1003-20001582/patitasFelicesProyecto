@@ -18,7 +18,6 @@ export class GestionClientesComponent implements OnInit {
 
   clientes: any[] = [];
   clientesFiltrados: any[] = [];
-
   mascotasCliente: any[] = []; 
   
   kpis = { total: 0, nuevos: 0, activos: 0 };
@@ -26,10 +25,15 @@ export class GestionClientesComponent implements OnInit {
   mostrarModalAgregar = false;
   mostrarModalEditar = false;
   mostrarModalEliminar = false;
-  mostrarModalFiltros = false;
+ 
   mostrarModalVistaRapida = false;
 
   textoBusqueda = '';
+  
+  // NUEVO: Variable para el filtro de estado
+  mostrarModalFiltros = false;
+  filtroEstado = 'todos'; 
+
   nuevoCliente: Cliente = this.initCliente();
   clienteEditando: Cliente = this.initCliente();
   clienteSeleccionado: any = null;
@@ -37,7 +41,6 @@ export class GestionClientesComponent implements OnInit {
   constructor(
     private clientesService: ClientesService,
     private mascotasService: MascotasService
-  
   ) {}
 
   ngOnInit(): void {
@@ -55,7 +58,7 @@ export class GestionClientesComponent implements OnInit {
         telefono: c.telefono,
         direccion: c.direccion,
         num_mascotas: c.num_mascotas || 0,
-        estado: c.estado || 'Activo' // Dato importante
+        estado: c.estado || 'Activo' 
       }));
 
       this.clientesFiltrados = [...this.clientes];
@@ -69,13 +72,32 @@ export class GestionClientesComponent implements OnInit {
     this.kpis.nuevos = Math.floor(this.clientes.length * 0.1); 
   }
 
+
+
+
   filtrarClientes() {
     const texto = this.textoBusqueda.toLowerCase();
-    this.clientesFiltrados = this.clientes.filter(c => 
-      c.nombre.toLowerCase().includes(texto) || 
-      c.email.toLowerCase().includes(texto)
-    );
+    
+    this.clientesFiltrados = this.clientes.filter(c => {
+  
+      const matchTexto = c.nombre.toLowerCase().includes(texto) || 
+                         c.email.toLowerCase().includes(texto);
+      
+
+      const matchEstado = this.filtroEstado === 'todos' || c.estado === this.filtroEstado;
+      
+      return matchTexto && matchEstado;
+    });
   }
+  
+
+  aplicarFiltros() {
+      this.filtrarClientes();
+      this.cerrarModalFiltros();
+  }
+
+
+
 
 
   guardarCliente() {
@@ -111,12 +133,11 @@ export class GestionClientesComponent implements OnInit {
   }
 
   confirmarEliminar() {
-  
     if (!this.clienteSeleccionado) return;
 
     this.clientesService.eliminarCliente(this.clienteSeleccionado.id).subscribe(res => {
       if (res.exito) {
-        Swal.fire('Archivado', 'Cliente marcado como inactivo', 'success');
+        Swal.fire('Inactivo', 'Cliente marcado como inactivo', 'success');
         this.cerrarModalEliminar();
         this.cargarClientes(); 
       } else {
@@ -130,9 +151,7 @@ export class GestionClientesComponent implements OnInit {
     this.mascotasCliente = [];
     this.mostrarModalVistaRapida = true;
 
-
     this.mascotasService.getMascotas(cliente.id).subscribe((res: any) => {
-       
         const lista = res.mascotas || (Array.isArray(res) ? res : []);
         this.mascotasCliente = lista;
     });
@@ -143,7 +162,7 @@ export class GestionClientesComponent implements OnInit {
     this.clienteSeleccionado = null;
   }
 
-  // --- MODALES ---
+
   abrirModalAgregar() { this.mostrarModalAgregar = true; }
   cerrarModalAgregar() { this.mostrarModalAgregar = false; }
 
@@ -158,8 +177,6 @@ export class GestionClientesComponent implements OnInit {
     this.mostrarModalEliminar = true;
   }
   cerrarModalEliminar() { this.mostrarModalEliminar = false; }
-
-
   
   abrirModalFiltros() { this.mostrarModalFiltros = true; }
   cerrarModalFiltros() { this.mostrarModalFiltros = false; }

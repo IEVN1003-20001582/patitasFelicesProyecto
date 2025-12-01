@@ -138,11 +138,11 @@
         </div>
     </div>
 
-    <!-- Tablas de Datos Detallados -->
+
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
         <div class="border-b border-gray-200 bg-gray-50">
             <nav class="flex space-x-1 -mb-px px-6 overflow-x-auto">
-                <!-- Tab Facturación -->
+               
                 <button (click)="cambiarTab('facturacion')" 
                         [class.border-secondary-teal]="tabActiva==='facturacion'" 
                         class="py-4 px-4 border-b-4 text-sm font-medium transition-colors flex items-center whitespace-nowrap focus:outline-none" 
@@ -151,7 +151,7 @@
                     Reporte de Facturación
                 </button>
                 
-                <!-- Tab Citas -->
+      
                 <button (click)="cambiarTab('citas')" 
                         [class.border-secondary-teal]="tabActiva==='citas'" 
                         class="py-4 px-4 border-b-4 text-sm font-medium transition-colors flex items-center whitespace-nowrap focus:outline-none" 
@@ -159,8 +159,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     Reporte de Citas
                 </button>
-                
-                <!-- Tab Inventario -->
+      
                 <button (click)="cambiarTab('inventario')" 
                         [class.border-secondary-teal]="tabActiva==='inventario'" 
                         class="py-4 px-4 border-b-4 text-sm font-medium transition-colors flex items-center whitespace-nowrap focus:outline-none" 
@@ -172,7 +171,7 @@
         </div>
 
         <div class="p-0 max-h-96 overflow-y-auto custom-scrollbar bg-white">
-            <!-- Tabla Facturas -->
+
             <table *ngIf="tabActiva === 'facturacion'" class="w-full text-left text-sm">
                 <thead class="bg-gray-50 text-gray-500 uppercase font-bold text-xs sticky top-0 shadow-sm">
                     <tr><th class="px-6 py-3 font-semibold">Folio</th><th class="px-6 py-3 font-semibold">Cliente</th><th class="px-6 py-3 font-semibold">Fecha</th><th class="px-6 py-3 font-semibold">Total</th></tr>
@@ -190,7 +189,6 @@
                 </tbody>
             </table>
 
-            <!-- Tabla Citas -->
             <table *ngIf="tabActiva === 'citas'" class="w-full text-left text-sm">
                 <thead class="bg-gray-50 text-gray-500 uppercase font-bold text-xs sticky top-0 shadow-sm">
                     <tr><th class="px-6 py-3 font-semibold">Fecha</th><th class="px-6 py-3 font-semibold">Paciente</th><th class="px-6 py-3 font-semibold">Motivo</th><th class="px-6 py-3 font-semibold">Estado</th></tr>
@@ -218,7 +216,7 @@
                 </tbody>
             </table>
 
-             <!-- Tabla Inventario -->
+
              <table *ngIf="tabActiva === 'inventario'" class="w-full text-left text-sm">
                 <thead class="bg-gray-50 text-gray-500 uppercase font-bold text-xs sticky top-0 shadow-sm">
                     <tr><th class="px-6 py-3 font-semibold">Producto</th><th class="px-6 py-3 font-semibold">SKU</th><th class="px-6 py-3 font-semibold">Stock</th><th class="px-6 py-3 font-semibold">Precio</th></tr>

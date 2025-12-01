@@ -47,7 +47,9 @@ export class ConfiguracionComponent implements OnInit {
   }
 
   cargarConfiguraciones() {
-    this.configService.getInfoClinica().subscribe((res: any) => this.infoClinica = res);
+     this.configService.infoClinica$.subscribe((res: any) => {
+        this.infoClinica = res;
+    });
     this.cargarTiposCita();
     this.cargarCategorias();
   }
@@ -106,9 +108,13 @@ export class ConfiguracionComponent implements OnInit {
   }
 
  
-  guardarInfoClinica() {
+ guardarInfoClinica() {
       this.configService.guardarInfoClinica(this.infoClinica).subscribe(res => {
-          if(res.exito) Swal.fire('Guardado', 'Información actualizada', 'success');
+          if(res.exito) {
+              Swal.fire('Guardado', 'La información de la clínica se actualizó y persistirá.', 'success');
+          } else {
+              Swal.fire('Error', 'No se pudo guardar la configuración.', 'error');
+          }
       });
   }
   

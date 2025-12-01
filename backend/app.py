@@ -2,26 +2,22 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from datetime import datetime, date
 from db import get_db_connection
+from datetime import datetime, timedelta
 import json
+import os
 
 app = Flask(__name__)
 # Permitir CORS para que Angular consuma la API sin problemas
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
+# -----------------------
+# CONFIG / CONSTANTES
+# -----------------------
+ADMIN_ID = 1  # <-- ID del administrador en tu tabla `users`
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+# -----------------------
+# UTILITIES / HELPERS
+# -----------------------
 
 def format_fecha(data):
     """
@@ -32,20 +28,10 @@ def format_fecha(data):
     if not data:
         return []
     for item in data:
-        for key, value in item.items():
+        for key, value in list(item.items()):
             if isinstance(value, (date, datetime)):
                 item[key] = value.isoformat()
     return data
-
-
-
-
-
-
-
-
-
-
 
 
 # FUNCIONES AUXILIARES #
@@ -65,24 +51,13 @@ def leer_usuario(email):
         return None
 
 
-
-
-
-
-
-
-
-
-
-
-
 def leer_mascota(id):
     """Busca una mascota por ID"""
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         sql = """
-            SELECT m.*, c.nombre_completo as nombre_dueno 
+            SELECT m.*, c.nombre_completo as nombre_dueno, c.user_id as cliente_user_id
             FROM mascotas m
             JOIN clientes c ON m.cliente_id = c.id
             WHERE m.id = %s
@@ -98,26 +73,60 @@ def leer_mascota(id):
     except Exception as ex:
         print('Error al leer mascota:', ex)
         return None
-    
 
 
+def get_usuario_id_por_cliente(cliente_id):
+    """Devuelve el user_id (tabla users) asociado a un cliente (tabla clientes)"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_id FROM clientes WHERE id = %s", (cliente_id,))
+        res = cursor.fetchone()
+        conn.close()
+        if res:
+            return res[0]
+        return None
+    except Exception as ex:
+        print("Error get_usuario_id_por_cliente:", ex)
+        return None
 
 
+def get_usuario_id_por_veterinario(vet_id):
+    """Devuelve el user_id asociado a un veterinario"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_id FROM veterinarios WHERE id = %s", (vet_id,))
+        res = cursor.fetchone()
+        conn.close()
+        if res:
+            return res[0]
+        return None
+    except Exception as ex:
+        print("Error get_usuario_id_por_veterinario:", ex)
+        return None
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+def crear_notificacion(user_id, titulo, mensaje, tipo="Sistema", enlace=None):
+    """Inserta una notificación en la base de datos"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        sql = """
+            INSERT INTO notificaciones (user_id, titulo, mensaje, tipo, enlace, leido)
+            VALUES (%s, %s, %s, %s, %s, 0)
+        """
+        cursor.execute(sql, (user_id, titulo, mensaje, tipo, enlace))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as ex:
+        print("Error creando notificación:", ex)
+        try:
+            conn.close()
+        except:
+            pass
+        return False
 
 
 # RUTAS DE LA API
@@ -132,7 +141,7 @@ def home():
 def login():
     try:
         user = leer_usuario(request.json['email'])
-        # Compara la contraseña enviada con la guardada en BD
+        
         if user and user['password_hash'] == request.json['password']:
             nombre = "Administrador"
             perfil_id = user['id']
@@ -158,45 +167,9 @@ def login():
         return jsonify({'mensaje': 'Error: ' + str(ex), 'exito': False})
     
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# ---------------------------------------------------------------------
 # GESTION DE MASCOTAS
-# GESTION DE MASCOTAS
-# GESTION DE MASCOTAS
-# GESTION DE MASCOTAS
-# GESTION DE MASCOTAS
-# GESTION DE MASCOTAS
-# GESTION DE MASCOTAS
-# GESTION DE MASCOTAS
+# ---------------------------------------------------------------------
 
 @app.route('/api/mascotas', methods=['GET'])
 def listar_mascotas():
@@ -230,21 +203,16 @@ def listar_mascotas():
                 fila['fecha_nacimiento'] = fila['fecha_nacimiento'].isoformat()
             # Asegurar que peso sea float
             if fila.get('peso'):
-                fila['peso'] = float(fila['peso'])
+                try:
+                    fila['peso'] = float(fila['peso'])
+                except:
+                    pass
                 
         conn.close()
         # Retornamos estructura escolar: { mascotas: [...], exito: true }
         return jsonify({'mascotas': datos, 'mensaje': 'Mascotas listadas', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': 'Error al listar mascotas: ' + str(ex), 'exito': False})
-    
-
-
-
-
-
-
-
 
 
 @app.route('/api/mascotas', methods=['POST'])
@@ -252,8 +220,11 @@ def registrar_mascota():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        sql = """INSERT INTO mascotas (cliente_id, nombre, especie, raza, fecha_nacimiento, sexo, peso, alergias)
-                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"""
+        sql = """INSERT INTO mascotas 
+            (cliente_id, nombre, especie, raza, fecha_nacimiento, sexo, peso, alergias, foto_url)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
         valores = (
             request.json['cliente_id'],
             request.json['nombre'],
@@ -262,23 +233,29 @@ def registrar_mascota():
             request.json['fecha_nacimiento'],
             request.json['sexo'],
             request.json['peso'],
-            request.json.get('alergias', '')
+            request.json.get('alergias', ''),
+            request.json.get('foto_url', None)  
         )
+
         cursor.execute(sql, valores)
         conn.commit()
+
+        # Notificar al administrador que se registró una nueva mascota
+        try:
+            crear_notificacion(
+                user_id=ADMIN_ID,
+                titulo="Nueva mascota registrada",
+                mensaje=f"Se registró la mascota {request.json.get('nombre', 'sin nombre')}.",
+                tipo="Mascota",
+                enlace="/dashboard/mascotas"
+            )
+        except Exception as ex:
+            print("Error notificando registro mascota:", ex)
+
         conn.close()
         return jsonify({'mensaje': 'Mascota registrada correctamente', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': 'Error al registrar mascota: ' + str(ex), 'exito': False})
-    
-
-
-
-
-
-
-
-
 
 
 @app.route('/api/mascotas/<id>', methods=['PUT'])
@@ -288,36 +265,39 @@ def actualizar_mascota(id):
         if mascota:
             conn = get_db_connection()
             cursor = conn.cursor()
-            sql = """UPDATE mascotas SET nombre=%s, especie=%s, raza=%s, peso=%s, alergias=%s 
-                     WHERE id=%s"""
+            sql = """UPDATE mascotas 
+                SET nombre=%s, especie=%s, raza=%s, peso=%s, alergias=%s, foto_url=%s
+                WHERE id=%s"""
             valores = (
                 request.json['nombre'],
                 request.json['especie'],
                 request.json['raza'],
                 request.json['peso'],
                 request.json.get('alergias', ''),
+                request.json.get('foto_url', None),
                 id
             )
             cursor.execute(sql, valores)
             conn.commit()
+
+            # Notificar al administrador sobre la actualización
+            try:
+                crear_notificacion(
+                    user_id=ADMIN_ID,
+                    titulo="Mascota actualizada",
+                    mensaje=f"La mascota {request.json.get('nombre', 'ID '+str(id))} fue actualizada.",
+                    tipo="Mascota",
+                    enlace=f"/dashboard/mascotas/{id}"
+                )
+            except Exception as ex:
+                print("Error notificando actualización mascota:", ex)
+
             conn.close()
             return jsonify({'mensaje': 'Mascota actualizada', 'exito': True})
         else:
             return jsonify({'mensaje': 'Mascota no encontrada', 'exito': False})
     except Exception as ex:
         return jsonify({'mensaje': 'Error al actualizar: ' + str(ex), 'exito': False})
-    
-
-
-
-
-
-
-
-
-
-
-
 
 
 @app.route('/api/mascotas/<id>', methods=['DELETE'])
@@ -331,6 +311,19 @@ def eliminar_mascota(id):
             sql = "UPDATE mascotas SET estado = 'archivado' WHERE id = %s"
             cursor.execute(sql, (id,))
             conn.commit()
+
+            # Notificar al admin
+            try:
+                crear_notificacion(
+                    user_id=ADMIN_ID,
+                    titulo="Mascota archivada",
+                    mensaje=f"La mascota {mascota.get('nombre', 'ID '+str(id))} fue archivada.",
+                    tipo="Mascota",
+                    enlace="/dashboard/mascotas"
+                )
+            except Exception as ex:
+                print("Error notificando mascota archivada:", ex)
+
             conn.close()
             return jsonify({'mensaje': 'Mascota archivada', 'exito': True})
         else:
@@ -339,37 +332,9 @@ def eliminar_mascota(id):
         return jsonify({'mensaje': 'Error al eliminar: ' + str(ex), 'exito': False})
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#GESTION DE CITAS#
-#GESTION DE CITAS#
-#GESTION DE CITAS#
-#GESTION DE CITAS#
-
+# ---------------------------------------------------------------------
+# GESTION DE CITAS
+# ---------------------------------------------------------------------
 
 # LISTAR CITAS
 @app.route('/api/citas', methods=['GET'])
@@ -378,14 +343,66 @@ def listar_citas():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
-        # Auto-cancelación de citas vencidas
-        cursor.execute("UPDATE citas SET estado = 'cancelada' WHERE fecha_hora < NOW() AND estado = 'pendiente'")
+        ahora = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Antes de cancelar automáticamente, buscamos las citas que vamos a cancelar
+        sql_select_cancelar = """
+            SELECT c.id, c.mascota_id, c.veterinario_id, m.nombre as nombre_mascota, cli.id as cliente_id, cli.user_id as cliente_user_id
+            FROM citas c
+            JOIN mascotas m ON c.mascota_id = m.id
+            JOIN clientes cli ON m.cliente_id = cli.id
+            WHERE c.fecha_hora < %s AND c.estado IN ('pendiente', 'confirmada')
+        """
+        cursor.execute(sql_select_cancelar, (ahora,))
+        citas_a_cancelar = cursor.fetchall() or []
+
+        # Ejecutamos la cancelación automática
+        sql_cancelar = """
+            UPDATE citas 
+            SET estado = 'cancelada' 
+            WHERE fecha_hora < %s 
+            AND estado IN ('pendiente', 'confirmada')
+        """
+        cursor.execute(sql_cancelar, (ahora,))
         conn.commit()
+
+        # Notificamos por cada cita cancelada automáticamente
+        for c in citas_a_cancelar:
+            try:
+                # Notificar al cliente (si tiene user_id)
+                if c.get('cliente_user_id'):
+                    crear_notificacion(
+                        user_id=c['cliente_user_id'],
+                        titulo="Cita cancelada",
+                        mensaje=f"Tu cita para {c.get('nombre_mascota','tu mascota')} fue cancelada (fecha pasada).",
+                        tipo="Cita",
+                        enlace="/dashboard/citas"
+                    )
+                # Notificar al veterinario (si existe)
+                if c.get('veterinario_id'):
+                    user_vet = get_usuario_id_por_veterinario(c['veterinario_id'])
+                    if user_vet:
+                        crear_notificacion(
+                            user_id=user_vet,
+                            titulo="Cita cancelada",
+                            mensaje=f"La cita para {c.get('nombre_mascota','una mascota')} fue cancelada (fecha pasada).",
+                            tipo="Cita",
+                            enlace="/dashboard/citas"
+                        )
+                # Notificar al admin
+                crear_notificacion(
+                    user_id=ADMIN_ID,
+                    titulo="Cita cancelada automáticamente",
+                    mensaje=f"Cita ID {c.get('id')} cancelada automáticamente por fecha.",
+                    tipo="Cita",
+                    enlace="/dashboard/citas"
+                )
+            except Exception as ex:
+                print("Error notificando cancelación automática:", ex)
 
         mascota_id = request.args.get('mascota_id')
         veterinario_id = request.args.get('veterinario_id')
         
-      
         sql = """
             SELECT c.id, c.fecha_hora, c.motivo, c.estado, 
                    m.nombre as nombre_mascota, 
@@ -400,11 +417,9 @@ def listar_citas():
         """
         
         params = []
-        
         if mascota_id:
             sql += " AND c.mascota_id = %s"
             params.append(mascota_id)
-            
         if veterinario_id:
             sql += " AND c.veterinario_id = %s"
             params.append(veterinario_id)
@@ -424,25 +439,71 @@ def listar_citas():
 @app.route('/api/citas', methods=['POST'])
 def registrar_cita():
     try:
+        d = request.json
         conn = get_db_connection()
         cursor = conn.cursor()
-        sql = """INSERT INTO citas (mascota_id, veterinario_id, tipo_cita_id, fecha_hora, motivo, estado)
-                 VALUES (%s, %s, %s, %s, %s, 'pendiente')"""
-        valores = (
-            request.json['mascota_id'],
-            request.json.get('veterinario_id'),
-            request.json.get('tipo_cita_id', 1),
-            request.json['fecha_hora'],
-            request.json['motivo']
-        )
-        cursor.execute(sql, valores)
+        
+
+        estado_inicial = d.get('estado', 'pendiente')
+        
+    
+        tipo_id = d.get('tipo_cita_id', 1)
+        if not tipo_id: tipo_id = 1
+
+        sql = """
+            INSERT INTO citas (mascota_id, veterinario_id, tipo_cita_id, fecha_hora, motivo, estado) 
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        vals = (d['mascota_id'], d.get('veterinario_id'), tipo_id, d['fecha_hora'], d['motivo'], estado_inicial)
+        
+        cursor.execute(sql, vals)
         conn.commit()
+
+        # Recuperamos info para notificar:
+        try:
+            mascota = leer_mascota(d['mascota_id'])
+            cliente_user_id = None
+            if mascota and mascota.get('cliente_user_id'):
+                cliente_user_id = mascota['cliente_user_id']
+
+            # Notificar al veterinario asignado (si aplica)
+            if d.get('veterinario_id'):
+                vet_user_id = get_usuario_id_por_veterinario(d['veterinario_id'])
+                if vet_user_id:
+                    crear_notificacion(
+                        user_id=vet_user_id,
+                        titulo="Nueva cita asignada",
+                        mensaje=f"Tienes una nueva cita para {mascota.get('nombre','una mascota')} el {d.get('fecha_hora')}.",
+                        tipo="Cita",
+                        enlace="/dashboard/citas"
+                    )
+
+            # Notificar al cliente (si tiene user_id)
+            if cliente_user_id:
+                crear_notificacion(
+                    user_id=cliente_user_id,
+                    titulo="Cita programada",
+                    mensaje=f"Se ha programado una cita para {mascota.get('nombre','tu mascota')} el {d.get('fecha_hora')}.",
+                    tipo="Cita",
+                    enlace="/dashboard/citas"
+                )
+
+            # Notificar al administrador
+            crear_notificacion(
+                user_id=ADMIN_ID,
+                titulo="Nueva cita registrada",
+                mensaje=f"Se registró una nueva cita para mascota ID {d['mascota_id']} el {d.get('fecha_hora')}.",
+                tipo="Cita",
+                enlace="/dashboard/citas"
+            )
+        except Exception as ex:
+            print("Error creando notificaciones para nueva cita:", ex)
+
         conn.close()
         return jsonify({'mensaje': 'Cita registrada correctamente', 'exito': True})
     except Exception as ex:
-        return jsonify({'mensaje': 'Error al registrar cita: ' + str(ex), 'exito': False})
+        return jsonify({'mensaje': str(ex), 'exito': False})
     
-
 
 
 # ACTUALIZAR CITA
@@ -453,7 +514,13 @@ def actualizar_cita(id):
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Construimos la query dinámicamente según lo que se envíe
+        # Buscamos estado/vet previo para comparar
+        cursor.execute("SELECT veterinario_id, mascota_id, estado FROM citas WHERE id = %s", (id,))
+        previo = cursor.fetchone()
+        previo_vet = previo[0] if previo else None
+        previo_mascota_id = previo[1] if previo else None
+        previo_estado = previo[2] if previo else None
+
         campos = []
         valores = []
         
@@ -468,6 +535,7 @@ def actualizar_cita(id):
             valores.append(d['fecha_hora'])
             
         if not campos:
+            conn.close()
             return jsonify({'mensaje': 'No hay datos para actualizar', 'exito': False})
             
         valores.append(id)
@@ -475,33 +543,90 @@ def actualizar_cita(id):
         
         cursor.execute(sql, tuple(valores))
         conn.commit()
+
+        # Notificaciones según lo que cambió
+        try:
+            # Información de la mascota y su cliente
+            mascota = leer_mascota(previo_mascota_id) if previo_mascota_id else None
+            cliente_user_id = mascota.get('cliente_user_id') if mascota else None
+            mascota_nombre = mascota.get('nombre') if mascota else 'tu mascota'
+
+            # Si se reasignó veterinario -> notificar al nuevo vet
+            if 'veterinario_id' in d and d.get('veterinario_id'):
+                nuevo_vet_user = get_usuario_id_por_veterinario(d['veterinario_id'])
+                if nuevo_vet_user:
+                    crear_notificacion(
+                        user_id=nuevo_vet_user,
+                        titulo="Cita asignada",
+                        mensaje=f"Se te asignó la cita para {mascota_nombre} el {d.get('fecha_hora', 'la fecha indicada')}.",
+                        tipo="Cita",
+                        enlace="/dashboard/citas"
+                    )
+                # Notificar admin
+                crear_notificacion(
+                    user_id=ADMIN_ID,
+                    titulo="Veterinario reasignado a cita",
+                    mensaje=f"La cita ID {id} fue reasignada a veterinario ID {d.get('veterinario_id')}.",
+                    tipo="Cita",
+                    enlace=f"/dashboard/citas/{id}"
+                )
+                # Notificar al cliente que hubo una reasignación (opcional)
+                if cliente_user_id:
+                    crear_notificacion(
+                        user_id=cliente_user_id,
+                        titulo="Cita actualizada",
+                        mensaje=f"Tu cita para {mascota_nombre} fue reasignada a otro veterinario.",
+                        tipo="Cita",
+                        enlace="/dashboard/citas"
+                    )
+
+            # Si se cambió el estado a 'cancelada'
+            if 'estado' in d and d['estado'] == 'cancelada':
+                # Notificar cliente
+                if cliente_user_id:
+                    crear_notificacion(
+                        user_id=cliente_user_id,
+                        titulo="Cita cancelada",
+                        mensaje=f"Tu cita para {mascota_nombre} fue cancelada.",
+                        tipo="Cita",
+                        enlace="/dashboard/citas"
+                    )
+                # Notificar veterinario (previo vet y/o nuevo vet)
+                vets_to_notify = set()
+                if previo_vet:
+                    vets_to_notify.add(previo_vet)
+                if 'veterinario_id' in d and d.get('veterinario_id'):
+                    vets_to_notify.add(d.get('veterinario_id'))
+                for vet_id in vets_to_notify:
+                    vet_user = get_usuario_id_por_veterinario(vet_id)
+                    if vet_user:
+                        crear_notificacion(
+                            user_id=vet_user,
+                            titulo="Cita cancelada",
+                            mensaje=f"La cita para {mascota_nombre} fue cancelada.",
+                            tipo="Cita",
+                            enlace="/dashboard/citas"
+                        )
+                # Notificar admin
+                crear_notificacion(
+                    user_id=ADMIN_ID,
+                    titulo="Cita cancelada",
+                    mensaje=f"La cita ID {id} fue cancelada por el usuario.",
+                    tipo="Cita",
+                    enlace=f"/dashboard/citas/{id}"
+                )
+        except Exception as ex:
+            print("Error creando notificaciones tras actualizar cita:", ex)
+
         conn.close()
         return jsonify({'mensaje': 'Cita actualizada correctamente', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#GESTION DE FACTURASS#
-#GESTION DE FACTURASS#
-#GESTION DE FACTURASS#
-#GESTION DE FACTURASS#
-#GESTION DE FACTURASS#
-#GESTION DE FACTURASS#
+# ---------------------------------------------------------------------
+# GESTION DE FACTURAS
+# ---------------------------------------------------------------------
 
 # 1. LEER FACTURAS
 @app.route('/api/facturas', methods=['GET'])
@@ -527,8 +652,6 @@ def get_facturas():
         return jsonify({'facturas': facturas, 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
-
-
 
 
 # 2. BUSCAR CARGOS PENDIENTES
@@ -585,9 +708,6 @@ def get_cargos_pendientes(cliente_id):
         return jsonify({'mensaje': str(ex), 'exito': False})
 
 
-
-
-
 # 3. CREAR FACTURA Y MARCAR CARGOS COMO PAGADOS
 @app.route('/api/facturas', methods=['POST'])
 def crear_factura():
@@ -627,12 +747,23 @@ def crear_factura():
                 cursor.execute("UPDATE vacunacion SET facturado = TRUE WHERE id = %s", (item['id_origen'],))
             
         conn.commit()
+
+        # Notificar al admin que hay una factura nueva
+        try:
+            crear_notificacion(
+                user_id=ADMIN_ID,
+                titulo="Factura generada",
+                mensaje=f"Se generó la factura {folio}.",
+                tipo="Sistema",
+                enlace="/dashboard/facturacion"
+            )
+        except Exception as ex:
+            print("Error notificando factura generada:", ex)
+
         conn.close()
         return jsonify({'mensaje': 'Factura generada correctamente', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
-    
-
 
 
 # 4. MARCAR PAGADA
@@ -647,29 +778,11 @@ def pagar_factura(id):
         return jsonify({'mensaje': 'Factura marcada como pagada', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
-    
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ==========================================
+# ---------------------------------------------------------------------
 # GESTIÓN DE INVENTARIO
-# ==========================================
+# ---------------------------------------------------------------------
 
 # LEER 
 @app.route('/api/productos', methods=['GET'])
@@ -690,8 +803,6 @@ def get_productos():
         return jsonify({'productos': datos, 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
-
-
 
 
 # CREAR PRODUCTO
@@ -735,8 +846,6 @@ def crear_producto():
         return jsonify({'mensaje': str(ex), 'exito': False})
     
 
-    
-
 # EDITAR PRODUCTO
 @app.route('/api/productos/<id>', methods=['PUT'])
 def actualizar_producto(id):
@@ -766,13 +875,29 @@ def actualizar_producto(id):
         )
         cursor.execute(sql, vals)
         conn.commit()
+
+        # Notificar si el stock está por debajo del mínimo
+        try:
+            if 'stock_actual' in d and 'stock_minimo' in d:
+                try:
+                    if int(d['stock_actual']) <= int(d['stock_minimo']):
+                        crear_notificacion(
+                            user_id=ADMIN_ID,
+                            titulo="Stock bajo",
+                            mensaje=f"El producto {d['nombre']} tiene stock bajo ({d['stock_actual']}).",
+                            tipo="Stock",
+                            enlace="/dashboard/productos"
+                        )
+                except:
+                    pass
+        except Exception as ex:
+            print("Error al evaluar stock para notificación:", ex)
+
         conn.close()
         return jsonify({'mensaje': 'Producto actualizado', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
     
-
-
 
 # AJUSTE RÁPIDO DE STOCK
 @app.route('/api/productos/<id>/stock', methods=['PATCH'])
@@ -790,11 +915,6 @@ def ajustar_stock(id):
         return jsonify({'mensaje': str(ex), 'exito': False})
     
 
-
-
-
-
-
 # ELIMINAR 
 @app.route('/api/productos/<id>', methods=['DELETE'])
 def eliminar_producto(id):
@@ -811,37 +931,9 @@ def eliminar_producto(id):
         return jsonify({'mensaje': 'No se puede eliminar (tiene historial)', 'exito': False})
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# ---------------------------------------------------------------------
 # GESTIÓN DE VETERINARIOS
-# GESTIÓN DE VETERINARIOS
-# GESTIÓN DE VETERINARIOS
-# GESTIÓN DE VETERINARIOS
-# GESTIÓN DE VETERINARIOS
-# GESTIÓN DE VETERINARIOS
-
+# ---------------------------------------------------------------------
 
 # LEER
 @app.route('/api/veterinarios', methods=['GET'])
@@ -886,13 +978,24 @@ def crear_veterinario():
         cursor.execute(sql, vals)
         
         conn.commit()
+
+        # Notificar al admin de nuevo vet
+        try:
+            crear_notificacion(
+                user_id=ADMIN_ID,
+                titulo="Nuevo veterinario",
+                mensaje=f"Se registró el veterinario {d.get('nombre_completo','')}.",
+                tipo="Sistema",
+                enlace="/dashboard/veterinarios"
+            )
+        except Exception as ex:
+            print("Error notificando nuevo veterinario:", ex)
+
         conn.close()
         return jsonify({'mensaje': 'Veterinario registrado correctamente', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
     
-
-
 
 # EDITAR
 @app.route('/api/veterinarios/<id>', methods=['PUT'])
@@ -924,10 +1027,6 @@ def actualizar_veterinario(id):
         return jsonify({'mensaje': str(ex), 'exito': False})
     
 
-
-
-
-
 # DESACTIVAR (Soft Delete)
 @app.route('/api/veterinarios/<id>', methods=['DELETE'])
 def eliminar_veterinario(id):
@@ -948,58 +1047,9 @@ def eliminar_veterinario(id):
         return jsonify({'mensaje': str(ex), 'exito': False})
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# ---------------------------------------------------------------------
 # GESTIÓN DE CLIENTES (CRUD)
-# GESTIÓN DE CLIENTES (CRUD)
-# GESTIÓN DE CLIENTES (CRUD)
-# GESTIÓN DE CLIENTES (CRUD)
-# GESTIÓN DE CLIENTES (CRUD)
-# GESTIÓN DE CLIENTES (CRUD)
-# GESTIÓN DE CLIENTES (CRUD)
-
+# ---------------------------------------------------------------------
 
 @app.route('/api/clientes', methods=['GET'])
 def get_clientes():
@@ -1031,8 +1081,6 @@ def get_clientes():
         return jsonify({'clientes': datos, 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
-    
-
 
 
 # CREAR CLIENTE
@@ -1054,12 +1102,23 @@ def crear_cliente():
         cursor.execute(sql, (user_id, d['nombre'], d['telefono'], d['direccion'], d['email']))
         
         conn.commit()
+
+        # Notificar al admin nuevo cliente
+        try:
+            crear_notificacion(
+                user_id=ADMIN_ID,
+                titulo="Nuevo cliente",
+                mensaje=f"Se registró el cliente {d.get('nombre','')}.",
+                tipo="Sistema",
+                enlace="/dashboard/clientes"
+            )
+        except Exception as ex:
+            print("Error notificando nuevo cliente:", ex)
+
         conn.close()
         return jsonify({'mensaje': 'Cliente registrado', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
-    
-
 
 
 # ACTUALIZAR CLIENTE
@@ -1070,16 +1129,35 @@ def actualizar_cliente(id):
         d = request.json
         conn = get_db_connection()
         cursor = conn.cursor()
-        sql = "UPDATE clientes SET nombre_completo=%s, telefono=%s, direccion=%s, email_contacto=%s WHERE id=%s"
-        cursor.execute(sql, (d['nombre'], d['telefono'], d['direccion'], d['email'], id))
+        
+
+        cursor.execute("SELECT user_id FROM clientes WHERE id=%s", (id,))
+        res = cursor.fetchone()
+        user_id = res[0] if res else None
+        
+      
+        if user_id:
+            cursor.execute("SELECT id FROM users WHERE email=%s AND id!=%s", (d['email'], user_id))
+            if cursor.fetchone():
+                conn.close()
+                return jsonify({'mensaje': 'El correo electrónico ya está en uso por otro usuario.', 'exito': False})
+            
+    
+            cursor.execute("UPDATE users SET email=%s WHERE id=%s", (d['email'], user_id))
+
+  
+        sql = """
+            UPDATE clientes 
+            SET nombre_completo=%s, telefono=%s, direccion=%s, email_contacto=%s
+            WHERE id=%s
+        """
+        cursor.execute(sql, (d['nombre'], d.get('telefono', ''), d.get('direccion', ''), d['email'], id))
+        
         conn.commit()
         conn.close()
-        return jsonify({'mensaje': 'Cliente actualizado', 'exito': True})
+        return jsonify({'mensaje': 'Datos actualizados correctamente', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
-
-
-
 
 
 # ARCHIVAR CLIENTE
@@ -1108,29 +1186,9 @@ def archivar_cliente(id):
         return jsonify({'mensaje': str(ex), 'exito': False})
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# ---------------------------------------------------------------------
 # HISTORIAL MÉDICO Y VACUNAS
-# HISTORIAL MÉDICO Y VACUNAS
-
-
+# ---------------------------------------------------------------------
 
 @app.route('/api/historial', methods=['GET'])
 def get_historial():
@@ -1154,8 +1212,6 @@ def get_historial():
         return jsonify({'mensaje': str(ex), 'exito': False})
     
 
-
-
 # AGREGAR REGISTRO AL HISTORIAL
 @app.route('/api/historial', methods=['POST'])
 def add_historial():
@@ -1174,14 +1230,39 @@ def add_historial():
         
         cursor.execute(sql, vals)
         conn.commit()
+
+        # Notificar: admin y cliente (cliente sólo si existe user_id)
+        try:
+            mascota = leer_mascota(d['mascota_id'])
+            cliente_user_id = mascota.get('cliente_user_id') if mascota else None
+            mascota_nombre = mascota.get('nombre') if mascota else 'tu mascota'
+
+            # Notificar al cliente
+            if cliente_user_id:
+                crear_notificacion(
+                    user_id=cliente_user_id,
+                    titulo="Nuevo tratamiento registrado",
+                    mensaje=f"Se agregó un tratamiento al historial de {mascota_nombre}: {diag}.",
+                    tipo="Sistema",
+                    enlace=f"/dashboard/mascotas/{d['mascota_id']}"
+                )
+
+            # Notificar al admin
+            crear_notificacion(
+                user_id=ADMIN_ID,
+                titulo="Historial actualizado",
+                mensaje=f"Se registró tratamiento para mascota ID {d['mascota_id']}.",
+                tipo="Sistema",
+                enlace=f"/dashboard/mascotas/{d['mascota_id']}"
+            )
+        except Exception as ex:
+            print("Error notificando historial:", ex)
+
         conn.close()
         return jsonify({'mensaje': 'Tratamiento agregado', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
     
-
-
-
 
 # VACUNAS
 @app.route('/api/vacunas', methods=['GET'])
@@ -1208,10 +1289,6 @@ def get_vacunas():
     
 
 
-
-
-
-
 @app.route('/api/vacunas', methods=['POST'])
 def add_vacuna():
     try:
@@ -1229,53 +1306,37 @@ def add_vacuna():
         cursor.execute("UPDATE productos SET stock_actual = stock_actual - 1 WHERE id = %s", (d['producto_id'],))
         
         conn.commit()
+
+        # Notificar admin (y opcionalmente cliente/vet si quieres)
+        try:
+            crear_notificacion(
+                user_id=ADMIN_ID,
+                titulo="Vacuna registrada",
+                mensaje=f"Se aplicó vacuna a mascota ID {d['mascota_id']}.",
+                tipo="Vacuna",
+                enlace=f"/dashboard/mascotas/{d['mascota_id']}"
+            )
+        except Exception as ex:
+            print("Error notificando vacuna:", ex)
+
         conn.close()
         return jsonify({'mensaje': 'Vacuna registrada', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
     
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ==========================================
+# ---------------------------------------------------------------------
 # MÓDULO DE REPORTES Y ANALÍTICA
-# ==========================================
+# ---------------------------------------------------------------------
 
 @app.route('/api/reportes/dashboard', methods=['GET'])
 def get_reportes_dashboard():
     try:
-        # Filtros de fechas (opcionales, por defecto último mes)
+    
         fecha_inicio = request.args.get('fecha_inicio')
         fecha_fin = request.args.get('fecha_fin')
         
-        # Clausula WHERE dinámica
+        
         where_date_facturas = ""
         where_date_citas = ""
         params = []
@@ -1311,7 +1372,7 @@ def get_reportes_dashboard():
         # 2. DATOS PARA GRÁFICOS
         
         # Gráfico 1: Ingresos por Mes (Últimos 6 meses o rango)
-        # Nota: TiDB/MySQL usa DATE_FORMAT
+        
         sql_graf_ingresos = """
             SELECT DATE_FORMAT(fecha_emision, '%Y-%m') as etiqueta, SUM(total) as valor 
             FROM facturas 
@@ -1363,83 +1424,51 @@ def get_reportes_dashboard():
         return jsonify({'mensaje': str(ex), 'exito': False})
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ==========================================
+# ---------------------------------------------------------------------
 # MÓDULO DE CONFIGURACIÓN
-# ==========================================
+# ---------------------------------------------------------------------
 
-# --- 1. INFORMACIÓN DE LA CLÍNICA (Archivo JSON) ---
 CONFIG_FILE = 'clinica_config.json'
 
-def cargar_config_clinica():
-    if os.path.exists(CONFIG_FILE):
-        with open(CONFIG_FILE, 'r') as f:
-            return json.load(f)
-    return { # Default
-        'nombre': 'Patitas Felices',
-        'telefono': '555-0000',
-        'direccion': 'Calle Principal #123',
+# 1. LEER CONFIGURACIÓN 
+@app.route('/api/config/clinica', methods=['GET'])
+def get_info_clinica():
+    # Valores por defecto por si el archivo no existe o está vacío
+    datos_default = {
+        'nombre': '',
+        'telefono': '',
+        'direccion': '',
         'iva': 16,
         'moneda': '$'
     }
+    
+    try:
+        if os.path.exists(CONFIG_FILE):
+            with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+                datos = json.load(f)
+                # Combinar con default para asegurar que no falten campos
+                return jsonify({**datos_default, **datos}) 
+        else:
+            # Si no existe, creamos uno con default
+            with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
+                json.dump(datos_default, f)
+            return jsonify(datos_default)
+            
+    except Exception as e:
+        print(f"Error leyendo config: {e}")
+        return jsonify(datos_default) # Retornar default en caso de error
 
-
-
-
-
-
-
-@app.route('/api/config/clinica', methods=['GET'])
-def get_info_clinica():
-    return jsonify(cargar_config_clinica())
-
-
-
-
+# 2. GUARDAR CONFIGURACIÓN 
 @app.route('/api/config/clinica', methods=['POST'])
 def save_info_clinica():
     try:
         datos = request.json
-        with open(CONFIG_FILE, 'w') as f:
-            json.dump(datos, f)
-        return jsonify({'mensaje': 'Información actualizada', 'exito': True})
+        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
+            json.dump(datos, f, indent=4) # indent=4 para que se vea bonito
+        return jsonify({'mensaje': 'Configuración guardada', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
     
-
-
-
-
-
 
 # --- 2. CAMBIAR CONTRASEÑA ---
 @app.route('/api/cambiar-password', methods=['POST'])
@@ -1468,12 +1497,6 @@ def cambiar_password():
             
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
-    
-
-
-
-
-
 
 
 # --- 3. TIPOS DE CITA 
@@ -1490,10 +1513,6 @@ def get_tipos_cita():
         return jsonify({'mensaje': str(ex), 'exito': False})
     
 
-
-
-
-
 @app.route('/api/config/tipos-cita', methods=['POST'])
 def add_tipo_cita():
     try:
@@ -1509,11 +1528,6 @@ def add_tipo_cita():
         return jsonify({'mensaje': str(ex), 'exito': False})
     
 
-
-
-
-
-
 @app.route('/api/config/tipos-cita/<id>', methods=['DELETE'])
 def delete_tipo_cita(id):
     try:
@@ -1525,11 +1539,6 @@ def delete_tipo_cita(id):
         return jsonify({'mensaje': 'Eliminado', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': 'Error al eliminar (puede estar en uso)', 'exito': False})
-    
-
-
-
-
 
 
 # --- 4. CATEGORÍAS 
@@ -1546,10 +1555,6 @@ def get_categorias():
         return jsonify({'mensaje': str(ex), 'exito': False})
     
 
-
-
-
-
 @app.route('/api/config/categorias', methods=['POST'])
 def add_categoria():
     try:
@@ -1564,10 +1569,7 @@ def add_categoria():
         return jsonify({'mensaje': str(ex), 'exito': False})
     
 
-
-
 @app.route('/api/config/categorias/<id>', methods=['DELETE'])
-
 def delete_categoria(id):
     try:
         conn = get_db_connection()
@@ -1578,10 +1580,6 @@ def delete_categoria(id):
         return jsonify({'mensaje': 'Eliminado', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': 'Error al eliminar', 'exito': False})
-    
-
-
-
 
 
 # --- 5. ACTUALIZAR PERFIL USUARIO (Email) ---
@@ -1609,66 +1607,66 @@ def actualizar_perfil_usuario(id):
         
       
         cursor.execute("UPDATE clientes SET email_contacto = %s WHERE user_id = %s", (nuevo_email, id))
-       
+        
         
         conn.commit()
         conn.close()
         return jsonify({'mensaje': 'Perfil actualizado correctamente', 'exito': True})
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'exito': False})
-    
 
 
-
-
-
-
-
-
-
-
-
-
-
-#NOTIFICACIONES
-#NOTIFICACIONES
-#NOTIFICACIONES
-#NOTIFICACIONES
-#NOTIFICACIONES
-#NOTIFICACIONES
-
+# ---------------------------------------------------------------------
+# NOTIFICACIONES
+# ---------------------------------------------------------------------
 
 @app.route('/api/notificaciones', methods=['GET'])
 def get_notificaciones():
     try:
         user_id = request.args.get('user_id')
-        if not user_id:
-            return jsonify({'notificaciones': [], 'exito': False})
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        
-        sql = "SELECT * FROM notificaciones WHERE user_id = %s ORDER BY created_at DESC LIMIT 20"
+
+        sql = """
+            SELECT * FROM notificaciones
+            WHERE user_id = %s
+            ORDER BY created_at DESC
+            LIMIT 40
+        """
         cursor.execute(sql, (user_id,))
-        
-        datos = format_fecha(cursor.fetchall())
+        data = cursor.fetchall()
+
         conn.close()
-        return jsonify({'notificaciones': datos, 'exito': True})
+
+        return jsonify({'exito': True, 'notificaciones': data})
     except Exception as ex:
-        return jsonify({'mensaje': str(ex), 'exito': False})
-    
+        return jsonify({'exito': False, 'mensaje': str(ex)})
 
 
+@app.route('/api/notificaciones/<int:id>/leer', methods=['PUT', 'OPTIONS'])
+def marcar_notificacion(id):
+
+    if request.method == 'OPTIONS':
+        return jsonify({'ok': True})
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        sql = "UPDATE notificaciones SET leido = 1 WHERE id = %s"
+        cursor.execute(sql, (id,))
+        conn.commit()
+        conn.close()
+
+        return jsonify({'exito': True, 'mensaje': 'Notificación marcada'})
+    except Exception as ex:
+        return jsonify({'exito': False, 'mensaje': str(ex)})
 
 
-
-
-
-
-
-
-    
-
+# ---------------------------------------------------------------------
+# ERRORES / RUN
+# ---------------------------------------------------------------------
 
 # MANEJO DE ERROR 404
 def pagina_no_encontrada(error):

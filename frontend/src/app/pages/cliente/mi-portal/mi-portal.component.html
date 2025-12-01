@@ -28,10 +28,25 @@
             </div>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div *ngFor="let mascota of misMascotas" (click)="abrirModalDetalle(mascota)" class="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer transform hover:-translate-y-1 transition duration-300">
-                    <div class="h-40 bg-gray-200 relative">
-                         <img [src]="mascota.foto_url || 'https://placehold.co/400x300?text=' + mascota.nombre" class="w-full h-full object-cover">
+                <div *ngFor="let mascota of misMascotas" 
+                (click)="abrirModalDetalle(mascota)" 
+                class="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer transform hover:-translate-y-1 transition duration-300">
+                  
+          <div class="h-48 bg-gray-100 relative flex items-center justify-center overflow-hidden">
+                        
+                  
+                        <div class="absolute inset-0 flex items-center justify-center text-gray-300 font-bold text-6xl uppercase bg-gray-100 select-none z-0">
+                            {{ mascota.nombre.charAt(0) }}
+                        </div>
+
+                     
+                        <img *ngIf="mascota.foto_url && mascota.foto_url.length > 10" 
+                             [src]="mascota.foto_url" 
+                             class="h-full w-full object-cover transition-transform duration-500 hover:scale-110 relative z-10"
+                             alt="{{ mascota.nombre }}"
+                             onerror="this.style.display='none'">
                     </div>
+
                     <div class="p-5">
                         <h3 class="text-xl font-bold text-primary-dark">{{ mascota.nombre }}</h3>
                         <p class="text-gray-600 text-sm">{{ mascota.especie }} - {{ mascota.raza }}</p>
@@ -53,7 +68,7 @@
                         <tr><th class="p-4">Fecha</th><th class="p-4">Mascota</th><th class="p-4">Motivo</th><th class="p-4">Estado</th></tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let cita of misCitas" class="border-b hover:bg-gray-50">
+                        <tr *ngFor="let cita of misCitasActivas" class="border-b hover:bg-gray-50">
                             <td class="p-4">{{ cita.fecha_hora | date:'longDate':'':'es' }}</td>
                             <td class="p-4 font-semibold">{{ cita.nombre_mascota }}</td>
                             <td class="p-4">{{ cita.motivo }}</td>
@@ -63,7 +78,7 @@
                                 </span>
                             </td>
                         </tr>
-                         <tr *ngIf="misCitas.length === 0"><td colspan="4" class="p-6 text-center text-gray-400">No tienes citas programadas.</td></tr>
+                         <tr *ngIf="misCitasActivas.length === 0"><td colspan="4" class="p-6 text-center text-gray-400">No tienes citas programadas.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -137,7 +152,7 @@
         </div>
         
         <form class="space-y-4">
-     
+            <!-- Mascota -->
             <div>
                 <label class="block mb-1 text-sm font-bold text-gray-700">Mascota</label>
                 <select [(ngModel)]="solicitudCita.mascota_id" name="mascota" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none">
@@ -146,7 +161,7 @@
                 </select>
             </div>
 
-
+            <!-- CAMBIO AQUÍ: Motivo/Tipo de Cita Dinámico -->
             <div>
                 <label class="block mb-1 text-sm font-bold text-gray-700">Tipo de Cita</label>
                 <select [(ngModel)]="solicitudCita.tipo_cita_id" name="tipo_cita" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none bg-white">
@@ -158,7 +173,7 @@
                 </select>
             </div>
 
-  
+            <!-- Fecha y Hora -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block mb-1 text-sm font-bold text-gray-700">Fecha</label>
@@ -166,12 +181,12 @@
                 </div>
                 <div>
                     <label class="block mb-1 text-sm font-bold text-gray-700">Hora</label>
-
+                    <!-- Al cambiar la hora, filtramos los veterinarios -->
                     <input [(ngModel)]="solicitudCita.hora" (change)="filtrarVeterinarios()" name="hora" type="time" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none">
                 </div>
             </div>
 
-       
+            <!-- Veterinario (Dinámico) -->
             <div>
                 <label class="block mb-1 text-sm font-bold text-gray-700">Veterinario Disponible</label>
                 <select [(ngModel)]="solicitudCita.veterinario_id" name="veterinario" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none bg-white" [disabled]="!solicitudCita.hora">
@@ -187,7 +202,7 @@
                 </p>
             </div>
 
-
+            <!-- Comentarios -->
             <div>
                 <label class="block mb-1 text-sm font-bold text-gray-700">Comentarios Adicionales</label>
                 <textarea [(ngModel)]="solicitudCita.comentarios" name="coments" placeholder="Ej. Ha estado decaído..." class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none" rows="2"></textarea>
@@ -203,24 +218,97 @@
 
 <!-- MODAL AGREGAR MASCOTA -->
 <div *ngIf="mostrarModalAgregarMascota" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-fade-in-down">
-        <h3 class="text-xl font-bold mb-4">Nueva Mascota</h3>
-        <form class="space-y-3">
-            <input [(ngModel)]="nuevaMascota.nombre" name="nom" placeholder="Nombre" class="w-full border p-2 rounded">
-            <div class="grid grid-cols-2 gap-2">
-                <input [(ngModel)]="nuevaMascota.especie" name="esp" placeholder="Especie (Perro/Gato)" class="border p-2 rounded">
-                <input [(ngModel)]="nuevaMascota.raza" name="raz" placeholder="Raza" class="border p-2 rounded">
-            </div>
-             <input [(ngModel)]="nuevaMascota.fecha_nacimiento" name="fec" type="date" class="w-full border p-2 rounded">
-             <input [(ngModel)]="nuevaMascota.foto_url" name="foto" placeholder="URL Foto" class="w-full border p-2 rounded">
-             
-             <div class="flex justify-end space-x-2 pt-2">
-                <button (click)="cerrarModalAgregarMascota()" class="px-4 py-2 border rounded">Cancelar</button>
-                <button (click)="registrarMascota()" class="bg-secondary-teal text-white px-4 py-2 rounded">Guardar</button>
-            </div>
-        </form>
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl animate-fade-in-down">
+        <div class="flex justify-between items-center p-5 border-b">
+            <h3 class="text-xl font-bold text-primary-dark">Registrar Nueva Mascota</h3>
+            <button (click)="cerrarModalAgregarMascota()" class="text-gray-400 hover:text-gray-600">X</button>
+        </div>
+        
+        <div class="p-6 max-h-[70vh] overflow-y-auto">
+            <form class="space-y-4">
+                <!-- FOTO CON PREVISUALIZACIÓN -->
+                <div class="flex flex-col items-center mb-6">
+                    <div class="relative h-32 w-32 mb-4 rounded-full bg-gray-100 border-4 border-white shadow-md overflow-hidden flex items-center justify-center group">
+                        
+                        <!-- Opción A: Si hay URL válida, mostramos la imagen -->
+                        <img *ngIf="nuevaMascota.foto_url" 
+                             [src]="nuevaMascota.foto_url" 
+                             class="w-full h-full object-cover"
+                             alt="Previsualización"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        
+                        <!-- Opción B: Si no hay URL o falla la carga, mostramos icono -->
+                        <div [style.display]="nuevaMascota.foto_url ? 'none' : 'flex'" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l-1.586-1.586a2 2 0 00-2.828 0L6 14m6-6l.25-.25a2 2 0 012.828 0l.25.25m-3 3l.25.25a2 2 0 002.828 0l.25-.25m-3-3l.25-.25a2 2 0 012.828 0l.25.25m0 0l-3 3m0 0l-3-3m3 3V3" /></svg>
+                            <span class="text-[10px] font-semibold uppercase tracking-wider">Sin Foto</span>
+                        </div>
+                    </div>
+
+                    <div class="w-full max-w-xs">
+                        <label class="text-xs font-bold text-gray-400 uppercase mb-1 block text-center">URL de la Foto</label>
+                      
+                        <input [(ngModel)]="nuevaMascota.foto_url" name="foto" type="text" placeholder="https://ejemplo.com/foto.jpg" class="w-full px-3 py-2 text-sm border rounded-lg text-center focus:ring-2 focus:ring-secondary-teal outline-none transition-shadow">
+                        <p class="text-[10px] text-gray-400 mt-1 text-center">Pega el enlace de una imagen de internet</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Nombre -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre</label>
+                        <input [(ngModel)]="nuevaMascota.nombre" name="nom" type="text" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal" required>
+                    </div>
+                    
+                    <!-- Dueño (Autocompletado y Visible) -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Dueño (Tú)</label>
+                        <input [value]="clientePerfil?.nombre_completo" disabled class="w-full px-3 py-2 border bg-gray-100 rounded-lg text-gray-500 cursor-not-allowed font-medium">
+                    </div>
+
+                    <!-- Detalles -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Especie</label>
+                        <input [(ngModel)]="nuevaMascota.especie" name="esp" placeholder="Perro/Gato" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Raza</label>
+                        <input [(ngModel)]="nuevaMascota.raza" name="raz" placeholder="Ej. Labrador" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha Nacimiento</label>
+                        <input [(ngModel)]="nuevaMascota.fecha_nacimiento" name="fec" type="date" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Sexo</label>
+                        <select [(ngModel)]="nuevaMascota.sexo" name="sex" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal bg-white">
+                            <option value="Macho">Macho</option>
+                            <option value="Hembra">Hembra</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Peso (kg)</label>
+                        <input [(ngModel)]="nuevaMascota.peso" name="pes" type="number" step="0.1" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal">
+                    </div>
+                </div>
+
+                <!-- Alergias -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Alergias</label>
+                    <textarea [(ngModel)]="nuevaMascota.alergias" name="alergias" rows="2" placeholder="Ninguna..." class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal"></textarea>
+                </div>
+            </form>
+        </div>
+        
+        <div class="flex justify-end p-5 border-t space-x-4 bg-gray-50 rounded-b-2xl">
+            <button (click)="cerrarModalAgregarMascota()" class="bg-white border border-gray-300 px-4 py-2 rounded-lg text-gray-700 font-medium hover:bg-gray-100">Cancelar</button>
+            <button (click)="registrarMascota()" class="bg-secondary-teal text-white px-4 py-2 rounded-lg shadow hover:bg-opacity-90 font-semibold transition">Guardar Mascota</button>
+        </div>
     </div>
 </div>
+
+
 
 <!-- MODAL MIS FACTURAS -->
 <div *ngIf="mostrarModalFacturas" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -240,16 +328,70 @@
     </div>
 </div>
 
-<!-- MODAL PERFIL -->
+
 <div *ngIf="mostrarModalPerfil" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-fade-in-down">
-        <h3 class="text-xl font-bold mb-4">Mi Perfil</h3>
-        <form class="space-y-3" *ngIf="clientePerfil">
-            <input [(ngModel)]="clientePerfil.nombre_completo" name="p_nom" class="w-full border p-2 rounded">
-            <input [(ngModel)]="clientePerfil.telefono" name="p_tel" class="w-full border p-2 rounded">
-            <input [(ngModel)]="clientePerfil.direccion" name="p_dir" class="w-full border p-2 rounded">
-            <button (click)="guardarPerfil()" class="w-full bg-secondary-teal text-white py-2 rounded mt-4">Actualizar Datos</button>
-        </form>
-        <div class="text-right mt-2"><button (click)="cerrarModalPerfil()" class="text-gray-500 text-sm underline">Cerrar</button></div>
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 animate-fade-in-down max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <h3 class="text-xl font-bold text-primary-dark">Mi Perfil</h3>
+            <button (click)="cerrarModalPerfil()" class="text-gray-400 hover:text-gray-600">X</button>
+        </div>
+        
+        <div *ngIf="clientePerfil">
+        
+            <form (submit)="guardarPerfil()" class="space-y-4 mb-8">
+                <h4 class="text-sm font-bold text-gray-500 uppercase border-b pb-1 mb-3">Datos Personales</h4>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Nombre Completo</label>
+                    <input [(ngModel)]="clientePerfil.nombre_completo" name="p_nom" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none transition-shadow">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Correo Electrónico (Login)</label>
+                    <input [(ngModel)]="clientePerfil.email_contacto" name="p_mail" type="email" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none transition-shadow">
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Teléfono</label>
+                        <input [(ngModel)]="clientePerfil.telefono" name="p_tel" type="tel" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none transition-shadow">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Dirección</label>
+                    <textarea [(ngModel)]="clientePerfil.direccion" name="p_dir" rows="2" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none transition-shadow"></textarea>
+                </div>
+                
+                <div class="text-right">
+                    <button type="submit" class="bg-secondary-teal text-white px-6 py-2 rounded-lg shadow hover:bg-opacity-90 font-bold transition">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+
+           
+            <form (submit)="cambiarPassword()" class="space-y-4 pt-4 border-t">
+                <h4 class="text-sm font-bold text-gray-500 uppercase border-b pb-1 mb-3">Seguridad</h4>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Contraseña Actual</label>
+                    <input [(ngModel)]="passwordForm.actual" name="pass_old" type="password" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-red-400 outline-none">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Nueva Contraseña</label>
+                        <input [(ngModel)]="passwordForm.nueva" name="pass_new" type="password" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-red-400 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Confirmar Nueva</label>
+                        <input [(ngModel)]="passwordForm.confirmar" name="pass_conf" type="password" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-red-400 outline-none">
+                    </div>
+                </div>
+                <div class="text-right">
+                    <button type="submit" class="bg-primary-dark text-white px-6 py-2 rounded-lg shadow hover:bg-opacity-90 font-bold transition">
+                        Actualizar Contraseña
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

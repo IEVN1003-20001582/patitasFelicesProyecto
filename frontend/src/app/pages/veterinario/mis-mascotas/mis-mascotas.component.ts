@@ -54,6 +54,8 @@ export class MisMascotasComponent implements OnInit {
 
   tabActiva: string = 'info'; 
   textoBusqueda: string = '';
+
+  filtroEstadoMascota = 'todos';
   
 
   nuevaMascota: Mascota = this.initMascota();
@@ -123,8 +125,10 @@ export class MisMascotasComponent implements OnInit {
         this.vacunasMascota = res.vacunas || (Array.isArray(res) ? res : []);
     });
 
-    this.citasService.getCitas(id).subscribe((res: any) => {
-        this.citasMascota = res.citas || (Array.isArray(res) ? res : []);
+      this.citasService.getCitas({ mascota_id: id }).subscribe((res: any) => {
+        const todasCitas = res.citas || (Array.isArray(res) ? res : []);
+
+        this.citasMascota = todasCitas.filter((c: any) => c.nombre_mascota === this.mascotaSeleccionada.nombre);
     });
   }
 
@@ -201,14 +205,32 @@ export class MisMascotasComponent implements OnInit {
     this.kpis.nuevas = Math.floor(this.mascotas.length * 0.15); 
   }
 
+ 
+  // --- FILTRADO AVANZADO ---
   filtrarMascotas() {
-    if (!this.mascotas) return;
     const texto = this.textoBusqueda.toLowerCase();
-    this.mascotasFiltradas = this.mascotas.filter(m => 
-      m.nombre.toLowerCase().includes(texto) || 
-      (m.nombre_dueno && m.nombre_dueno.toLowerCase().includes(texto)) ||
-      (m.raza && m.raza.toLowerCase().includes(texto))
-    );
+    
+    this.mascotasFiltradas = this.mascotas.filter(m => {
+      // Coincidencia de texto (Nombre, Dueño, Raza)
+      const matchTexto = m.nombre.toLowerCase().includes(texto) || 
+                         (m.nombre_dueno && m.nombre_dueno.toLowerCase().includes(texto)) ||
+                         (m.raza && m.raza.toLowerCase().includes(texto));
+      
+  
+      let matchEstado = true;
+      if (this.filtroEstadoMascota === 'con_alergias') {
+          matchEstado = m.alergias && m.alergias.length > 2 && m.alergias !== 'Ninguna';
+      } else if (this.filtroEstadoMascota === 'sin_alergias') {
+          matchEstado = !m.alergias || m.alergias === 'Ninguna';
+      }
+      
+      return matchTexto && matchEstado;
+    });
+  }
+
+  aplicarFiltros() {
+      this.filtrarMascotas();
+      this.cerrarModalFiltros();
   }
 
   cambiarTab(tab: string) { this.tabActiva = tab; }

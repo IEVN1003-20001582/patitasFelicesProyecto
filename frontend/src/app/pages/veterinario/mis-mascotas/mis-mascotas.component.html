@@ -69,23 +69,24 @@
     </div>
 
 
-    <!-- SECCIÓN 3: Lista de Mascotas -->
+   <!-- SECCIÓN 3: Grid de Mascotas -->
+
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         
         <div *ngFor="let mascota of mascotasFiltradas; let i = index" 
              (click)="abrirModalDetalle(mascota)"
              class="btn-detalle-mascota bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 hover:shadow-xl transition duration-300 cursor-pointer">
             
-        
+         
             <div class="h-40 bg-gray-200 relative flex items-center justify-center overflow-hidden">
-      
+                <!-- 1. Foto Real (Si existe URL) -->
                 <img *ngIf="mascota.foto_url && mascota.foto_url.length > 10" 
                      [src]="mascota.foto_url" 
                      alt="Foto de {{mascota.nombre}}" 
-                     class="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
+                     class="h-full w-full object-cover transition-transform duration-500 hover:scale-110 z-10"
                      onerror="this.style.display='none'">
                 
-        
+          
                   <div class="absolute inset-0 flex items-center justify-center z-0"
                      [ngClass]="{
                         'bg-blue-100 text-blue-400': i % 4 === 0,
@@ -144,19 +145,19 @@
         <div class="p-6 max-h-[70vh] overflow-y-auto">
             <form class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
+                  
                     <div class="md:col-span-1 flex flex-col items-center">
                         <label class="block text-gray-700 mb-2 font-semibold">Foto (URL)</label>
                         
-                  
+                   
                         <div class="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center mb-2 overflow-hidden border-2 border-secondary-teal relative">
-                           
+                         
                             <img *ngIf="nuevaMascota.foto_url" [src]="nuevaMascota.foto_url" class="w-full h-full object-cover" onerror="this.style.display='none'">
-                        
+                         
                             <svg *ngIf="!nuevaMascota.foto_url" xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l-1.586-1.586a2 2 0 00-2.828 0L6 14m6-6l.25-.25a2 2 0 012.828 0l.25.25m-3 3l.25.25a2 2 0 002.828 0l.25-.25m-3-3l.25-.25a2 2 0 012.828 0l.25.25m0 0l-3 3m0 0l-3-3m3 3V3" /></svg>
                         </div>
                     
-                  
+               
                         <input [(ngModel)]="nuevaMascota.foto_url" name="foto" type="text" placeholder="Pega aquí el link..." class="text-xs w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal text-center">
                         <p class="text-xs text-gray-400 mt-1 text-center">Ej: https://imgur.com/perro.jpg</p>
                     </div>
@@ -170,7 +171,7 @@
                             <label class="block text-gray-700 mb-1 font-semibold">Dueño (Cliente)</label>
                             <select [(ngModel)]="nuevaMascota.cliente_id" name="cliente_id" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-teal" required>
                                 <option [value]="0">Seleccionar cliente...</option>
-                                <option *ngFor="let cli of clientes" [value]="cli.id">{{ cli.nombre }}</option>
+                                <option *ngFor="let cli of clientes" [value]="cli.id">{{ cli.nombre_completo }}</option>
                             </select>
                         </div>
                         <div>
@@ -405,6 +406,33 @@
         </div>
     </div>
 </div>
+
+
+
+ <!-- Modal Filtros -->
+    <div *ngIf="mostrarModalFiltros" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg animate-fade-in-down">
+            <div class="flex justify-between items-center p-5 border-b"><h3 class="text-xl font-bold text-primary-dark">Filtros Avanzados</h3><button (click)="cerrarModalFiltros()">X</button></div>
+            <div class="p-6">
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 mb-1 font-semibold">Filtrar por Estado de Salud</label>
+                        
+                        <select [(ngModel)]="filtroEstadoMascota" name="estado_mascota" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-teal outline-none">
+                            <option value="todos">Todas</option>
+                            <option value="con_alergias">Con Alergias</option>
+                            <option value="sin_alergias">Sin Alertas</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="flex justify-end p-5 border-t space-x-4">
+                <button (click)="cerrarModalFiltros()" class="bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50">Cancelar</button>
+               
+                <button (click)="aplicarFiltros()" class="bg-secondary-teal text-white px-4 py-2 rounded-lg shadow hover:bg-opacity-90 transition">Aplicar</button>
+            </div>
+        </div>
+    </div>
 
 
 <!-- MODAL AGREGAR VACUNA -->

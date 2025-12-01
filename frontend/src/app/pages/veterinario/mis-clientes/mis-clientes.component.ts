@@ -26,8 +26,11 @@ export class ClientesVetComponent implements OnInit {
   mostrarModalAgregar = false;
   mostrarModalEditar = false;
   mostrarModalEliminar = false; 
-  mostrarModalFiltros = false;
+
   mostrarModalVistaRapida = false;
+
+  mostrarModalFiltros = false;
+  filtroEstado = 'todos'; 
 
   textoBusqueda = '';
   nuevoCliente: Cliente = this.initCliente();
@@ -69,12 +72,26 @@ export class ClientesVetComponent implements OnInit {
     this.kpis.nuevos = Math.floor(this.clientes.length * 0.1); 
   }
 
+
   filtrarClientes() {
     const texto = this.textoBusqueda.toLowerCase();
-    this.clientesFiltrados = this.clientes.filter(c => 
-      c.nombre.toLowerCase().includes(texto) || 
-      c.email.toLowerCase().includes(texto)
-    );
+    
+    this.clientesFiltrados = this.clientes.filter(c => {
+
+      const matchTexto = c.nombre.toLowerCase().includes(texto) || 
+                         c.email.toLowerCase().includes(texto);
+      
+
+      const matchEstado = this.filtroEstado === 'todos' || c.estado === this.filtroEstado;
+      
+      return matchTexto && matchEstado;
+    });
+  }
+  
+
+  aplicarFiltros() {
+      this.filtrarClientes();
+      this.cerrarModalFiltros();
   }
 
 
@@ -125,6 +142,8 @@ export class ClientesVetComponent implements OnInit {
       }
     });
   }
+
+
 
   abrirVistaRapida(cliente: any) {
     this.clienteSeleccionado = cliente;

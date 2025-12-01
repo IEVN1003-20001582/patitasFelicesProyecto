@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { AuthService, Usuario } from '../../service/auth.service';
 import { NotificacionesService } from '../../service/notificaciones.service';
 import { Notificacion } from '../../interfaces/notificacion.interfaces';
+import { ConfiguracionService } from '../../service/configuracion.service';
+import { Router } from '@angular/router'; 
 
 
 
@@ -20,20 +22,35 @@ export class NavbarComponent implements OnInit, OnDestroy {
   noLeidas = 0;
   mostrarDropdown = false;
   
+  nombreClinica = '';
+
+
   private intervalo: any;
 
   constructor(
     private authService: AuthService,
-    private notifService: NotificacionesService
+    private notifService: NotificacionesService,
+    private configService: ConfiguracionService
+    , private router: Router
   ) {}
 
   ngOnInit() {
+
+    this.configService.infoClinica$.subscribe(info => {
+      this.nombreClinica = info.nombre;
+      });
+      
     this.authService.currentUser$.subscribe(user => {
       this.usuario = user;
       if (user) {
         this.cargarNotificaciones();
+         this.intervalo = setInterval(() => {
+        this.cargarNotificaciones();
+      }, 60000); 
       }
     });
+
+    
   }
 
   ngOnDestroy() {
@@ -64,15 +81,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   marcarComoLeida(notif: Notificacion) {
-    if (notif.leido) return;
-    
-    this.notifService.marcarLeida(notif.id).subscribe(res => {
-        if (res.exito) {
-            notif.leido = 1;
-            this.noLeidas--;
-        }
-    });
+  if (!notif.leido) {
+    this.notifService.marcarLeida(notif.id).subscribe();
   }
+
+  this.mostrarDropdown = false;
+
+
+}
+
 
   getIconColor(tipo: string): string {
     switch(tipo) {
